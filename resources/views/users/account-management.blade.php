@@ -74,7 +74,7 @@
                         </div>
                     </div>
                     <!-- Form Pencarian -->
-                    <form action="{{ route('account.management') }}" method="GET" class="relative">
+                    <form action="{{ route('account.management') }}" method="GET" class="relative"> 
                         <input type="search" name="search" id="search"
                             class="block w-full px-10 py-3 rounded-lg border border-gray-200 placeholder:font-bold"
                             value="{{ request('search') }}" placeholder="Search" />

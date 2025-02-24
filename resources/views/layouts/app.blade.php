@@ -75,7 +75,7 @@
         $(document).ready(function() {
           updateActiveSidebar();
       
-          $(".ajax-link").on("click", function(e) {
+          $(document).on("click", ".ajax-link", function(e) {
             e.preventDefault();
             const url = $(this).data("url");
             window.history.pushState(null, "", url);
@@ -106,6 +106,7 @@
             });
           };
         });
+        
       </script>
       
       

@@ -2,7 +2,7 @@
     <div class="p-10 flex flex-col gap-6">
         {{-- ROW 1 --}}
         <div class="grid grid-cols-4 gap-6 w-full">
-            <a href="{{ route('obats.index') }}" class="col-span-1">
+            <a href="#" data-url="{{ route('obats.index') }}" class="ajax-link col-span-1">
                 <div
                     class="bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 duration-100 transition-all">
                     <div class="pr-4 border-r-2">
@@ -22,7 +22,7 @@
         <hr>
         {{-- ROW 2 --}}
         <div class="grid grid-cols-4 gap-6 w-full">
-            <a href="{{ route('pembelian_obats.index') }}" class="bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] col-start-1 hover:bg-gray-50 transition-all duration-100">
+            <a href="#" data-url="{{ route('pembelian_obats.index') }}" class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] col-start-1 hover:bg-gray-50 transition-all duration-100">
                 <div class="pr-4 border-r-2">
                     <svg class="w-16 h-16 text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -34,7 +34,7 @@
                 </div>
                 <p class="text-[2.2rem] py-2 px-4 leading-tight">Pembelian</p>
             </a>
-            <a href="{{ route('penjualan_obats.index') }}" class="bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
+            <a href="#" data-url="{{ route('penjualan_obats.index') }}" class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
                 <div class="pr-4 border-r-2">
                     <svg class="w-16 h-16 text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -46,7 +46,7 @@
                 </div>
                 <p class="text-[2.2rem] py-2 px-4 leading-tight">Penjualan</p>
             </a>
-            <a href="{{ route('suppliers.index') }}" class="bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
+            <a href="#" data-url="{{ route('suppliers.index') }}" class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
                 <div class="pr-4 border-r-2">
                     <svg class="w-16 h-16 text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -61,8 +61,8 @@
         <hr>
         {{-- ROW 3 --}}
         <div class="grid grid-cols-4 gap-6 w-full">
-            <a href="{{ route('satuan_obats.index') }}"
-                class="bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
+            <a href="#" data-url="{{ route('satuan_obats.index') }}"
+                class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
                 <div class="pr-4 border-r-2">
                     <svg class="w-16 h-16 text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -73,8 +73,8 @@
                 </div>
                 <p class="text-[2.2rem] py-2 px-4 leading-tight">Satuan Obat</p>
             </a>
-            <a href="{{ route('kategori_obats.index') }}"
-                class="bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
+            <a href="#" data-url="{{ route('kategori_obats.index') }}"
+                class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
                 <div class="pr-4 border-r-2">
                     <svg class="w-16 h-16 text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
