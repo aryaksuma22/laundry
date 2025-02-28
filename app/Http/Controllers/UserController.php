@@ -9,158 +9,166 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * -------------------------------------------------------------------------
+     * Fitur: Menampilkan Daftar Pengguna (Index)
+     * -------------------------------------------------------------------------
+     * Menampilkan daftar pengguna dengan dukungan fitur pencarian, 
+     * pengurutan (sorting), dan pagination. 
+     * Jika request merupakan AJAX (dari pagination, search, atau sort),
+     * maka akan mengembalikan partial view untuk update konten tabel.
      */
     public function index(Request $request)
     {
-        // Ambil query parameter untuk sorting
-        $sortBy = $request->get('sortBy', 'id'); // Default sort by ID
-        $sortOrder = $request->get('sortOrder', 'asc'); // Default ascending order
-    
-        // Validasi parameter sortOrder untuk memastikan hanya 'asc' atau 'desc' yang diterima
+        // Ambil parameter untuk sorting dengan default
+        $sortBy    = $request->get('sortBy', 'id');
+        $sortOrder = $request->get('sortOrder', 'asc');
+
+        // Validasi sortOrder (hanya 'asc' atau 'desc' yang diperbolehkan)
         if (!in_array($sortOrder, ['asc', 'desc'])) {
-            $sortOrder = 'asc'; // Set ke ascending jika tidak valid
+            $sortOrder = 'asc';
         }
-    
-        // Validasi bahwa sortBy adalah salah satu kolom yang valid (id, name, role)
+
+        // Validasi kolom yang boleh digunakan untuk sorting
         $validColumns = ['id', 'name', 'role'];
         if (!in_array($sortBy, $validColumns)) {
-            $sortBy = 'id'; // Set ke default sort by ID jika kolom tidak valid
+            $sortBy = 'id';
         }
-    
-        // Ambil nilai perPage dari request, dengan default 10
-        $perPage = $request->get('perPage', 10); 
-    
-        // Ambil nilai search dari request untuk pencarian
-        $search = $request->get('search', '');
-    
-        // Cek apakah pencarian kosong, jika iya ambil semua data tanpa filter
-        if ($search) {
-            // Ambil data pengguna yang terfilter berdasarkan pencarian
-            $users = User::where('name', 'like', "%$search%")
-                        ->orWhere('email', 'like', "%$search%")
-                        ->orderBy($sortBy, $sortOrder)
-                        ->paginate($perPage); 
-        } else {
-            // Ambil data pengguna tanpa filter pencarian
-            $users = User::orderBy($sortBy, $sortOrder)
-                        ->paginate($perPage);
+
+        // Ambil parameter untuk pagination dan pencarian
+        $perPage = $request->get('perPage', 10);
+        $search  = $request->get('search', '');
+
+        // Buat query dasar
+        $query = User::query();
+
+        // Fitur Pencarian: Cari berdasarkan nama atau email
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
         }
-    
-        // Kirim data ke view
-        return view('users.account-management', compact('users', 'search'));
+
+        // Terapkan sorting dan pagination
+        $users = $query->orderBy($sortBy, $sortOrder)->paginate($perPage);
+
+        // Jika request AJAX (misalnya pagination, search, atau sort), kembalikan partial view
+        if ($request->ajax() && ($request->has('page') || $request->has('search') || $request->has('sortBy') || $request->has('sortOrder') || $request->has('perPage'))) {
+            $html = view('users.partials.user-table', compact('users'))->render();
+            return response()->json(['html' => $html]);
+        }
+
+        // Untuk navigasi full view (misalnya dari sidebar), kembalikan view lengkap
+        return view('users.account-management', compact('users'));
     }
-    
-    
-    
-    
-    
 
     /**
-     * Show the form for creating a new resource.
+     * -------------------------------------------------------------------------
+     * Fitur: Menampilkan Form Pembuatan Pengguna Baru
+     * -------------------------------------------------------------------------
      */
     public function create()
     {
         return view('users.create');
     }
 
-
     /**
-     * Store a newly created resource in storage.
+     * -------------------------------------------------------------------------
+     * Fitur: Menyimpan Pengguna Baru ke Database
+     * -------------------------------------------------------------------------
      */
     public function store(Request $request)
     {
         // Validasi input dari form
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email|max:255',
-            'password' => 'required|string|min:8|confirmed', // Password minimal 8 karakter dan konfirmasi password
-            'role' => 'nullable|string|max:255',
-            'telepon' => 'nullable|string|max:255',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email|max:255',
+            'password' => 'required|string|min:8|confirmed',
+            'role'     => 'nullable|string|max:255',
+            'telepon'  => 'nullable|string|max:255',
         ]);
 
-        // Membuat user baru dengan data yang diterima
+        // Membuat instance User baru dan mengisi data
         $user = new User;
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-        $user->role = $request->input('role');
-        $user->telepon = $request->input('telepon');
-
+        $user->name     = $request->input('name');
+        $user->email    = $request->input('email');
+        $user->role     = $request->input('role');
+        $user->telepon  = $request->input('telepon');
         // Hash password sebelum disimpan ke database
         $user->password = Hash::make($request->input('password'));
 
-        // Simpan ke database
+        // Simpan data ke database
         $user->save();
 
-        // Redirect ke halaman daftar pengguna atau halaman lain
+        // Redirect dengan pesan sukses
         return redirect()->route('account.management')->with('success', 'Akun berhasil ditambahkan');
     }
 
     /**
-     * Display the specified resource.
+     * -------------------------------------------------------------------------
+     * Fitur: Menampilkan Detail Pengguna (Optional)
+     * -------------------------------------------------------------------------
      */
     public function show(string $id)
     {
-        //
+        // Belum diimplementasikan, bisa digunakan untuk menampilkan detail user
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * -------------------------------------------------------------------------
+     * Fitur: Menampilkan Form Edit Pengguna
+     * -------------------------------------------------------------------------
      */
     public function edit($id)
     {
         // Ambil data pengguna berdasarkan ID
         $user = User::findOrFail($id);
-
-        // Kembalikan view dengan data pengguna yang akan diedit
         return view('users.edit', compact('user'));
     }
 
-
     /**
-     * Update the specified resource in storage.
+     * -------------------------------------------------------------------------
+     * Fitur: Mengupdate Data Pengguna di Database
+     * -------------------------------------------------------------------------
      */
     public function update(Request $request, $id)
     {
-        // Validasi input
+        // Validasi input yang diterima dari form
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'role' => 'nullable|string|max:255',
+            'name'    => 'required|string|max:255',
+            'email'   => 'required|email|max:255',
+            'role'    => 'nullable|string|max:255',
             'telepon' => 'nullable|string|max:255',
         ]);
 
-        // Cari pengguna berdasarkan ID
+        // Cari user berdasarkan ID dan update datanya
         $user = User::findOrFail($id);
-
-        // Update data pengguna
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-        $user->role = $request->input('role');
+        $user->name    = $request->input('name');
+        $user->email   = $request->input('email');
+        $user->role    = $request->input('role');
         $user->telepon = $request->input('telepon');
-
-        // Simpan perubahan
         $user->save();
 
-        // Redirect ke halaman daftar pengguna atau halaman lain yang diinginkan
+        // Redirect ke daftar pengguna dengan pesan sukses
         return redirect()->route('users.index')->with('success', 'User updated successfully');
     }
 
-
     /**
-     * Remove the specified resource from storage.
+     * -------------------------------------------------------------------------
+     * Fitur: Menghapus Pengguna (Mass Delete)
+     * -------------------------------------------------------------------------
      */
     public function destroy(Request $request)
     {
-        // Ambil ID pengguna yang dipilih
+        // Ambil array ID pengguna yang dipilih
         $userIds = $request->input('users');
 
-        // Pastikan ada ID yang dipilih
+        // Jika ada ID yang dipilih, hapus semua pengguna tersebut
         if ($userIds && is_array($userIds)) {
-            // Hapus semua pengguna yang dipilih
             User::whereIn('id', $userIds)->delete();
         }
 
+        // Redirect kembali ke halaman account management dengan pesan sukses
         return redirect()->route('account.management')->with('success', 'Users deleted successfully.');
     }
 }

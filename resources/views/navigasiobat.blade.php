@@ -22,7 +22,8 @@
         <hr>
         {{-- ROW 2 --}}
         <div class="grid grid-cols-4 gap-6 w-full">
-            <a href="#" data-url="{{ route('pembelian_obats.index') }}" class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] col-start-1 hover:bg-gray-50 transition-all duration-100">
+            <a href="#" data-url="{{ route('pembelian_obats.index') }}"
+                class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] col-start-1 hover:bg-gray-50 transition-all duration-100">
                 <div class="pr-4 border-r-2">
                     <svg class="w-16 h-16 text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -34,7 +35,8 @@
                 </div>
                 <p class="text-[2.2rem] py-2 px-4 leading-tight">Pembelian</p>
             </a>
-            <a href="#" data-url="{{ route('penjualan_obats.index') }}" class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
+            <a href="#" data-url="{{ route('penjualan_obats.index') }}"
+                class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
                 <div class="pr-4 border-r-2">
                     <svg class="w-16 h-16 text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -46,7 +48,8 @@
                 </div>
                 <p class="text-[2.2rem] py-2 px-4 leading-tight">Penjualan</p>
             </a>
-            <a href="#" data-url="{{ route('suppliers.index') }}" class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
+            <a href="#" data-url="{{ route('suppliers.index') }}"
+                class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
                 <div class="pr-4 border-r-2">
                     <svg class="w-16 h-16 text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -88,3 +91,7 @@
         </div>
     </div>
 </x-app-layout>
+
+@push('scripts')
+    @vite(['resources/js/sidebar.js'])
+@endpush

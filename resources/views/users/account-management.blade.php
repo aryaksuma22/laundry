@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="p-4">
+    <main id="main-content" class="p-4">
         <div class="w-full p-10 mx-auto">
             <div class="text-gray-900 text-4xl font-semibold mb-5">
                 {{ __('Account Management Menu') }}
@@ -19,7 +19,7 @@
                             xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                             viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2M12 4v12m0-12 4 4m-4-4L8 8" />
+                                d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2M12 4v12m0-12l4 4m-4-4L8 8" />
                         </svg>
                         <p class="font-semibold">Export</p>
                     </div>
@@ -45,7 +45,7 @@
                             <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="M8 20V10m0 10-3-3m3 3 3-3m5-13v10m0-10 3 3m-3-3-3 3" />
+                                    stroke-width="2" d="M8 20V10m0 10l-3-3m3 3l3-3m5-13v10m0-10l3 3m-3-3l-3 3" />
                             </svg>
                         </div>
                         <!-- Icon Sort By -->
@@ -61,23 +61,17 @@
                             <div class="grid-cols-1 divide-y divide-gray-200 absolute w-[10rem] bg-white shadow-sm rounded-xl border top-[3.4rem] right-[0.1px] hidden"
                                 id="sortByPopup">
                                 <!-- Pilih opsi Sort By -->
-                                <div class="py-2 px-4 cursor-pointer sort-option" data-sortby="id">
-                                    ID
-                                </div>
-                                <div class="py-2 px-4 cursor-pointer sort-option" data-sortby="name">
-                                    Name
-                                </div>
-                                <div class="py-2 px-4 cursor-pointer sort-option" data-sortby="role">
-                                    Role
-                                </div>
+                                <div class="py-2 px-4 cursor-pointer sort-option" data-sortby="id">ID</div>
+                                <div class="py-2 px-4 cursor-pointer sort-option" data-sortby="name">Name</div>
+                                <div class="py-2 px-4 cursor-pointer sort-option" data-sortby="role">Role</div>
                             </div>
                         </div>
                     </div>
                     <!-- Form Pencarian -->
-                    <form action="{{ route('account.management') }}" method="GET" class="relative"> 
+                    <form action="{{ route('account.management') }}" method="GET" class="relative" id="searchForm">
                         <input type="search" name="search" id="search"
                             class="block w-full px-10 py-3 rounded-lg border border-gray-200 placeholder:font-bold"
-                            value="{{ request('search') }}" placeholder="Search" />
+                            value="{{ $search }}" placeholder="Search" />
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                             <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -103,9 +97,7 @@
                     <div class="flex items-center border rounded-lg bg-white px-6 py-1">
                         <form action="{{ route('account.management') }}" method="GET" id="perPageForm">
                             <label for="perPage" class="mr-2 text-sm">Show</label>
-                            <select name="perPage" id="perPage"
-                                onchange="document.getElementById('perPageForm').submit()"
-                                class="border border-gray-200 rounded">
+                            <select name="perPage" id="perPage" class="border border-gray-200 rounded">
                                 <option value="5" {{ request('perPage') == 5 ? 'selected' : '' }}>5</option>
                                 <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
                                 <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
@@ -118,173 +110,10 @@
                 </div>
             </div>
 
-            <!-- Table -->
-            <form id="deleteForm" action="{{ route('users.destroy', ['user' => 0]) }}" method="POST">
-                @csrf
-                @method('DELETE')
-                <table class="min-w-full bg-white border rounded-xl shadow-sm mb-5">
-                    <thead>
-                        <tr>
-                            <th class="px-4 py-2 text-left">
-                                <input type="checkbox" class="form-checkbox rounded-[4px]" id="checkbox-all" />
-                            </th>
-                            <th class="px-4 py-2 text-left">ID</th>
-                            <th class="px-4 py-2 text-left">Name</th>
-                            <th class="px-4 py-2 text-left">Email</th>
-                            <th class="px-4 py-2 text-left">Role</th>
-                            <th class="px-4 py-2 text-left">Telepon</th>
-                            <th class="px-4 py-2 text-left">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($users as $user)
-                            <tr class="border">
-                                <td class="px-4 py-3">
-                                    <input type="checkbox" name="users[]" value="{{ $user->id }}"
-                                        class="form-checkbox rounded-[5px] checkbox-row" />
-                                </td>
-                                <td class="px-4 py-3">{{ $user->id }}</td>
-                                <td class="px-4 py-3">{{ $user->name }}</td>
-                                <td class="px-4 py-3">{{ $user->email }}</td>
-                                <td class="px-4 py-3">{{ $user->role }}</td>
-                                <td class="px-4 py-3">{{ $user->telepon }}</td>
-                                <td class="px-4 py-3">
-                                    <a href="{{ route('users.edit', $user->id) }}">
-                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            fill="currentColor" viewBox="0 0 24 24">
-                                            <path fill-rule="evenodd"
-                                                d="M11.32 6.176H5c-1.105 0-2 .949-2 2.118v10.588C3 20.052 3.895 21 5 21h11c1.105 0 2-.948 2-2.118v-7.75l-3.914 4.144A2.46 2.46 0 0 1 12.81 16l-2.681.568c-1.75.37-3.292-1.263-2.942-3.115l.536-2.839c.097-.512.335-.983.684-1.352l2.914-3.086Z"
-                                                clip-rule="evenodd" />
-                                            <path fill-rule="evenodd"
-                                                d="M19.846 4.318a2.148 2.148 0 0 0-.437-.692 2.014 2.014 0 0 0-.654-.463 1.92 1.92 0 0 0-1.544 0 2.014 2.014 0 0 0-.654.463l-.546.578 2.852 3.02.546-.579a2.14 2.14 0 0 0 .437-.692 2.244 2.244 0 0 0 0-1.635ZM17.45 8.721 14.597 5.7 9.82 10.76a.54.54 0 0 0-.137.27l-.536 2.84c-.07.37.239.696.588.622l2.682-.567a.492.492 0 0 0 .255-.145l4.778-5.06Z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                    </a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-
-                <!-- Pagination links -->
-                <div class="mt-4">
-                    {{ $users->appends(['search' => request('search'), 'perPage' => request('perPage')])->links() }}
-                </div>
-
-            </form>
+            <!-- Container Tabel (akan diperbarui via AJAX) -->
+            <div id="userTableContainer">
+                @include('users.partials.user-table')
+            </div>
         </div>
-    </div>
-
-    <script>
-        // Checkbox header: cek/uncek semua
-        $('#checkbox-all').on('change', function() {
-            $('.checkbox-row').prop('checked', $(this).prop('checked'));
-        });
-
-        // Update checkbox header jika semua checkbox tercentang
-        $('.checkbox-row').on('change', function() {
-            $('#checkbox-all').prop('checked', $('.checkbox-row').length === $('.checkbox-row:checked').length);
-        });
-
-        $(document).ready(function() {
-            // Default sortOrder
-            var sortOrder = 'asc';
-
-            var urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('sortOrder')) {
-                sortOrder = urlParams.get('sortOrder');
-            }
-
-            // Tombol toggle untuk Ascending/Descending
-            $('#toggleSortOrder').on('click', function() {
-                sortOrder = (sortOrder === 'asc') ? 'desc' :
-                    'asc'; // Toggle antara ascending dan descending
-                $(this).toggleClass('bg-gray-200');
-
-                // Update URL dengan parameter sortOrder
-                updateUrl(null, sortOrder);
-            });
-
-            // Mengatur pilihan sortBy berdasarkan klik pada item
-            $('.sort-option').on('click', function() {
-                var sortBy = $(this).data('sortby');
-                updateUrl(sortBy, sortOrder);
-            });
-
-            // Toggling visibility dari pop-up ketika tombol Sort By diklik
-            $('#sortByButton').on('click', function(event) {
-                event
-                    .stopPropagation();
-                $('#sortByPopup').stop(true, true).fadeToggle(200);
-            });
-
-            // Menutup pop-up jika pengguna mengklik di luar pop-up atau tombol dengan animasi
-            $(document).on('click', function(event) {
-                if (!$(event.target).closest('#sortByButton').length && !$(event.target).closest(
-                        '#sortByPopup').length) {
-                    $('#sortByPopup').fadeOut(200);
-                }
-            });
-
-            // Fungsi untuk memperbarui query string dengan parameter baru
-            function updateUrl(sortBy = null, sortOrder = null) {
-                var currentUrl = window.location.href;
-
-                // Memperbarui query parameter sortBy jika diberikan
-                if (sortBy) {
-                    currentUrl = updateQueryStringParameter(currentUrl, 'sortBy', sortBy);
-                }
-
-                // Memperbarui query parameter sortOrder jika diberikan
-                if (sortOrder) {
-                    currentUrl = updateQueryStringParameter(currentUrl, 'sortOrder', sortOrder);
-                }
-
-                window.location.href = currentUrl;
-            }
-
-            // Fungsi untuk memperbarui query string dengan parameter baru
-            function updateQueryStringParameter(url, param, value) {
-                var newUrl;
-                if (url.indexOf(param) === -1) {
-                    newUrl = url + (url.indexOf('?') === -1 ? '?' : '&') + param + '=' + value;
-                } else {
-                    var regex = new RegExp('([?&])' + param + '=.*?(&|$)', 'i');
-                    newUrl = url.replace(regex, '$1' + param + '=' + value + '$2');
-                }
-                return newUrl;
-            }
-        });
-
-        $(document).ready(function() {
-            // Menangani perubahan entri per halaman
-            $('#perPage').on('change', function() {
-                var perPage = $(this).val();
-
-
-                var currentUrl = window.location.href;
-
-
-                currentUrl = updateQueryStringParameter(currentUrl, 'perPage', perPage);
-
-
-                window.location.href = currentUrl;
-            });
-
-            // Fungsi untuk memperbarui query string dengan parameter baru
-            function updateQueryStringParameter(url, param, value) {
-                var newUrl;
-                if (url.indexOf(param) === -1) {
-
-                    newUrl = url + (url.indexOf('?') === -1 ? '?' : '&') + param + '=' + value;
-                } else {
-
-                    var regex = new RegExp('([?&])' + param + '=.*?(&|$)', 'i');
-                    newUrl = url.replace(regex, '$1' + param + '=' + value + '$2');
-                }
-                return newUrl;
-            }
-        });
-    </script>
+    </main>
 </x-app-layout>

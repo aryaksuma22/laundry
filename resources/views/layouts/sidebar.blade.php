@@ -23,42 +23,51 @@
 
         {{-- Database Obat Link --}}
         <a href="#" data-url="{{ route('navigasiobat') }}"
-            class="ajax-link group rounded-xl flex flex-row gap-4 p-4">
-            <svg class="w-6 h-6 group-hover:transition-all group-hover:duration-150' }}" aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+            class="dropdown-parent group rounded-xl flex flex-row gap-4 p-4 items-center
+          {{ request()->routeIs('navigasiobat') ? 'bg-[#4268F6] text-white' : 'text-gray-800 hover:text-[#4268F6]' }}">
+            <svg class="w-6 h-6 group-hover:transition-all group-hover:duration-200
+         {{ request()->routeIs('navigasiobat') ? 'text-white' : 'text-gray-800 group-hover:text-[#4268F6]' }}"
+                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                 viewBox="0 0 24 24">
+                <!-- Path SVG -->
                 <path fill-rule="evenodd"
-                    d="M5.617 2.076a1 1 0 0 1 1.09.217L8 3.586l1.293-1.293a1 1 0 0 1 1.414 0L12 3.586l1.293-1.293a1 1 0 0 1 1.414 0L16 3.586l1.293-1.293A1 1 0 0 1 19 3v18a1 1 0 0 1-1.707.707L16 20.414l-1.293 1.293a1 1 0 0 1-1.414 0L12 20.414l-1.293 1.293a1 1 0 0 1-1.414 0L8 20.414l-1.293 1.293A1 1 0 0 1 5 21V3a1 1 0 0 1 .617-.924ZM9 7a1 1 0 0 0 0 2h6a1 1 0 1 0 0-2H9Zm0 4a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2H9Zm0 4a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2H9Z"
+                    d="M5.617 2.076a1 1 0 0 1 1.09.217L8 3.586l1.293-1.293a1 1 0 0 1 1.414 0L12 3.586l1.293-1.293a1 1 0 0 1 1.414 0L16 3.586l1.293-1.293A1 1 0 0 1 19 3v18a1 1 0 0 1-1.707.707L16 20.414l-1.293 1.293a1 1 0 0 1-1.414 0L12 20.414l-1.293 1.293a1 1 0 0 1-1.414 0L8 20.414l-1.293 1.293A1 1 0 0 1 5 21V3a1 1 0 0 1 .617-.924Z"
                     clip-rule="evenodd" />
             </svg>
             <p
-                class="group-hover:transition-all group-hover:duration-150 {{ request()->routeIs('navigasiobat') ? 'font-semibold' : 'font-semibold group-hover:text-[#4268F6]' }}">
-                Database Obat</p>
+                class="group-hover:transition-all group-hover:duration-200
+          {{ request()->routeIs('navigasiobat') ? 'font-semibold' : 'font-semibold group-hover:text-[#4268F6]' }}">
+                Database Obat
+            </p>
+            <!-- Ikon panah untuk toggle dropdown -->
+            <svg class="w-4 h-4 ml-auto arrow-icon transition-transform duration-200
+         {{ request()->routeIs('navigasiobat') ? 'text-white rotate-90' : 'text-gray-800' }}"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
         </a>
 
-        {{-- Dropdown Database Obat --}}
-        <div class="flex flex-col">
-            <a href="#" data-url="{{ route('obats.index') }}" class="ajax-link rounded-xl">
+        {{-- Dropdown Menu (hidden secara default) --}}
+        <div class="dropdown-menu hidden flex-col">
+            <a href="#" data-url="{{ route('obats.index') }}" class="ajax-link block rounded-xl">
                 <p class="font-semibold py-2 px-8">Obat</p>
             </a>
-            <a href="#" data-url="{{ route('pembelian_obats.index') }}" class="ajax-link rounded-xl">
+            <a href="#" data-url="{{ route('pembelian_obats.index') }}" class="ajax-link block rounded-xl">
                 <p class="font-semibold py-2 px-8">Pembelian</p>
             </a>
-            <a href="#" data-url="{{ route('penjualan_obats.index') }}" class="ajax-link rounded-xl">
+            <a href="#" data-url="{{ route('penjualan_obats.index') }}" class="ajax-link block rounded-xl">
                 <p class="font-semibold py-2 px-8">Penjualan</p>
             </a>
-            <a href="#" data-url="{{ route('suppliers.index') }}" class="ajax-link rounded-xl">
+            <a href="#" data-url="{{ route('suppliers.index') }}" class="ajax-link block rounded-xl">
                 <p class="font-semibold py-2 px-8">Supplier</p>
             </a>
-            <a href="#" data-url="{{ route('satuan_obats.index') }}" class="ajax-link rounded-xl">
+            <a href="#" data-url="{{ route('satuan_obats.index') }}" class="ajax-link block rounded-xl">
                 <p class="font-semibold py-2 px-8">Satuan Obat</p>
             </a>
-            <a href="#" data-url="{{ route('kategori_obats.index') }}" class="ajax-link rounded-xl">
+            <a href="#" data-url="{{ route('kategori_obats.index') }}" class="ajax-link block rounded-xl">
                 <p class="font-semibold py-2 px-8">Kategori Obat</p>
             </a>
         </div>
-
-
 
 
         <!-- Account Management Link -->
@@ -93,3 +102,7 @@
     </div>
 
 </div>
+
+@push('scripts')
+    @vite(['resources/js/sidebar.js'])
+@endpush

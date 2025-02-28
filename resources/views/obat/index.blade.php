@@ -63,10 +63,10 @@
                         </button>
                     </div>
                     {{-- SEARCH BAR --}}
-                    <form action="{{ route('obats.index') }}" method="GET" class="relative">
+                    <form action="{{ route('obats.index') }}" method="GET" class="relative" id="searchForm">
                         <input type="search" name="search" id="search"
                                class="block w-full px-10 py-3 rounded-lg border border-gray-200 placeholder:font-bold"
-                               value="{{ $search }}" placeholder="Search" />
+                               value="{{ request('search') }}" placeholder="Search" />
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                             <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
                                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">

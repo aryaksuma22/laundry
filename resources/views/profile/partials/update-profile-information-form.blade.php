@@ -56,13 +56,6 @@
             <x-input-error class="mt-2" :messages="$errors->get('role')" />
         </div>
 
-        <!-- Alamat -->
-        <div>
-            <x-input-label for="alamat" :value="__('Alamat')" />
-            <x-text-input id="alamat" name="alamat" type="text" class="mt-1 block w-full" :value="old('alamat', $user->alamat)" required autocomplete="alamat" />
-            <x-input-error class="mt-2" :messages="$errors->get('alamat')" />
-        </div>
-
         <!-- Telepon -->
         <div>
             <x-input-label for="telepon" :value="__('Telepon')" />

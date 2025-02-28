@@ -17,7 +17,9 @@
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/autonumeric@4.6.0/dist/autoNumeric.min.js"></script>
-
+    <!-- Link ke jQuery UI -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -43,75 +45,9 @@
         </div>
     </div>
 
-    <script>
-        function updateActiveSidebar() {
-          const currentUrl = window.location.href;
-          $(".ajax-link").each(function() {
-            const linkUrl = $(this).data("url");
-            if (currentUrl.indexOf(linkUrl) !== -1) {
-              // Link aktif: hapus kelas hover dan tetapkan styling aktif
-              $(this)
-                .removeClass("text-gray-800 hover:text-[#4268F6]")
-                .addClass("bg-[#4268F6] text-white");
-              $(this).find("svg")
-                .removeClass("text-gray-800 group-hover:text-[#4268F6]")
-                .addClass("text-white");
-              $(this).find("p")
-                .removeClass("group-hover:text-[#4268F6]");
-            } else {
-              // Link non-aktif: terapkan kembali kelas default
-              $(this)
-                .removeClass("bg-[#4268F6] text-white")
-                .addClass("text-gray-800 hover:text-[#4268F6]");
-              $(this).find("svg")
-                .removeClass("text-white")
-                .addClass("text-gray-800 group-hover:text-[#4268F6]");
-              $(this).find("p")
-                .addClass("group-hover:text-[#4268F6]");
-            }
-          });
-        }
-      
-        $(document).ready(function() {
-          updateActiveSidebar();
-      
-          $(document).on("click", ".ajax-link", function(e) {
-            e.preventDefault();
-            const url = $(this).data("url");
-            window.history.pushState(null, "", url);
-            updateActiveSidebar();
-            $("#main-content").html("<p class='text-center py-10'>Loading...</p>");
-            $.ajax({
-              url: url,
-              type: "GET",
-              success: function(response) {
-                $("#main-content").html($(response).find("#main-content").html());
-              },
-              error: function() {
-                $("#main-content").html("<p class='text-center py-10 text-red-500'>Failed to load content.</p>");
-              }
-            });
-          });
-      
-          window.onpopstate = function() {
-            const url = window.location.href;
-            updateActiveSidebar();
-            $("#main-content").html("<p class='text-center py-10'>Loading...</p>");
-            $.ajax({
-              url: url,
-              type: "GET",
-              success: function(response) {
-                $("#main-content").html($(response).find("#main-content").html());
-              }
-            });
-          };
-        });
-        
-      </script>
-      
-      
-
-
+    <!-- Stack untuk script khusus -->
+    @stack('scripts')
+    @vite(['resources/js/app.js', 'resources/js/account-management.js'])
 </body>
 
 </html>
