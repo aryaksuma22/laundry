@@ -40,16 +40,16 @@
                 <div class="flex flex-row space-x-4 items-center">
                     <div class="flex flex-row gap-2">
                         {{-- Icon Sort Ascending - Descending --}}
-                        <div class="bg-white flex justify-center items-center px-3 py-2 rounded-lg border hover:bg-gray-50 cursor-pointer"
+                        <button class="bg-white flex justify-center items-center px-3 py-2 rounded-lg border hover:bg-gray-50 cursor-pointer"
                             id="toggleSortOrder">
                             <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2" d="M8 20V10m0 10l-3-3m3 3l3-3m5-13v10m0-10l3 3m-3-3l-3 3" />
                             </svg>
-                        </div>
+                        </button>
                         <!-- Icon Sort By -->
-                        <div class="flex flex-row gap-2 px-4 py-3 bg-white border rounded-lg justify-center items-center relative cursor-pointer hover:bg-gray-50 transition-all duration-200"
+                        <button class="flex flex-row gap-2 px-4 py-3 bg-white border rounded-lg justify-center items-center relative cursor-pointer hover:bg-gray-50"
                             id="sortByButton">
                             <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -58,20 +58,19 @@
                             </svg>
                             <p class="font-semibold text-black">Sort By</p>
                             <!-- Pop Up Sort by -->
-                            <div class="grid-cols-1 divide-y divide-gray-200 absolute w-[10rem] bg-white shadow-sm rounded-xl border top-[3.4rem] right-[0.1px] hidden"
+                            <div class="grid-cols-1 divide-y divide-gray-200 absolute w-[7.5rem] bg-white shadow-sm rounded-lg border top-[3.4rem] right-[0.1px] hidden overflow-hidden"
                                 id="sortByPopup">
-                                <!-- Pilih opsi Sort By -->
-                                <div class="py-2 px-4 cursor-pointer sort-option" data-sortby="id">ID</div>
-                                <div class="py-2 px-4 cursor-pointer sort-option" data-sortby="name">Name</div>
-                                <div class="py-2 px-4 cursor-pointer sort-option" data-sortby="role">Role</div>
+                                <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="id">ID</div>
+                                <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="name">Name</div>
+                                <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="role">Role</div>
                             </div>
-                        </div>
+                        </button>
                     </div>
                     <!-- Form Pencarian -->
                     <form action="{{ route('account.management') }}" method="GET" class="relative" id="searchForm">
                         <input type="search" name="search" id="search"
                             class="block w-full px-10 py-3 rounded-lg border border-gray-200 placeholder:font-bold"
-                            value="{{ $search }}" placeholder="Search" />
+                            value="{{ request('search') }}" placeholder="Search" />
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                             <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">

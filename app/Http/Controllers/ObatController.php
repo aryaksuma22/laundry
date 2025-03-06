@@ -11,15 +11,12 @@ class ObatController extends Controller
 {
     public function index(Request $request)
     {
-        // Ambil nilai pencarian dari request
-        $search = $request->get('search', '');
 
         // Ambil parameter sorting dari request, default sort by "nama_obat" ascending
-        $sortBy = $request->get('sortBy', 'nama_obat');
         $sortOrder = $request->get('sortOrder', 'asc');
+        $sortBy = $request->get('sortBy', 'nama_obat');
 
-        // Ambil parameter perPage dari request, default 10
-        $perPage = $request->get('perPage', 10);
+
 
         // Daftar kolom yang diizinkan untuk sorting
         $allowedSort = ['kode_obat', 'nama_obat', 'stok', 'harga_beli', 'harga_jual', 'tanggal_kadaluarsa'];
@@ -27,26 +24,63 @@ class ObatController extends Controller
             $sortBy = 'nama_obat';
         }
 
-        // Mulai query dengan relasi kategori dan satuan
-        $obats = Obat::with(['kategori', 'satuan']);
 
-        if ($search) {
-            $obats = $obats->where(function ($query) use ($search) {
-                $query->where('kode_obat', 'like', "%{$search}%")
-                      ->orWhere('nama_obat', 'like', "%{$search}%")
-                      ->orWhere('deskripsi', 'like', "%{$search}%")
-                      ->orWhereHas('satuan', function ($query) use ($search) {
-                          $query->where('nama_satuan', 'like', "%{$search}%");
-                      })
-                      ->orWhereHas('kategori', function ($query) use ($search) {
-                          $query->where('nama_kategori', 'like', "%{$search}%");
-                      });
+
+        // Ambil parameter perPage dari request, default 10
+        // Ambil nilai pencarian dari request
+        $perPage = $request->get('perPage', 10);
+        $search = $request->get('search', '');
+
+
+
+        // Mulai query dengan relasi kategori dan satuan
+        // $obats = Obat::with(['kategori', 'satuan']);
+        $query = Obat::with(['kategori', 'satuan']);
+
+
+        // if ($search) {
+        //     $obats = $obats->where(function ($query) use ($search) {
+        //         $query->where('kode_obat', 'like', "%{$search}%")
+        //             ->orWhere('nama_obat', 'like', "%{$search}%")
+        //             ->orWhere('deskripsi', 'like', "%{$search}%")
+        //             ->orWhereHas('satuan', function ($query) use ($search) {
+        //                 $query->where('nama_satuan', 'like', "%{$search}%");
+        //             })
+        //             ->orWhereHas('kategori', function ($query) use ($search) {
+        //                 $query->where('nama_kategori', 'like', "%{$search}%");
+        //             });
+        //     });
+        // }
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('kode_obat', 'like', "%{$search}%")
+                    ->orWhere('nama_obat', 'like', "%{$search}%")
+                    ->orWhere('deskripsi', 'like', "%{$search}%")
+                    ->orWhereHas('satuan', function ($q) use ($search) {
+                        $q->where('nama_satuan', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('kategori', function ($q) use ($search) {
+                        $q->where('nama_kategori', 'like', "%{$search}%");
+                    });
             });
         }
-        
+
 
         // Terapkan sorting dan paginasi berdasarkan parameter yang dipilih
-        $obats = $obats->orderBy($sortBy, $sortOrder)->paginate($perPage);
+        $obats = $query->orderBy($sortBy, $sortOrder)->paginate($perPage);
+
+
+        // Jika request AJAX (misalnya pagination, search, atau sort), kembalikan partial view
+        if ($request->ajax() && ($request->has('page') || $request->has('search') || $request->has('sortBy') || $request->has('sortOrder') || $request->has('perPage'))) {
+            $html = view('obat.partials.table', compact('obats'))->render();
+            return response()->json(['html' => $html]);
+        }
+
+        $headers = [
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT',
+        ];
 
         // Tampilkan halaman dengan data obat
         return view('obat.index', compact('obats', 'search', 'sortBy', 'sortOrder'));

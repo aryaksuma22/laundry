@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
+
 class UserController extends Controller
 {
     /**
@@ -20,9 +21,11 @@ class UserController extends Controller
     public function index(Request $request)
     {
         // Ambil parameter untuk sorting dengan default
-        $sortBy    = $request->get('sortBy', 'id');
         $sortOrder = $request->get('sortOrder', 'asc');
+        $sortBy    = $request->get('sortBy', 'id');
 
+
+        
         // Validasi sortOrder (hanya 'asc' atau 'desc' yang diperbolehkan)
         if (!in_array($sortOrder, ['asc', 'desc'])) {
             $sortOrder = 'asc';
@@ -34,18 +37,23 @@ class UserController extends Controller
             $sortBy = 'id';
         }
 
+
+
         // Ambil parameter untuk pagination dan pencarian
         $perPage = $request->get('perPage', 10);
         $search  = $request->get('search', '');
 
+        
         // Buat query dasar
         $query = User::query();
+
+
 
         // Fitur Pencarian: Cari berdasarkan nama atau email
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -57,6 +65,13 @@ class UserController extends Controller
             $html = view('users.partials.user-table', compact('users'))->render();
             return response()->json(['html' => $html]);
         }
+
+        $headers = [
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT',
+        ];
+    
 
         // Untuk navigasi full view (misalnya dari sidebar), kembalikan view lengkap
         return view('users.account-management', compact('users'));
@@ -150,7 +165,12 @@ class UserController extends Controller
         $user->save();
 
         // Redirect ke daftar pengguna dengan pesan sukses
-        return redirect()->route('users.index')->with('success', 'User updated successfully');
+        return redirect()->route('account.management', [
+            'search' => request('search'),
+            'sortBy' => request('sortBy'),
+            'sortOrder' => request('sortOrder'),
+            'perPage' => request('perPage')
+        ])->with('success', 'User updated successfully');
     }
 
     /**

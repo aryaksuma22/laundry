@@ -47,7 +47,9 @@
 
     <!-- Stack untuk script khusus -->
     @stack('scripts')
-    @vite(['resources/js/app.js', 'resources/js/account-management.js'])
+
+    @vite(['resources/js/app.js', 'resources/js/account-management.js', 'resources/js/obat.js'])
+
 </body>
 
 </html>
