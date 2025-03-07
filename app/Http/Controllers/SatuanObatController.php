@@ -8,19 +8,35 @@ use App\Models\Satuan_obat;
 class SatuanObatController extends Controller
 {
     // Controller View/Index
-
     public function index(Request $request)
     {
         $search = $request->get('search', '');
-
-        $satuan_obats = Satuan_obat::all(); // Mengambil semua satuan obat dari database
-
-        if ($search) {
-            $satuan_obats = Satuan_obat::where('nama_satuan', 'like', "%$search%")->get();
+    
+        // Mulai query dengan Satuan_obat
+        $satuan_obats = Satuan_obat::query();
+    
+        if (!empty($search)) {
+            $satuan_obats = $satuan_obats->where('nama_satuan', 'like', "%$search%");
         }
-
-        return view('satuan_obat_folder.index', compact('satuan_obats'));
+    
+        // Pastikan selalu mengambil data dengan get()
+        $satuan_obats = $satuan_obats->get();
+    
+        // Jika request AJAX (misalnya pagination, search, atau sort), kembalikan partial view
+        if ($request->ajax() && ($request->has('page') || $request->has('search'))) {
+            $html = view('satuan_obat_folder.partials.table', compact('satuan_obats'))->render();
+            return response()->json(['html' => $html]);
+        }
+    
+        $headers = [
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT',
+        ];
+    
+        return view('satuan_obat_folder.index', compact('satuan_obats', 'search'));
     }
+    
 
     // Controller Create
 
@@ -77,10 +93,22 @@ class SatuanObatController extends Controller
         $satuan_obatIds = $request->input('satuan_obats');
 
         if (!empty($satuan_obatIds)) {
-            satuan_obat::whereIn('id', $satuan_obatIds)->delete();
+            Satuan_obat::whereIn('id', $satuan_obatIds)->delete();
             return redirect()->route('satuan_obats.index')->with('success', 'Obat berhasil dihapus.');
         }
 
         return redirect()->route('satuan_obats.index')->with('success', 'Satuan obat berhasil dihapus.');
+    }
+
+    public function destroySingle($id)
+    {
+        $satuan_obat = Satuan_obat::where('id', $id)->first();
+
+        if ($satuan_obat) {
+            $satuan_obat->delete();
+            return response()->json(['success' => true, 'message' => 'satuan_obat deleted succesfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Penjualan Obat tidak ditemukan'], 404);
     }
 }

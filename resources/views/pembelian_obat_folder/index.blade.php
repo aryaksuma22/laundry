@@ -72,7 +72,7 @@
                             </button>
                         </div>
                         {{-- SEARCH BAR --}}
-                        <form action="{{ route('pembelian_obats.index') }}" method="GET" class="relative">
+                        <form id="searchForm" action="{{ route('pembelian_obats.index') }}" method="GET" class="relative">
                             <input type="search" name="search" id="search"
                                 class="block w-full px-10 py-3 rounded-lg border border-gray-200 placeholder:font-bold"
                                 value="{{ $search }}" placeholder="Search" />

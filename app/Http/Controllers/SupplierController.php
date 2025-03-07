@@ -24,11 +24,11 @@ class SupplierController extends Controller
             $sortBy = 'nama_supplier';
         }
 
-        $suppliers = Supplier::query();
+        $query = Supplier::query();
 
-        if ($search) {
-            $suppliers->where(function ($query) use ($search) {
-                $query->where('nama_supplier', 'like', "%$search%")
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_supplier', 'like', "%$search%")
                     ->orWhere('alamat', 'like', "%$search%")
                     ->orWhere('telepon', 'like', "%$search%")
                     ->orWhere('email', 'like', "%$search%");
@@ -36,10 +36,22 @@ class SupplierController extends Controller
         }
 
         // Tambahkan sorting
-        $suppliers = $suppliers->orderBy($sortBy, $sortOrder);
+        $suppliers = $query->orderBy($sortBy, $sortOrder);
 
         // Ubah menjadi paginasi
-        $suppliers = $suppliers->paginate($perPage);
+        $suppliers = $query->orderBy($sortBy, $sortOrder)->paginate($perPage);
+
+        // Jika request AJAX (misalnya pagination, search, atau sort), kembalikan partial view
+        if ($request->ajax() && ($request->has('page') || $request->has('search') || $request->has('sortBy') || $request->has('sortOrder') || $request->has('perPage'))) {
+            $html = view('supplier_folder.partials.table', compact('suppliers'))->render();
+            return response()->json(['html' => $html]);
+        }
+
+        $headers = [
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT',
+        ];
 
         return view('supplier_folder.index', compact('suppliers', 'search', 'sortBy', 'sortOrder'));
     }
@@ -89,25 +101,25 @@ class SupplierController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama_supplier' => 'required|string|max:255|unique:suppliers,nama_supplier,'.$id,
+            'nama_supplier' => 'required|string|max:255|unique:suppliers,nama_supplier,' . $id,
             'alamat'        => 'required|string|max:255',
             'telepon'       => 'required|string|max:15',
-            'email'         => 'required|email|max:255|unique:suppliers,email,'.$id,
+            'email'         => 'required|email|max:255|unique:suppliers,email,' . $id,
         ], [
             'nama_supplier.unique' => 'Nama Supplier sudah ada'
         ]);
-    
+
         $supplier = Supplier::findOrFail($id);
         $supplier->nama_supplier = $request->input('nama_supplier');
         $supplier->alamat        = $request->input('alamat');
         $supplier->telepon       = $request->input('telepon');
         $supplier->email         = $request->input('email');
-    
+
         $supplier->save();
-    
+
         return redirect()->route('suppliers.index')->with('success', 'Supplier updated successfully.');
     }
-    
+
 
 
 
@@ -124,5 +136,17 @@ class SupplierController extends Controller
         }
 
         return redirect()->route('suppliers.index')->with('error', 'Tidak ada supplier yang dihapus.');
+    }
+
+    public function destroySingle($id)
+    {
+        $supplier = Supplier::where('id', $id)->first();
+
+        if ($supplier) {
+            $supplier->delete();
+            return response()->json(['success' => true, 'message' => 'supplier deleted succesfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Penjualan Obat tidak ditemukan'], 404);
     }
 }

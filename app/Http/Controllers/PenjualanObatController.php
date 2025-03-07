@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Penjualan_obat;
 use App\Models\Obat;
 
-
 class PenjualanObatController extends Controller
 {
 
@@ -25,28 +24,41 @@ class PenjualanObatController extends Controller
             $sortBy = 'id';
         }
 
-        $penjualan_obats = Penjualan_obat::with(['obat']);
+        $query = Penjualan_obat::with(['obat']);
 
-        if ($search) {
-            $penjualan_obats = $penjualan_obats->where(function ($query) use ($search) {
-                $query->Where('jumlah', 'like', "%{$search}%")
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->Where('jumlah', 'like', "%{$search}%")
                     ->orWhere('harga_jual', 'like', "%{$search}%")
                     ->orWhere('total_harga', 'like', "%{$search}%")
-                    ->orWhereHas('obat', function ($query) use ($search) {
-                        $query->where('nama_obat', 'like', "%{$search}%");
+                    ->orWhereHas('obat', function ($q) use ($search) {
+                        $q->where('nama_obat', 'like', "%{$search}%");
                     });
             });
         }
 
+
         if ($sortBy == 'nama_obat') {
-            $penjualan_obats = $penjualan_obats->join('obats', 'penjualan_obats.obat_id', '=', 'obats.id')
+            $query = $query->join('obats', 'penjualan_obats.obat_id', '=', 'obats.id')
                 ->orderBy('obats.nama_obat', $sortOrder)
                 ->select('penjualan_obats.*');
         } else {
-            $penjualan_obats = $penjualan_obats->orderBy($sortBy, $sortOrder);
+            $query = $query->orderBy($sortBy, $sortOrder);
         }
 
-        $penjualan_obats = $penjualan_obats->orderBy($sortBy, $sortOrder)->paginate($perPage);
+        $penjualan_obats = $query->orderBy($sortBy, $sortOrder)->paginate($perPage);
+
+        // Jika request AJAX (misalnya pagination, search, atau sort), kembalikan partial view
+        if ($request->ajax() && ($request->has('page') || $request->has('search') || $request->has('sortBy') || $request->has('sortOrder') || $request->has('perPage'))) {
+            $html = view('penjualan_obat_folder.partials.table', compact('penjualan_obats'))->render();
+            return response()->json(['html' => $html]);
+        }
+
+        $headers = [
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT',
+        ];
 
 
         return view('penjualan_obat_folder.index', compact('penjualan_obats', 'search', 'sortBy', 'sortOrder'));
@@ -69,7 +81,7 @@ class PenjualanObatController extends Controller
             'harga_jual'        => 'required|numeric|min:0',
         ]);
 
-        // Simpan data pembelian obat
+        // Simpan data penjualan obat
         $penjualan_obat = new penjualan_obat();
         $penjualan_obat->obat_id = $request->obat_id;
         $penjualan_obat->jumlah = $request->jumlah;
@@ -130,5 +142,17 @@ class PenjualanObatController extends Controller
 
         return redirect()->route('penjualan_obats.index')
             ->with('error', 'Tidak ada data penjualan yang dipilih.');
+    }
+
+    public function destroySingle($id)
+    {
+        $penjualan_obat = Penjualan_obat::where('id', $id)->first();
+
+        if ($penjualan_obat) {
+            $penjualan_obat->delete();
+            return response()->json(['success' => true, 'message' => 'penjualan_obat deleted succesfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Penjualan Obat tidak ditemukan'], 404);
     }
 }

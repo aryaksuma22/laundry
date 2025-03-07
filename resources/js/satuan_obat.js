@@ -4,7 +4,7 @@ let sortOrder = 'asc';
 let perPage = 10;
 
 // Initialize the account management parameters from the URL
-function initPembelianObats() {
+function initSatuanObats() {
     const queryParams = new URLSearchParams(window.location.search);
     sortBy = queryParams.get('sortBy') || 'id';
     sortOrder = queryParams.get('sortOrder') || 'asc';
@@ -24,13 +24,13 @@ function initPembelianObats() {
 
 // Initialize the page on document ready
 $(document).ready(function () {
-    initPembelianObats();
+    initSatuanObats();
 });
 
 // Event listener to reinitialize when triggered (for AJAX content load)
-$(document).on("pembelian_obats:init", function () {
-    initPembelianObats();
-    fetchPembelianObats(1);  // Fetch users after initialization
+$(document).on("satuan_obats:init", function () {
+    initSatuanObats();
+    fetchSatuanObats(1);  // Fetch users after initialization
 });
 
 // Update the URL with the current parameters
@@ -46,7 +46,7 @@ function updateUrl(page) {
 }
 
 // Fetch user data based on current parameters
-function fetchPembelianObats(page = 1) {
+function fetchSatuanObats(page = 1) {
     const uniqueParam = new Date().getTime();  // Menambahkan timestamp untuk mencegah cache
     $.ajax({
         url: window.location.pathname + '?_=' + uniqueParam,
@@ -60,11 +60,11 @@ function fetchPembelianObats(page = 1) {
             page: page
         },
         success: function (response) {
-            $('#pembelian_obatTableContainer').html(response.html);
+            $('#satuan_obatTableContainer').html(response.html);
             updateUrl(page);
         },
         error: function () {
-            alert('Error fetching pembelian_obat data.');
+            alert('Error fetching satuan_obats data.');
         }
     });
 }
@@ -72,52 +72,7 @@ function fetchPembelianObats(page = 1) {
 // Form submission to fetch users based on search input
 $(document).on('submit', '#searchForm', function (e) {
     e.preventDefault();
-    fetchPembelianObats(1);
-});
-
-// Toggle sorting order and fetch users
-$(document).on('click', '#toggleSortOrder', function () {
-    sortOrder = (sortOrder === 'asc') ? 'desc' : 'asc';
-    $(this).toggleClass('bg-gray-200');
-    fetchPembelianObats(1);
-});
-
-// Handle sort-by button dropdown visibility
-$(document).on('click', '#sortByButton', function (e) {
-    e.stopPropagation();
-    $('#sortByPopup').toggleClass('hidden');
-});
-
-// Close sort-by dropdown if clicked outside
-$(document).on('click', function (e) {
-    if (!$(e.target).closest('#sortByButton, #sortByPopup').length) {
-        $('#sortByPopup').toggleClass('hidden');
-    }
-});
-
-// Select the sorting option and fetch users
-$(document).on('click', '.sort-option', function () {
-    sortBy = $(this).data('sortby');
-    fetchPembelianObats(1);
-    $('#sortByPopup').fadeOut(200);
-});
-
-// Change the number of items per page and fetch users
-$(document).on('change', '#perPage', function () {
-    perPage = $(this).val();
-    fetchPembelianObats(1);
-});
-
-// Handle pagination link clicks
-$(document).on('click', '#pembelian_obatTableContainer nav a', function (e) {
-    e.preventDefault();
-    const href = $(this).attr('href');
-    if (href) {
-        const url = new URL(href, window.location.origin);
-        const page = url.searchParams.get('page') || 1;
-        fetchPembelianObats(page);
-    }
-    return false;
+    fetchSatuanObats(1);
 });
 
 // Handle "select all" checkbox click
@@ -132,18 +87,18 @@ $(document).on('change', '.checkbox-row', function () {
 });
 
 // Single Delete
-$(document).on('click', '.delete-pembelian_obat', function (e) {
+$(document).on('click', '.delete-satuan_obat', function (e) {
     e.preventDefault();
 
-    let idPembelianObat = $(this).data('id');
+    let idSatuanObat = $(this).data('id');
     let row = $(this).closest('tr');
 
-    if (!confirm('Apakah Anda yakin ingin menghapus transaksi obat ini?')) {
+    if (!confirm('Apakah Anda yakin ingin menghapus satuan obat ini?')) {
         return;
     }
 
     $.ajax({
-        url: '/pembelian_obats/single/' + idPembelianObat,
+        url: '/satuan_obats/single/' + idSatuanObat,
         type: 'DELETE',
         data: {
             _token: $('meta[name="csrf-token"]').attr('content')
@@ -151,13 +106,13 @@ $(document).on('click', '.delete-pembelian_obat', function (e) {
         success: function (response) {
             if (response.success) {
                 row.fadeOut(300, function () { $(this).remove(); });
-                alert('Transaksi Pembelian Obat berhasil dihapus.');
+                alert('Satuan Obat berhasil dihapus.');
             } else {
-                alert('Gagal menghapus transaksi pembelian obat.');
+                alert('Gagal menghapus Satuan Obat.');
             }
         },
         error: function (xhr) {
-            alert('Terjadi kesalahan. Pastikan transaksi pembelian masih ada.');
+            alert('Terjadi kesalahan. Pastikan Satuan Obat masih ada.');
         }
     });
 });

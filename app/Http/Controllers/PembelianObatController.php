@@ -156,4 +156,16 @@ class PembelianObatController extends Controller
 
         return redirect()->route('pembelian_obats.index')->with('error', 'Tidak ada obat yang dipilih.');
     }
+
+    public function destroySingle($id)
+    {
+        $pembelian_obat = Pembelian_obat::where('id', $id)->first();
+
+        if($pembelian_obat) {
+            $pembelian_obat->delete();
+            return response()->json(['success' => true, 'message' => 'pembelian_obat deleted succesfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Pembelian Obat tidak ditemukan'], 404);
+    }
 }

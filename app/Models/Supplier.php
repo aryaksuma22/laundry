@@ -9,7 +9,7 @@ class Supplier extends Model
 {
     use HasFactory;
 
-    protected $table = 'suppliers'; // Nama tabel di database
+    protected $table = 'suppliers';
 
     protected $fillable = [
         'nama_supplier',
@@ -21,7 +21,7 @@ class Supplier extends Model
 
     public function pembelian()
     {
-        return $this->hasMany(Pembelian_obat::class, 'supplier_id');
+        return $this->hasMany(Pembelian_obat::class, 'supplier_id')->onDelete('cascade');
     }
     
 }

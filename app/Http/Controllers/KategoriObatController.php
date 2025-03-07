@@ -15,12 +15,27 @@ class KategoriObatController extends Controller
         $search = $request->get('search', '');
 
 
-        $kategori_obats = Kategori_obat::all(); // Mengambil semua kategori obat dari database
+        $kategori_obats = Kategori_obat::query(); // Mengambil semua kategori obat dari database
 
 
-        if ($search) {
-            $kategori_obats = Kategori_obat::where('nama_kategori', 'like', "%$search%")->get();
+        if (!empty($search)) {
+            $kategori_obats = $kategori_obats->where('nama_kategori', 'like', "%$search%");
         }
+
+        $kategori_obats = $kategori_obats->get();
+
+        // Jika request AJAX (misalnya pagination, search, atau sort), kembalikan partial view
+        if ($request->ajax() && ($request->has('page') || $request->has('search'))) {
+            $html = view('kategori_obat_folder.partials.table', compact('kategori_obats'))->render();
+            return response()->json(['html' => $html]);
+        }
+
+        $headers = [
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT',
+        ];
+
 
         return view('kategori_obat_folder.index', compact('kategori_obats'));
     }
@@ -87,5 +102,17 @@ class KategoriObatController extends Controller
         }
 
         return redirect()->route('kategori_obats.index')->with('error', 'Tidak ada obat yang dipilih.');
+    }
+
+    public function destroySingle($id)
+    {
+        $kategori_obat = Kategori_obat::where('id', $id)->first();
+
+        if ($kategori_obat) {
+            $kategori_obat->delete();
+            return response()->json(['success' => true, 'message' => 'kategori_obat deleted succesfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Kategori Obat tidak ditemukan'], 404);
     }
 }

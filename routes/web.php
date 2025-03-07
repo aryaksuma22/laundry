@@ -34,18 +34,26 @@ Route::delete('/obats/single/{id}', [ObatController::class, 'destroySingle'])->n
 
 Route::resource('kategori_obats', KategoriObatController::class)->middleware(['auth', 'verified']);
 Route::delete('/kategori_obats/mass-delete', [KategoriObatController::class, 'destroy'])->name('kategori_obats.massDestroy');
+Route::delete('/kategori_obats/single/{id}', [KategoriObatController::class, 'destroySingle'])->name('kategori_obats.destroySingle');
+
 
 Route::resource('satuan_obats', SatuanObatController::class)->middleware(['auth', 'verified']);
 Route::delete('/satuan_obats/mass-delete', [SatuanObatController::class, 'destroy'])->name('satuan_obats.massDestroy');
+Route::delete('/satuan_obats/single/{id}', [SatuanObatController::class, 'destroySingle'])->name('satuan_obats.destroySingle');
 
 Route::resource('suppliers', SupplierController::class)->middleware(['auth', 'verified']);
 Route::delete('/suppliers/mass-delete', [SupplierController::class, 'destroy'])->name('suppliers.massDestroy');
+Route::delete('/suppliers/single/{id}', [SupplierController::class, 'destroySingle'])->name('suppliers.destroySingle');
+
 
 Route::resource('pembelian_obats', PembelianObatController::class)->middleware(['auth', 'verified']);
 Route::delete('/pembelian_obats/mass-delete', [PembelianObatController::class, 'destroy'])->name('pembelian_obats.massDestroy');
- 
+Route::delete('/pembelian_obats/single/{id}', [PembelianObatController::class, 'destroySingle'])->name('pembelian_obats.destroySingle');
+
 Route::resource('penjualan_obats', PenjualanObatController::class)->middleware(['auth', 'verified']);
 Route::delete('/penjualan_obats/mass-delete', [PenjualanObatController::class, 'destroy'])->name('penjualan_obats.massDestroy');
+Route::delete('/penjualan_obats/single/{id}', [PenjualanObatController::class, 'destroySingle'])->name('penjualan_obats.destroySingle');
+
 
 // Route untuk Settings
 Route::get('/settings', function () {

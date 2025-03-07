@@ -186,7 +186,7 @@ class ObatController extends Controller
         // Jika user ditemukan, hapus
         if ($obat) {
             $obat->delete();
-            return response()->json(['success' => true, 'message' => 'User deleted successfully']);
+            return response()->json(['success' => true, 'message' => 'Obat deleted successfully']);
         }
 
         // Jika tidak ditemukan, kirim respon error
