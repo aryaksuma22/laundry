@@ -12,49 +12,60 @@ class PembelianObatController extends Controller
 {
     public function index(Request $request)
     {
-        $search = $request->get('search', '');
 
-        $sortBy = $request->get('sortBy', 'id');
         $sortOrder = $request->get('sortOrder', 'asc');
+        $sortBy = $request->get('sortBy', 'id');
 
         $perPage = $request->get('perPage', 10);
+        $search = $request->get('search', '');
 
         $allowedSort = ['id', 'nama_obat', 'nama_supplier', 'jumlah', 'harga_beli', 'total_harga', 'tanggal_pembelian'];
         if (!in_array($sortBy, $allowedSort)) {
             $sortBy = 'id';
         }
 
-        $pembelian_obats = Pembelian_obat::with(['obat', 'supplier']);
+        $query = Pembelian_obat::with(['obat', 'supplier']);
 
-        if ($search) {
-            $pembelian_obats = $pembelian_obats->where(function ($query) use ($search) {
-                $query->Where('jumlah', 'like', "%{$search}%")
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->Where('jumlah', 'like', "%{$search}%")
                     ->orWhere('harga_beli', 'like', "%{$search}%")
                     ->orWhere('total_harga', 'like', "%{$search}%")
                     ->orWhere('tanggal_pembelian', 'like', "%{$search}%")
-                    ->orWhereHas('obat', function ($query) use ($search) {
-                        $query->where('nama_obat', 'like', "%{$search}%");
+                    ->orWhereHas('obat', function ($q) use ($search) {
+                        $q->where('nama_obat', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('supplier', function ($query) use ($search) {
-                        $query->where('nama_supplier', 'like', "%{$search}%");
+                    ->orWhereHas('supplier', function ($q) use ($search) {
+                        $q->where('nama_supplier', 'like', "%{$search}%");
                     });
             });
         }
 
         if ($sortBy == 'nama_obat') {
-            $pembelian_obats = $pembelian_obats->join('obats', 'pembelian_obats.obat_id', '=', 'obats.id')
+            $query = $query->join('obats', 'pembelian_obats.obat_id', '=', 'obats.id')
                 ->orderBy('obats.nama_obat', $sortOrder)
                 ->select('pembelian_obats.*');
         } elseif ($sortBy == 'nama_supplier') {
-            $pembelian_obats = $pembelian_obats->join('suppliers', 'pembelian_obats.supplier_id', '=', 'suppliers.id')
+            $query = $query->join('suppliers', 'pembelian_obats.supplier_id', '=', 'suppliers.id')
                 ->orderBy('suppliers.nama_supplier', $sortOrder)
                 ->select('pembelian_obats.*');
         } else {
-            $pembelian_obats = $pembelian_obats->orderBy($sortBy, $sortOrder);
+            $query = $query->orderBy($sortBy, $sortOrder);
         }
 
-        $pembelian_obats = $pembelian_obats->orderBy($sortBy, $sortOrder)->paginate($perPage);
+        $pembelian_obats = $query->orderBy($sortBy, $sortOrder)->paginate($perPage);
 
+        // Jika request AJAX (misalnya pagination, search, atau sort), kembalikan partial view
+        if ($request->ajax() && ($request->has('page') || $request->has('search') || $request->has('sortBy') || $request->has('sortOrder') || $request->has('perPage'))) {
+            $html = view('pembelian_obat_folder.partials.table', compact('pembelian_obats'))->render();
+            return response()->json(['html' => $html]);
+        }
+
+        $headers = [
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT',
+        ];
 
         return view('pembelian_obat_folder.index', compact('pembelian_obats', 'search', 'sortBy', 'sortOrder'));
     }

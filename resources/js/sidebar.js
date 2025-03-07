@@ -82,6 +82,11 @@ $(document).ready(function () {
                         $(document).trigger("obats:init");
                     }
 
+                    // Jika halaman yang dimuat adalah Halaman Index Obat, trigger inisialisasi ulang
+                    if ($("#pembelian_obatTableContainer").length > 0) {
+                        $(document).trigger("pembelian_obats:init");
+                    }
+
                     // Jika halaman yang dimuat adalah Account Management, trigger inisialisasi ulang
                     if ($("#userTableContainer").length > 0) {
                         $(document).trigger("accountManagement:init");

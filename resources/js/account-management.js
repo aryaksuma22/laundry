@@ -119,3 +119,36 @@ $(document).on('change', '.checkbox-row', function () {
     const allChecked = $('.checkbox-row').length === $('.checkbox-row:checked').length;
     $('#checkbox-all').prop('checked', allChecked);
 });
+
+// Single Delete
+$(document).on('click', '.delete-user', function (e) {
+    e.preventDefault();
+
+    let userId = $(this).data('id');  // Ambil ID user
+    let row = $(this).closest('tr');  // Ambil baris tabel
+
+    // Konfirmasi sebelum menghapus
+    if (!confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
+        return;
+    }
+
+    // Kirim request AJAX DELETE ke Laravel
+    $.ajax({
+        url: '/users/single/' + userId, // Gunakan route baru untuk penghapusan single
+        type: 'DELETE',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (response) {
+            if (response.success) {
+                row.fadeOut(300, function () { $(this).remove(); }); // Hapus baris dari tabel
+                alert('Pengguna berhasil dihapus.');
+            } else {
+                alert('Gagal menghapus pengguna.');
+            }
+        },
+        error: function (xhr) {
+            alert('Terjadi kesalahan. Pastikan user masih ada.');
+        }
+    });
+});

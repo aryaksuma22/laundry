@@ -34,23 +34,9 @@ class ObatController extends Controller
 
 
         // Mulai query dengan relasi kategori dan satuan
-        // $obats = Obat::with(['kategori', 'satuan']);
         $query = Obat::with(['kategori', 'satuan']);
 
 
-        // if ($search) {
-        //     $obats = $obats->where(function ($query) use ($search) {
-        //         $query->where('kode_obat', 'like', "%{$search}%")
-        //             ->orWhere('nama_obat', 'like', "%{$search}%")
-        //             ->orWhere('deskripsi', 'like', "%{$search}%")
-        //             ->orWhereHas('satuan', function ($query) use ($search) {
-        //                 $query->where('nama_satuan', 'like', "%{$search}%");
-        //             })
-        //             ->orWhereHas('kategori', function ($query) use ($search) {
-        //                 $query->where('nama_kategori', 'like', "%{$search}%");
-        //             });
-        //     });
-        // }
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('kode_obat', 'like', "%{$search}%")
@@ -190,5 +176,20 @@ class ObatController extends Controller
         }
 
         return redirect()->route('obats.index')->with('error', 'Tidak ada obat yang dipilih.');
+    }
+
+    public function destroySingle($id)
+    {
+        // Cari pengguna berdasarkan ID
+        $obat = Obat::where('id', $id)->first();
+
+        // Jika user ditemukan, hapus
+        if ($obat) {
+            $obat->delete();
+            return response()->json(['success' => true, 'message' => 'User deleted successfully']);
+        }
+
+        // Jika tidak ditemukan, kirim respon error
+        return response()->json(['success' => false, 'message' => 'User not found'], 404);
     }
 }

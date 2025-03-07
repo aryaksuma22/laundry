@@ -105,8 +105,8 @@
             <form id="deleteForm" action="{{ route('suppliers.destroy', ['supplier' => 0]) }}" method="POST">
                 @csrf
                 @method('DELETE')
-                <table class="min-w-full bg-white border rounded-xl shadow-sm mb-5">
-                    <thead>
+                <table class="min-w-full bg-white overflow-hidden rounded-xl shadow-sm mb-5">
+                    <thead class="bg-slate-800 text-white">
                         <tr>
                             <th class="px-4 py-2 text-left">
                                 <input type="checkbox" class="form-checkbox rounded-[4px]" id="checkbox-all" />
@@ -116,6 +116,7 @@
                             <th class="px-4 py-2 text-left">Alamat</th>
                             <th class="px-4 py-2 text-left">Telepon</th>
                             <th class="px-4 py-2 text-left">Email</th>
+                            <th class="px-4 py-2 text-left">Supplier</th>
                         </tr>
                     </thead>
                     <tbody>

@@ -130,3 +130,34 @@ $(document).on('change', '.checkbox-row', function () {
     const allChecked = $('.checkbox-row').length === $('.checkbox-row:checked').length;
     $('#checkbox-all').prop('checked', allChecked);
 });
+
+// Single Delete
+$(document).on('click', '.delete-obat', function (e) {
+    e.preventDefault();
+
+    let idObat = $(this).data('id');  // Ambil ID obat
+    let row = $(this).closest('tr');  // Ambil baris tabel
+
+    if (!confirm('Apakah Anda yakin ingin menghapus obat ini?')) {
+        return;
+    }
+
+    $.ajax({
+        url: '/obats/single/' + idObat,  // Pastikan URL ini sesuai dengan route di Laravel
+        type: 'DELETE',  // Pastikan ini adalah DELETE, bukan GET
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content') // CSRF token untuk keamanan
+        },
+        success: function (response) {
+            if (response.success) {
+                row.fadeOut(300, function () { $(this).remove(); });
+                alert('Obat berhasil dihapus.');
+            } else {
+                alert('Gagal menghapus obat.');
+            }
+        },
+        error: function (xhr) {
+            alert('Terjadi kesalahan. Pastikan obat masih ada.');
+        }
+    });
+});

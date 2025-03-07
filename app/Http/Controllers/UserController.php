@@ -25,7 +25,7 @@ class UserController extends Controller
         $sortBy    = $request->get('sortBy', 'id');
 
 
-        
+
         // Validasi sortOrder (hanya 'asc' atau 'desc' yang diperbolehkan)
         if (!in_array($sortOrder, ['asc', 'desc'])) {
             $sortOrder = 'asc';
@@ -43,7 +43,7 @@ class UserController extends Controller
         $perPage = $request->get('perPage', 10);
         $search  = $request->get('search', '');
 
-        
+
         // Buat query dasar
         $query = User::query();
 
@@ -71,7 +71,7 @@ class UserController extends Controller
             'Pragma' => 'no-cache',
             'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT',
         ];
-    
+
 
         // Untuk navigasi full view (misalnya dari sidebar), kembalikan view lengkap
         return view('users.account-management', compact('users'));
@@ -190,5 +190,21 @@ class UserController extends Controller
 
         // Redirect kembali ke halaman account management dengan pesan sukses
         return redirect()->route('account.management')->with('success', 'Users deleted successfully.');
+    }
+
+
+    public function destroySingle($id)
+    {
+        // Cari pengguna berdasarkan ID
+        $user = User::find($id);
+
+        // Jika user ditemukan, hapus
+        if ($user) {
+            $user->delete();
+            return response()->json(['success' => true, 'message' => 'User deleted successfully']);
+        }
+
+        // Jika tidak ditemukan, kirim respon error
+        return response()->json(['success' => false, 'message' => 'User not found'], 404);
     }
 }
