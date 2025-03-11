@@ -70,11 +70,25 @@ class SupplierController extends Controller
     {
         $request->validate([
             'nama_supplier' => 'required|string|max:255|unique:suppliers,nama_supplier',
-            'alamat' => 'required|string|max:255',
-            'telepon' => 'required|string|max:15',
-            'email' => 'required|string|email|max:255|unique:suppliers,email',
+            'alamat'        => 'required|string|max:255',
+            'telepon'       => 'required|string|max:15',
+            'email'         => 'required|string|email|max:255|unique:suppliers,email',
         ], [
-            'nama_supplier.unique' => 'Nama Supplier sudah ada'
+            'nama_supplier.required' => 'Nama supplier wajib diisi.',
+            'nama_supplier.string'   => 'Nama supplier harus berupa teks.',
+            'nama_supplier.max'      => 'Nama supplier tidak boleh lebih dari 255 karakter.',
+            'nama_supplier.unique'   => 'Nama supplier sudah ada.',
+            'alamat.required'        => 'Alamat wajib diisi.',
+            'alamat.string'          => 'Alamat harus berupa teks.',
+            'alamat.max'             => 'Alamat tidak boleh lebih dari 255 karakter.',
+            'telepon.required'       => 'Telepon wajib diisi.',
+            'telepon.string'         => 'Telepon harus berupa teks.',
+            'telepon.max'            => 'Telepon tidak boleh lebih dari 15 angka.',
+            'email.required'         => 'Email wajib diisi.',
+            'email.string'           => 'Email harus berupa teks.',
+            'email.email'            => 'Email harus berupa alamat email yang valid.',
+            'email.max'              => 'Email tidak boleh lebih dari 255 karakter.',
+            'email.unique'           => 'Email sudah terdaftar.',
         ]);
 
         $supplier = new Supplier;
@@ -106,7 +120,20 @@ class SupplierController extends Controller
             'telepon'       => 'required|string|max:15',
             'email'         => 'required|email|max:255|unique:suppliers,email,' . $id,
         ], [
-            'nama_supplier.unique' => 'Nama Supplier sudah ada'
+            'nama_supplier.required' => 'Nama supplier wajib diisi.',
+            'nama_supplier.string'   => 'Nama supplier harus berupa teks.',
+            'nama_supplier.max'      => 'Nama supplier tidak boleh lebih dari 255 karakter.',
+            'nama_supplier.unique'   => 'Nama supplier sudah ada.',
+            'alamat.required'        => 'Alamat wajib diisi.',
+            'alamat.string'          => 'Alamat harus berupa teks.',
+            'alamat.max'             => 'Alamat tidak boleh lebih dari 255 karakter.',
+            'telepon.required'       => 'Telepon wajib diisi.',
+            'telepon.string'         => 'Telepon harus berupa teks.',
+            'telepon.max'            => 'Telepon tidak boleh lebih dari 15 angka.',
+            'email.required'         => 'Email wajib diisi.',
+            'email.email'            => 'Email harus berupa alamat email yang valid.',
+            'email.max'              => 'Email tidak boleh lebih dari 255 karakter.',
+            'email.unique'           => 'Email sudah terdaftar.',
         ]);
 
         $supplier = Supplier::findOrFail($id);

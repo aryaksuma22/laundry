@@ -13,10 +13,14 @@
                         <input type="text" name="nama_kategori" id="nama_kategori"
                             class="w-full px-4 py-2 border rounded-lg"
                             value="{{ old('nama_kategori', $kategori_obat->nama_kategori) }}" required>
-                        @if ($errors->has('nama_kategori'))
-                            <p class="text-red-500 text-sm mt-1">{{ $errors->first('nama_kategori') }}</p>
-                        @endif
                     </div>
+
+                    @error('nama_kategori')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
                     <div class="mb-4">
                         <button type="submit"
                             class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Update</button>

@@ -76,9 +76,18 @@ class PenjualanObatController extends Controller
     {
         // Validasi input
         $request->validate([
-            'obat_id'           => 'required|exists:obats,id',
-            'jumlah'            => 'required|integer|min:1',
-            'harga_jual'        => 'required|numeric|min:0',
+            'obat_id'    => 'required|exists:obats,id',
+            'jumlah'     => 'required|integer|min:1',
+            'harga_jual' => 'required|numeric|min:0',
+        ], [
+            'obat_id.required'    => 'Obat wajib dipilih.',
+            'obat_id.exists'      => 'Obat yang dipilih tidak valid.',
+            'jumlah.required'     => 'Jumlah penjualan wajib diisi.',
+            'jumlah.integer'      => 'Jumlah harus berupa angka bulat.',
+            'jumlah.min'          => 'Jumlah penjualan minimal 1.',
+            'harga_jual.required' => 'Harga jual wajib diisi.',
+            'harga_jual.numeric'  => 'Harga jual harus berupa angka.',
+            'harga_jual.min'      => 'Harga jual tidak boleh kurang dari 0.',
         ]);
 
         // Simpan data penjualan obat
@@ -112,6 +121,15 @@ class PenjualanObatController extends Controller
             'obat_id'    => 'required|exists:obats,id',
             'jumlah'     => 'required|integer|min:1',
             'harga_jual' => 'required|numeric|min:0',
+        ], [
+            'obat_id.required'    => 'Obat wajib dipilih.',
+            'obat_id.exists'      => 'Obat yang dipilih tidak valid.',
+            'jumlah.required'     => 'Jumlah penjualan wajib diisi.',
+            'jumlah.integer'      => 'Jumlah harus berupa angka bulat.',
+            'jumlah.min'          => 'Jumlah penjualan minimal 1.',
+            'harga_jual.required' => 'Harga jual wajib diisi.',
+            'harga_jual.numeric'  => 'Harga jual harus berupa angka.',
+            'harga_jual.min'      => 'Harga jual tidak boleh kurang dari 0.',
         ]);
 
         // Ambil data penjualan obat yang akan diupdate

@@ -88,6 +88,19 @@ class PembelianObatController extends Controller
             'jumlah'            => 'required|integer|min:1',
             'harga_beli'        => 'required|numeric|min:0',
             'tanggal_pembelian' => 'required|date',
+        ], [
+            'obat_id.required'           => 'Obat wajib dipilih.',
+            'obat_id.exists'             => 'Obat yang dipilih tidak valid.',
+            'supplier_id.required'       => 'Supplier wajib dipilih.',
+            'supplier_id.exists'         => 'Supplier yang dipilih tidak valid.',
+            'jumlah.required'            => 'Jumlah pembelian wajib diisi.',
+            'jumlah.integer'             => 'Jumlah harus berupa angka bulat.',
+            'jumlah.min'                 => 'Jumlah pembelian minimal 1.',
+            'harga_beli.required'        => 'Harga beli wajib diisi.',
+            'harga_beli.numeric'         => 'Harga beli harus berupa angka.',
+            'harga_beli.min'             => 'Harga beli tidak boleh kurang dari 0.',
+            'tanggal_pembelian.required' => 'Tanggal pembelian wajib diisi.',
+            'tanggal_pembelian.date'     => 'Tanggal pembelian harus berupa tanggal yang valid.',
         ]);
 
         // Simpan data pembelian obat
@@ -126,6 +139,19 @@ class PembelianObatController extends Controller
             'jumlah'            => 'required|integer|min:1',
             'harga_beli'        => 'required|numeric|min:0',
             'tanggal_pembelian' => 'required|date',
+        ], [
+            'obat_id.required'           => 'Obat wajib dipilih.',
+            'obat_id.exists'             => 'Obat yang dipilih tidak valid.',
+            'supplier_id.required'       => 'Supplier wajib dipilih.',
+            'supplier_id.exists'         => 'Supplier yang dipilih tidak valid.',
+            'jumlah.required'            => 'Jumlah pembelian wajib diisi.',
+            'jumlah.integer'             => 'Jumlah harus berupa angka bulat.',
+            'jumlah.min'                 => 'Jumlah pembelian minimal 1.',
+            'harga_beli.required'        => 'Harga beli wajib diisi.',
+            'harga_beli.numeric'         => 'Harga beli harus berupa angka.',
+            'harga_beli.min'             => 'Harga beli tidak boleh kurang dari 0.',
+            'tanggal_pembelian.required' => 'Tanggal pembelian wajib diisi.',
+            'tanggal_pembelian.date'     => 'Tanggal pembelian harus berupa tanggal yang valid.',
         ]);
 
         // Ambil data pembelian obat yang akan diupdate
@@ -161,7 +187,7 @@ class PembelianObatController extends Controller
     {
         $pembelian_obat = Pembelian_obat::where('id', $id)->first();
 
-        if($pembelian_obat) {
+        if ($pembelian_obat) {
             $pembelian_obat->delete();
             return response()->json(['success' => true, 'message' => 'pembelian_obat deleted succesfully']);
         }

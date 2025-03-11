@@ -14,24 +14,40 @@
                         <label for="obat_id" class="block text-sm font-semibold">Nama Obat</label>
                         <select name="obat_id" id="obat_id" class="w-full px-4 py-2 border rounded-lg" required>
                             @foreach ($obats as $obat)
-                                <option value="{{ $obat->id }}" {{ $pembelian_obat->obat_id == $obat->id ? 'selected' : '' }}>
+                                <option value="{{ $obat->id }}"
+                                    {{ $pembelian_obat->obat_id == $obat->id ? 'selected' : '' }}>
                                     {{ $obat->nama_obat }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
+                    @error('obat_id')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
+
                     <!-- Dropdown Supplier -->
                     <div class="flex flex-col mb-4">
                         <label for="supplier_id" class="block text-sm font-semibold">Supplier</label>
                         <select name="supplier_id" id="supplier_id" class="w-full px-4 py-2 border rounded-lg" required>
                             @foreach ($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}" {{ $pembelian_obat->supplier_id == $supplier->id ? 'selected' : '' }}>
+                                <option value="{{ $supplier->id }}"
+                                    {{ $pembelian_obat->supplier_id == $supplier->id ? 'selected' : '' }}>
                                     {{ $supplier->nama_supplier }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
+
+                    @error('supplier_id')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
 
                     <!-- Jumlah dan Harga Beli -->
                     <div class="flex flex-row mb-4 gap-6">
@@ -50,6 +66,18 @@
                         </div>
                     </div>
 
+                    @error('jumlah')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+                    @error('harga_beli')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
+
                     <!-- Tanggal Pembelian -->
                     <div class="flex flex-col mb-4">
                         <label for="tanggal_pembelian" class="block text-sm font-semibold">Tanggal Pembelian</label>
@@ -57,6 +85,13 @@
                             class="w-full px-4 py-2 border rounded-lg"
                             value="{{ old('tanggal_pembelian', $pembelian_obat->tanggal_pembelian) }}" required>
                     </div>
+
+                    @error('tanggal_pembelian')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
 
                     <div class="mb-4">
                         <button type="submit"

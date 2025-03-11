@@ -50,7 +50,10 @@ class SatuanObatController extends Controller
         $request->validate([
             'nama_satuan' => 'required|string|max:255|unique:satuan_obats,nama_satuan'
         ], [
-            'nama_satuan.unique' => 'Nama satuan sudah ada. Silakan gunakan nama lain.'
+            'nama_satuan.required' => 'Nama satuan obat wajib diisi.',
+            'nama_satuan.string' => 'Nama satuan obat harus berupa teks.',
+            'nama_satuan.max' => 'Nama satuan obat tidak boleh lebih dari 255 karakter.',
+            'nama_satuan.unique' => 'Nama satuan obat sudah ada. Silakan gunakan nama lain.'
         ]);
 
         Satuan_obat::create([
@@ -73,9 +76,12 @@ class SatuanObatController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama_satuan' => 'required|string|max:255|unique:satuan_obats,nama_satuan,' . $id
+            'nama_satuan' => 'required|string|max:255|unique:satuan_obats,nama_satuan'
         ], [
-            'nama_satuan.unique' => 'Nama satuan sudah ada. Silakan gunakan nama lain.'
+            'nama_satuan.required' => 'Nama satuan obat wajib diisi.',
+            'nama_satuan.string' => 'Nama satuan obat harus berupa teks.',
+            'nama_satuan.max' => 'Nama satuan obat tidak boleh lebih dari 255 karakter.',
+            'nama_satuan.unique' => 'Nama satuan obat sudah ada. Silakan gunakan nama lain.'
         ]);
 
         $satuan_obat = Satuan_obat::findOrFail($id);

@@ -21,40 +21,76 @@
                         </select>
                     </div>
 
+                    @error('obat_id')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
                     <!-- Dropdown Pilih Supplier -->
                     <div class="flex flex-col mb-4">
                         <label for="supplier_id" class="block text-sm font-semibold">Supplier</label>
                         <select name="supplier_id" id="supplier_id" class="w-full px-4 py-2 border rounded-lg" required>
                             <option value="">Pilih Supplier</option>
                             @foreach ($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                                <option value="{{ $supplier->id }}"
+                                    {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
                                     {{ $supplier->nama_supplier }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
+                    @error('supplier_id')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
                     <!-- Input Jumlah dan Harga Beli -->
                     <div class="flex flex-row mb-4 gap-6">
                         <div class="w-1/2">
                             <label for="jumlah" class="block text-sm font-semibold">Jumlah</label>
-                            <input type="number" name="jumlah" id="jumlah" class="w-full px-4 py-2 border rounded-lg" value="{{ old('jumlah') }}" required>
+                            <input type="number" name="jumlah" id="jumlah"
+                                class="w-full px-4 py-2 border rounded-lg" value="{{ old('jumlah') }}" required>
                         </div>
 
                         <div class="w-1/2">
                             <label for="harga_beli" class="block text-sm font-semibold">Harga Beli</label>
-                            <input type="text" name="harga_beli" id="harga_beli" class="w-full px-4 py-2 border rounded-lg" value="{{ old('harga_beli') }}" required>
+                            <input type="text" name="harga_beli" id="harga_beli"
+                                class="w-full px-4 py-2 border rounded-lg" value="{{ old('harga_beli') }}" required>
                         </div>
                     </div>
+
+                    @error('jumlah')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
+                    @error('harga_beli')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
 
                     <!-- Input Tanggal Pembelian -->
                     <div class="flex flex-col mb-4">
                         <label for="tanggal_pembelian" class="block text-sm font-semibold">Tanggal Pembelian</label>
-                        <input type="date" name="tanggal_pembelian" id="tanggal_pembelian" class="w-full px-4 py-2 border rounded-lg" value="{{ old('tanggal_pembelian') }}" required>
+                        <input type="date" name="tanggal_pembelian" id="tanggal_pembelian"
+                            class="w-full px-4 py-2 border rounded-lg" value="{{ old('tanggal_pembelian') }}" required>
                     </div>
 
+                    @error('tanggal_pembelian')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
+
                     <div class="mb-4">
-                        <button type="submit" class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Tambah</button>
+                        <button type="submit"
+                            class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Tambah</button>
                     </div>
                 </form>
             </div>
