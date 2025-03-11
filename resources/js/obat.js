@@ -138,26 +138,74 @@ $(document).on('click', '.delete-obat', function (e) {
     let idObat = $(this).data('id');  // Ambil ID obat
     let row = $(this).closest('tr');  // Ambil baris tabel
 
-    if (!confirm('Apakah Anda yakin ingin menghapus obat ini?')) {
-        return;
-    }
+    // Tampilkan SweetAlert untuk konfirmasi hapus
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: 'Data obat akan dihapus secara permanen',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/obats/single/' + idObat,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (response.success) {
+                        row.fadeOut(300, function () {
+                            $(this).remove();
+                        });
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: 'Obat berhasil dihapus.',
+                            confirmButtonText: 'OK'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Gagal menghapus obat.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan. Pastikan obat masih ada.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    });
+});
 
-    $.ajax({
-        url: '/obats/single/' + idObat,  // Pastikan URL ini sesuai dengan route di Laravel
-        type: 'DELETE',  // Pastikan ini adalah DELETE, bukan GET
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content') // CSRF token untuk keamanan
-        },
-        success: function (response) {
-            if (response.success) {
-                row.fadeOut(300, function () { $(this).remove(); });
-                alert('Obat berhasil dihapus.');
-            } else {
-                alert('Gagal menghapus obat.');
-            }
-        },
-        error: function (xhr) {
-            alert('Terjadi kesalahan. Pastikan obat masih ada.');
+
+$(document).on('submit', '#deleteForm', function (e) {
+    e.preventDefault(); // cegah submit form secara langsung
+
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: 'Obat-obat yang dipilih akan dihapus secara permanen',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Jika dikonfirmasi, submit form
+            this.submit();
         }
     });
 });

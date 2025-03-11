@@ -109,7 +109,7 @@ $(document).ready(function () {
                 },
                 error: function () {
                     // Jika terjadi error, tampilkan pesan error
-                    $("#main-content").html("<p class='text-center py-10 text-red-500'>Failed to load content.</p>");
+                    $("#main-content").html("<p class='text-center py-10 text-red-500 font-semibold'>Failed to load content.</p>");
                 }
             });
         }
