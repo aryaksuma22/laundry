@@ -23,8 +23,19 @@ divdivdivdivdiv<x-app-layout>
                                 class="w-full px-4 py-2 border rounded-lg"
                                 value="{{ old('nama_obat', $obat->nama_obat) }}" required>
                         </div>
-
                     </div>
+
+                    @error('kode_obat')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
+                    @error('nama_obat')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
 
                     <div class="flex flex-row mb-4 gap-6">
                         <div class="w-1/2">
@@ -53,6 +64,18 @@ divdivdivdivdiv<x-app-layout>
                         </div>
                     </div>
 
+                    @error('kategori_obat')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
+                    @error('satuan_obat')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
                     <div class="mb-4">
                         <label for="deskripsi" class="block text-sm font-semibold">Deskripsi</label>
                         <textarea name="deskripsi" id="deskripsi" class="w-full px-4 py-2 border rounded-lg">{{ old('deskripsi', $obat->deskripsi) }}</textarea>
@@ -72,8 +95,19 @@ divdivdivdivdiv<x-app-layout>
                                 class="w-full px-4 py-2 border rounded-lg"
                                 value="{{ old('harga_jual', $obat->harga_jual) }}" required>
                         </div>
-
                     </div>
+
+                    @error('harga_beli')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
+                    @error('harga_jual')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
 
                     <div class="flex flex-row gap-6 mb-4">
                         <div class="w-1/6">
@@ -91,6 +125,19 @@ divdivdivdivdiv<x-app-layout>
                                 value="{{ old('tanggal_kadaluarsa', $obat->tanggal_kadaluarsa) }}" required>
                         </div>
                     </div>
+
+                    @error('stok')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
+                    @error('tanggal_kadaluarsa')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
+
                     <div class="mb-4">
                         <button type="submit"
                             class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Update</button>

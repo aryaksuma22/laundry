@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Obat;
-use App\Models\Kategori_obat;
 use App\Models\Satuan_obat;
 use Illuminate\Http\Request;
+use App\Models\Kategori_obat;
+use Illuminate\Validation\Rule;
 
 class ObatController extends Controller
 {
@@ -106,6 +107,31 @@ class ObatController extends Controller
             'harga_jual' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
             'tanggal_kadaluarsa' => 'required|date|after:today',
+        ], [
+            'kategori_id.required' => 'Kategori obat wajib dipilih.',
+            'kategori_id.exists' => 'Kategori obat yang dipilih tidak valid.',
+            'satuan_id.required' => 'Satuan obat wajib dipilih.',
+            'satuan_id.exists' => 'Satuan obat yang dipilih tidak valid.',
+            'kode_obat.required' => 'Kode obat wajib diisi.',
+            'kode_obat.string' => 'Kode obat harus berupa teks.',
+            'kode_obat.max' => 'Kode obat tidak boleh lebih dari 255 karakter.',
+            'kode_obat.unique' => 'Kode obat sudah terdaftar.',
+            'nama_obat.required' => 'Nama obat wajib diisi.',
+            'nama_obat.string' => 'Nama obat harus berupa teks.',
+            'nama_obat.max' => 'Nama obat tidak boleh lebih dari 255 karakter.',
+            'deskripsi.string' => 'Deskripsi harus berupa teks.',
+            'harga_beli.required' => 'Harga beli obat wajib diisi.',
+            'harga_beli.numeric' => 'Harga beli harus berupa angka.',
+            'harga_beli.min' => 'Harga beli tidak boleh kurang dari 0.',
+            'harga_jual.required' => 'Harga jual obat wajib diisi.',
+            'harga_jual.numeric' => 'Harga jual harus berupa angka.',
+            'harga_jual.min' => 'Harga jual tidak boleh kurang dari 0.',
+            'stok.required' => 'Stok obat wajib diisi.',
+            'stok.integer' => 'Stok obat harus berupa angka bulat.',
+            'stok.min' => 'Stok obat tidak boleh kurang dari 0.',
+            'tanggal_kadaluarsa.required' => 'Tanggal kadaluarsa obat wajib diisi.',
+            'tanggal_kadaluarsa.date' => 'Tanggal kadaluarsa harus berupa tanggal yang valid.',
+            'tanggal_kadaluarsa.after' => 'Tanggal kadaluarsa harus setelah hari ini.',
         ]);
 
         // Buat instance baru dari model Obat
@@ -133,17 +159,48 @@ class ObatController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validasi input
+        // Validasi input dari form dengan pengecualian untuk kode_obat jika tidak berubah
         $request->validate([
             'kategori_id' => 'required|exists:kategori_obats,id',
             'satuan_id' => 'required|exists:satuan_obats,id',
-            'kode_obat' => 'required|string|max:255',
+            'kode_obat' => [
+                'required',
+                'string',
+                'max:255',
+                // Validasi kode_obat hanya unik jika kode_obat berubah
+                Rule::unique('obats', 'kode_obat')->ignore($id),
+            ],
             'nama_obat' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
-            'harga_beli' => 'required|numeric',
-            'harga_jual' => 'required|numeric',
-            'stok' => 'required|integer',
-            'tanggal_kadaluarsa' => 'required|date',
+            'harga_beli' => 'required|numeric|min:0',
+            'harga_jual' => 'required|numeric|min:0',
+            'stok' => 'required|integer|min:0',
+            'tanggal_kadaluarsa' => 'required|date|after:today',
+        ], [
+            'kategori_id.required' => 'Kategori obat wajib dipilih.',
+            'kategori_id.exists' => 'Kategori obat yang dipilih tidak valid.',
+            'satuan_id.required' => 'Satuan obat wajib dipilih.',
+            'satuan_id.exists' => 'Satuan obat yang dipilih tidak valid.',
+            'kode_obat.required' => 'Kode obat wajib diisi.',
+            'kode_obat.string' => 'Kode obat harus berupa teks.',
+            'kode_obat.max' => 'Kode obat tidak boleh lebih dari 255 karakter.',
+            'kode_obat.unique' => 'Kode obat sudah terdaftar.',
+            'nama_obat.required' => 'Nama obat wajib diisi.',
+            'nama_obat.string' => 'Nama obat harus berupa teks.',
+            'nama_obat.max' => 'Nama obat tidak boleh lebih dari 255 karakter.',
+            'deskripsi.string' => 'Deskripsi harus berupa teks.',
+            'harga_beli.required' => 'Harga beli obat wajib diisi.',
+            'harga_beli.numeric' => 'Harga beli harus berupa angka.',
+            'harga_beli.min' => 'Harga beli tidak boleh kurang dari 0.',
+            'harga_jual.required' => 'Harga jual obat wajib diisi.',
+            'harga_jual.numeric' => 'Harga jual harus berupa angka.',
+            'harga_jual.min' => 'Harga jual tidak boleh kurang dari 0.',
+            'stok.required' => 'Stok obat wajib diisi.',
+            'stok.integer' => 'Stok obat harus berupa angka bulat.',
+            'stok.min' => 'Stok obat tidak boleh kurang dari 0.',
+            'tanggal_kadaluarsa.required' => 'Tanggal kadaluarsa obat wajib diisi.',
+            'tanggal_kadaluarsa.date' => 'Tanggal kadaluarsa harus berupa tanggal yang valid.',
+            'tanggal_kadaluarsa.after' => 'Tanggal kadaluarsa harus setelah hari ini.',
         ]);
 
         // Cari obat berdasarkan ID
