@@ -96,11 +96,20 @@ class UserController extends Controller
     {
         // Validasi input dari form
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email|max:255',
             'password' => 'required|string|min:8|confirmed',
-            'role'     => 'nullable|string|max:255',
-            'telepon'  => 'nullable|string|max:255',
+            'role' => 'nullable|string|max:255',
+            'telepon' => 'nullable|string|max:255',
+        ], [
+            'name.required' => 'Nama pengguna wajib diisi.',
+            'name.string' => 'Nama pengguna harus berupa teks.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Email harus berupa alamat email yang valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password harus minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
         // Membuat instance User baru dan mengisi data
@@ -150,10 +159,15 @@ class UserController extends Controller
     {
         // Validasi input yang diterima dari form
         $request->validate([
-            'name'    => 'required|string|max:255',
-            'email'   => 'required|email|max:255',
-            'role'    => 'nullable|string|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'role' => 'nullable|string|max:255',
             'telepon' => 'nullable|string|max:255',
+        ], [
+            'name.required' => 'Nama pengguna wajib diisi.',
+            'name.string' => 'Nama pengguna harus berupa teks.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Email harus berupa alamat email yang valid.',
         ]);
 
         // Cari user berdasarkan ID dan update datanya

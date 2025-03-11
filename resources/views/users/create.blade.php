@@ -29,52 +29,72 @@
                         <label for="name" class="block text-sm font-semibold">Name</label>
                         <input type="text" name="name" id="name" class="w-full px-4 py-2 border rounded-lg"
                             value="{{ old('name') }}" required>
-                        @error('name')
-                            <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                        @enderror
                     </div>
+
+                    @error('name')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
 
                     <div class="mb-4">
                         <label for="email" class="block text-sm font-semibold">Email</label>
                         <input type="email" name="email" id="email" class="w-full px-4 py-2 border rounded-lg"
                             value="{{ old('email') }}" required>
-                        @error('email')
-                            <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                        @enderror
                     </div>
+
+                    @error('email')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
 
                     <div class="mb-4">
                         <label for="password" class="block text-sm font-semibold">Password</label>
                         <input type="password" name="password" id="password" class="w-full px-4 py-2 border rounded-lg"
                             required>
-                        @error('password')
-                            <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                        @enderror
                     </div>
+
+                    @error('password')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
 
                     <div class="mb-4">
                         <label for="password_confirmation" class="block text-sm font-semibold">Confirm Password</label>
                         <input type="password" name="password_confirmation" id="password_confirmation"
                             class="w-full px-4 py-2 border rounded-lg" required>
+                        @if ($errors->has('password'))
+                            <div class="mt-1 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative">
+                                <p class="text-red-700 text-sm">{{ $errors->first('password') }}</p>
+                            </div>
+                        @endif
                     </div>
 
                     <div class="mb-4">
                         <label for="role" class="block text-sm font-semibold">Role</label>
                         <input type="text" name="role" id="role" class="w-full px-4 py-2 border rounded-lg"
                             value="{{ old('role') }}">
-                        @error('role')
-                            <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                        @enderror
                     </div>
+
+                    @error('role')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
 
                     <div class="mb-4">
                         <label for="telepon" class="block text-sm font-semibold">Phone</label>
                         <input type="text" name="telepon" id="telepon" class="w-full px-4 py-2 border rounded-lg"
                             value="{{ old('telepon') }}">
-                        @error('telepon')
-                            <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                        @enderror
                     </div>
+
+                    @error('telepon')
+                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg relative ">
+                            <p class="text-red-700 text-sm">{{ $message }}</p>
+                        </div>
+                    @enderror
 
                     <div class="mb-4">
                         <button type="submit"
