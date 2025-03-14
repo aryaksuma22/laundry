@@ -10,7 +10,7 @@
                     <div class="flex flex-row gap-4">
                         {{-- Export Button --}}
                         <button
-                            class="px-4 py-2 gap-2 bg-white flex flex-row border rounded-lg justify-center items-center">
+                            class="px-4 py-2 gap-2 bg-white flex flex-row border rounded-lg justify-center items-center hover:bg-gray-50 transition-all duration-200">
                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                                 viewBox="0 0 24 24">
@@ -21,8 +21,8 @@
                             <p class="font-semibold">Export</p>
                         </button>
                         {{-- Delete Button --}}
-                        <button form="deleteForm" type="submit"
-                            class="px-4 py-2 bg-red-500 border rounded-lg flex items-center">
+                        <button form="deleteFormPenjualanObat" type="submit"
+                            class="px-4 py-2 bg-red-500 hover:bg-red-600 border rounded-lg flex items-center">
                             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path fill-rule="evenodd"
@@ -79,7 +79,8 @@
                             </button>
                         </div>
                         {{-- SEARCH BAR --}}
-                        <form id="searchForm" action="{{ route('penjualan_obats.index') }}" method="GET" class="relative">
+                        <form id="searchForm" action="{{ route('penjualan_obats.index') }}" method="GET"
+                            class="relative">
                             <input type="search" name="search" id="search"
                                 class="block w-full px-10 py-3 rounded-lg border border-gray-200 placeholder:font-bold"
                                 value="{{ $search }}" placeholder="Search" />
@@ -93,7 +94,7 @@
                         </form>
                         {{-- BUTTON TAMBAH --}}
                         <a href="{{ route('penjualan_obats.create') }}"
-                            class="px-4 py-3 gap-2 bg-[#4268F6] flex flex-row border rounded-lg justify-center items-center">
+                            class="px-4 py-3 gap-2 bg-[#4268F6] hover:bg-[#3a5ddc] flex flex-row border rounded-lg justify-center items-center">
                             <div class="flex flex-row items-center gap-2">
                                 <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -107,9 +108,7 @@
                         <div class="flex items-center border rounded-lg bg-white px-6 py-1">
                             <form action="{{ route('penjualan_obats.index') }}" method="GET" id="perPageForm">
                                 <label for="perPage" class="mr-2 text-sm">Show</label>
-                                <select name="perPage" id="perPage"
-                                    onchange="document.getElementById('perPageForm').submit()"
-                                    class="border border-gray-200 rounded">
+                                <select name="perPage" id="perPage" class="border border-gray-200 rounded">
                                     <option value="5" {{ request('perPage') == 5 ? 'selected' : '' }}>5</option>
                                     <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
                                     <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
@@ -132,4 +131,16 @@
             </div>
         </div>
     </main>
+    @if (session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    confirmButtonText: 'OK'
+                });
+            });
+        </script>
+    @endif
 </x-app-layout>

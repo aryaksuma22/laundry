@@ -1,11 +1,11 @@
-<form id="deleteForm" action="{{ route('obats.destroy', ['obat' => 0]) }}" method="POST">
+<form id="deleteFormObat" action="{{ route('obats.destroy', ['obat' => 0]) }}" method="POST">
     @csrf
     @method('DELETE')
     <table class="min-w-full bg-white overflow-hidden rounded-xl shadow-sm mb-5">
         <thead class="bg-slate-800 text-white">
             <tr>
                 <th class="px-4 py-2 text-left">
-                    <input type="checkbox" class="form-checkbox rounded-[4px]" id="checkbox-all" />
+                    <input type="checkbox" class="form-checkbox rounded-[4px] cursor-pointer" id="checkbox-all" />
                 </th>
                 <th class="px-4 py-2 text-left">Kode Obat</th>
                 <th class="px-4 py-2 text-left">Nama Obat</th>
@@ -21,10 +21,10 @@
         </thead>
         <tbody>
             @foreach ($obats as $obat)
-                <tr class="border">
+                <tr class="border hover:bg-gray-50">
                     <td class="px-4 py-3">
                         <input type="checkbox" name="obats[]" value="{{ $obat->id }}"
-                            class="form-checkbox rounded-[5px] checkbox-row" />
+                            class="form-checkbox rounded-[5px] checkbox-row cursor-pointer" />
                     </td>
                     <td class="px-4 py-3">{{ $obat->kode_obat }}</td>
                     <td class="px-4 py-3">{{ $obat->nama_obat }}</td>

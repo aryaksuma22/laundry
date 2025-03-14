@@ -1,4 +1,4 @@
-<form id="deleteForm" action="{{ route('suppliers.destroy', ['supplier' => 0]) }}" method="POST">
+<form id="deleteFormSupplier" action="{{ route('suppliers.destroy', ['supplier' => 0]) }}" method="POST">
     @csrf
     @method('DELETE')
     <table class="min-w-full bg-white overflow-hidden rounded-xl shadow-sm mb-5">
@@ -17,7 +17,7 @@
         </thead>
         <tbody>
             @foreach ($suppliers as $supplier)
-                <tr class="border">
+                <tr class="border hover:bg-gray-50">
                     <td class="px-4 py-3">
                         <input type="checkbox" name="suppliers[]" value="{{ $supplier->id }}"
                             class="form-checkbox rounded-[5px] checkbox-row" />

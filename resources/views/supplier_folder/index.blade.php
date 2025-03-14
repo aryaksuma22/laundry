@@ -10,7 +10,7 @@
                     <div class="flex flex-row gap-4">
                         {{-- Export Button --}}
                         <button
-                            class="px-4 py-2 gap-2 bg-white flex flex-row border rounded-lg justify-center items-center">
+                            class="px-4 py-2 gap-2 bg-white flex flex-row border rounded-lg justify-center items-center hover:bg-gray-50 transition-all duration-200">
                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                                 viewBox="0 0 24 24">
@@ -21,8 +21,8 @@
                             <p class="font-semibold">Export</p>
                         </button>
                         {{-- Delete Button --}}
-                        <button form="deleteForm" type="submit"
-                            class="px-4 py-2 bg-red-500 border rounded-lg flex items-center">
+                        <button form="deleteFormSupplier" type="submit"
+                            class="px-4 py-2 bg-red-500 hover:bg-red-600 border rounded-lg flex items-center">
                             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path fill-rule="evenodd"
@@ -92,7 +92,6 @@
                             <form action="{{ route('suppliers.index') }}" method="GET" id="perPageForm">
                                 <label for="perPage" class="mr-2 text-sm">Show</label>
                                 <select name="perPage" id="perPage"
-                                    onchange="document.getElementById('perPageForm').submit()"
                                     class="border border-gray-200 rounded">
                                     <option value="5" {{ request('perPage') == 5 ? 'selected' : '' }}>5</option>
                                     <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>

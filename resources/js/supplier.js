@@ -135,29 +135,108 @@ $(document).on('change', '.checkbox-row', function () {
 $(document).on('click', '.delete-supplier', function (e) {
     e.preventDefault();
 
-    let idSupplier = $(this).data('id');
-    let row = $(this).closest('tr');
+    let idSupplier = $(this).data('id');  // Ambil ID obat
+    let row = $(this).closest('tr');  // Ambil baris tabel
 
-    if (!confirm('Apakah Anda yakin ingin menghapus data supplier ini?')) {
-        return;
-    }
+    // Tampilkan SweetAlert untuk konfirmasi hapus
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: 'Supplier akan dihapus secara permanen',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/suppliers/single/' + idSupplier,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (response.success) {
+                        row.fadeOut(300, function () {
+                            $(this).remove();
+                        }); x
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: 'Supplier berhasil dihapus.',
+                            confirmButtonText: 'OK'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Gagal menghapus Supplier.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan. Pastikan Supplier masih ada.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    });
+});
 
-    $.ajax({
-        url: '/suppliers/single/' + idSupplier,
-        type: 'DELETE',
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function (response) {
-            if (response.success) {
-                row.fadeOut(300, function () { $(this).remove(); });
-                alert('Supplier berhasil dihapus.');
-            } else {
-                alert('Gagal menghapus Supplier.');
-            }
-        },
-        error: function (xhr) {
-            alert('Terjadi kesalahan. Pastikan Supplier masih ada.');
+$(document).on('submit', '#deleteFormSupplier', function (e) {
+    e.preventDefault(); // Cegah submit form secara tradisional
+
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: 'Supplier yang dipilih akan dihapus secara permanen',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let form = $(this);
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form.serialize(), // Mengirim data form (termasuk _token dan _method)
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: 'Supplier Terpilih Berhasil Dihapus',
+                            confirmButtonText: 'OK'
+                        });
+                        // Refresh tabel obat via AJAX (misalnya, panggil fungsi fetchObats)
+                        fetchSuppliers(1);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: response.message,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan saat menghapus Supplier.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
         }
     });
 });

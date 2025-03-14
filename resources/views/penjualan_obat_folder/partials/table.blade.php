@@ -1,5 +1,5 @@
 {{-- Tabel Data Obat --}}
-<form id="deleteForm" action="{{ route('penjualan_obats.destroy', ['penjualan_obat' => 0]) }}" method="POST">
+<form id="deleteFormPenjualanObat" action="{{ route('penjualan_obats.destroy', ['penjualan_obat' => 0]) }}" method="POST">
     @csrf
     @method('DELETE')
     <table class="min-w-full bg-white overflow-hidden rounded-xl shadow-sm mb-5">
@@ -18,7 +18,7 @@
         </thead>
         <tbody>
             @foreach ($penjualan_obats as $penjualan_obat)
-                <tr class="border">
+                <tr class="border hover:bg-gray-50">
                     <td class="px-4 py-3">
                         <input type="checkbox" name="penjualan_obats[]" value="{{ $penjualan_obat->id }}"
                             class="form-checkbox rounded-[5px] checkbox-row" />

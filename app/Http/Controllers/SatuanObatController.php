@@ -11,32 +11,32 @@ class SatuanObatController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search', '');
-    
+
         // Mulai query dengan Satuan_obat
         $satuan_obats = Satuan_obat::query();
-    
+
         if (!empty($search)) {
             $satuan_obats = $satuan_obats->where('nama_satuan', 'like', "%$search%");
         }
-    
+
         // Pastikan selalu mengambil data dengan get()
         $satuan_obats = $satuan_obats->get();
-    
+
         // Jika request AJAX (misalnya pagination, search, atau sort), kembalikan partial view
         if ($request->ajax() && ($request->has('page') || $request->has('search'))) {
             $html = view('satuan_obat_folder.partials.table', compact('satuan_obats'))->render();
             return response()->json(['html' => $html]);
         }
-    
+
         $headers = [
             'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
             'Pragma' => 'no-cache',
             'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT',
         ];
-    
+
         return view('satuan_obat_folder.index', compact('satuan_obats', 'search'));
     }
-    
+
 
     // Controller Create
 
@@ -100,10 +100,17 @@ class SatuanObatController extends Controller
 
         if (!empty($satuan_obatIds)) {
             Satuan_obat::whereIn('id', $satuan_obatIds)->delete();
-            return redirect()->route('satuan_obats.index')->with('success', 'Obat berhasil dihapus.');
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Satuan obat berhasil dihapus.']);
+            }
+            return redirect()->route('satuan_obats.index')->with('success', 'Satuan obat berhasil dihapus.');
         }
 
-        return redirect()->route('satuan_obats.index')->with('success', 'Satuan obat berhasil dihapus.');
+        if ($request->ajax()) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada Satuan obat yang dipilih.'], 400);
+        }
+
+        return redirect()->route('satuan_obats.index')->with('error', 'Tidak ada Satuan obat yang dipilih.');
     }
 
     public function destroySingle($id)

@@ -103,8 +103,15 @@ class KategoriObatController extends Controller
         $kategori_obatIds = $request->input('kategori_obats'); // Ambil array ID obat
 
         if (!empty($kategori_obatIds)) {
-            kategori_obat::whereIn('id', $kategori_obatIds)->delete();
-            return redirect()->route('kategori_obats.index')->with('success', 'Obat berhasil dihapus.');
+            Kategori_obat::whereIn('id', $kategori_obatIds)->delete();
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'kategori obat berhasil dihapus.']);
+            }
+            return redirect()->route('kategori_obats.index')->with('success', 'kategori obat berhasil dihapus.');
+        }
+
+        if ($request->ajax()) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada Kategori obat yang dipilih.'], 400);
         }
 
         return redirect()->route('kategori_obats.index')->with('error', 'Tidak ada obat yang dipilih.');

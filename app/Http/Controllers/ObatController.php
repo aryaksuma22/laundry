@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Obat;
+use App\Models\Obat;  
 use App\Models\Satuan_obat;
 use Illuminate\Http\Request;
 use App\Models\Kategori_obat;
@@ -15,14 +15,14 @@ class ObatController extends Controller
 
         // Ambil parameter sorting dari request, default sort by "nama_obat" ascending
         $sortOrder = $request->get('sortOrder', 'asc');
-        $sortBy = $request->get('sortBy', 'nama_obat');
+        $sortBy = $request->get('sortBy', 'kode_obat');
 
 
 
         // Daftar kolom yang diizinkan untuk sorting
         $allowedSort = ['kode_obat', 'nama_obat', 'stok', 'harga_beli', 'harga_jual', 'tanggal_kadaluarsa'];
         if (!in_array($sortBy, $allowedSort)) {
-            $sortBy = 'nama_obat';
+            $sortBy = 'kode_obat';
         }
 
 
@@ -229,7 +229,14 @@ class ObatController extends Controller
 
         if (!empty($obatIds)) {
             Obat::whereIn('id', $obatIds)->delete();
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Obat berhasil dihapus.']);
+            }
             return redirect()->route('obats.index')->with('success', 'Obat berhasil dihapus.');
+        }
+
+        if ($request->ajax()) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada obat yang dipilih.'], 400);
         }
 
         return redirect()->route('obats.index')->with('error', 'Tidak ada obat yang dipilih.');

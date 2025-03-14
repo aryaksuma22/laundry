@@ -9,6 +9,17 @@ function initAccountManagement() {
     sortBy = queryParams.get('sortBy') || 'id';
     sortOrder = queryParams.get('sortOrder') || 'asc';
     perPage = queryParams.get('perPage') || 10;
+
+    // Jika ada hidden inputs, kita bisa set nilainya (opsional)
+    if ($('#sort-by').length) {
+        $('#sort-by').val(sortBy);
+    }
+    if ($('#sort-order').length) {
+        $('#sort-order').val(sortOrder);
+    }
+    if ($('#perPage').length) {
+        $('#perPage').val(perPage);
+    }
 }
 
 // Initialize the page on document ready

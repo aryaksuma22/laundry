@@ -150,16 +150,20 @@ class PenjualanObatController extends Controller
     {
         $penjualan_obatIds = $request->input('penjualan_obats'); // array ID penjualan_obats
 
-        if (!empty($penjualan_obatIds)) {
-            // Hapus di tabel penjualan_obats
-            Penjualan_obat::whereIn('id', $penjualan_obatIds)->delete();
 
-            return redirect()->route('penjualan_obats.index')
-                ->with('success', 'Data Penjualan berhasil dihapus.');
+        if (!empty($penjualan_obatIds)) {
+            Penjualan_obat::whereIn('id', $penjualan_obatIds)->delete();
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Transaksi berhasil dihapus.']);
+            }
+            return redirect()->route('penjualan_obats.index')->with('success', 'Transaksi berhasil dihapus.');
         }
 
-        return redirect()->route('penjualan_obats.index')
-            ->with('error', 'Tidak ada data penjualan yang dipilih.');
+        if ($request->ajax()) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada transaksi yang dipilih.'], 400);
+        }
+
+        return redirect()->route('penjualan_obats.index')->with('error', 'Tidak ada transaksi yang dipilih.');
     }
 
     public function destroySingle($id)

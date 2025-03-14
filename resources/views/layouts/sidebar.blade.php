@@ -103,6 +103,3 @@
 
 </div>
 
-@push('scripts')
-    @vite(['resources/js/sidebar.js'])
-@endpush

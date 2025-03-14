@@ -10,7 +10,7 @@
                     <div class="flex flex-row gap-4">
                         {{-- Export Button --}}
                         <button
-                            class="px-4 py-2 gap-2 bg-white flex flex-row border rounded-lg justify-center items-center">
+                            class="px-4 py-2 gap-2 bg-white flex flex-row border rounded-lg justify-center items-center hover:bg-gray-50 transition-all duration-200">
                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                                 viewBox="0 0 24 24">
@@ -21,8 +21,8 @@
                             <p class="font-semibold">Export</p>
                         </button>
                         {{-- Delete Button --}}
-                        <button form="deleteForm" type="submit"
-                            class="px-4 py-2 bg-red-500 border rounded-lg flex items-center">
+                        <button form="deleteFormPembelianObat" type="submit"
+                            class="px-4 py-2 bg-red-500 hover:bg-red-600 transition-all duration-100  border rounded-lg flex items-center">
                             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path fill-rule="evenodd"
@@ -56,23 +56,31 @@
                                 <!-- Dropdown Sort By -->
                                 <div id="sortByPopup"
                                     class="hidden absolute w-[7.5rem] bg-white shadow-sm rounded-lg border top-[3.4rem] right-0 divide-y divide-gray-200 overflow-hidden">
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="id">ID</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="nama_obat">Obat</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="nama_supplier">
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50 text-gray-800"
+                                        data-sortby="id">ID</div>
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50 text-gray-800"
+                                        data-sortby="nama_obat">Obat</div>
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50 text-gray-800"
+                                        data-sortby="nama_supplier">
                                         Supplier</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="jumlah">Jumlah</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="harga_beli">Harga
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50 text-gray-800"
+                                        data-sortby="jumlah">Jumlah</div>
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50 text-gray-800"
+                                        data-sortby="harga_beli">Harga
                                         Beli
                                     </div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="total_harga">Total
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50 text-gray-800"
+                                        data-sortby="total_harga">Total
                                         Harga</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="tanggal_pemmbelian">
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50 text-gray-800"
+                                        data-sortby="tanggal_pemmbelian">
                                         Tanggal Pembelian</div>
                                 </div>
                             </button>
                         </div>
                         {{-- SEARCH BAR --}}
-                        <form id="searchForm" action="{{ route('pembelian_obats.index') }}" method="GET" class="relative">
+                        <form id="searchForm" action="{{ route('pembelian_obats.index') }}" method="GET"
+                            class="relative">
                             <input type="search" name="search" id="search"
                                 class="block w-full px-10 py-3 rounded-lg border border-gray-200 placeholder:font-bold"
                                 value="{{ $search }}" placeholder="Search" />
@@ -86,7 +94,7 @@
                         </form>
                         {{-- BUTTON TAMBAH --}}
                         <a href="{{ route('pembelian_obats.create') }}"
-                            class="px-4 py-3 gap-2 bg-[#4268F6] flex flex-row border rounded-lg justify-center items-center">
+                            class="px-4 py-3 gap-2 bg-[#4268F6] hover:bg-[#3a5ddc] transition-all duration-100 flex flex-row border rounded-lg justify-center items-center">
                             <div class="flex flex-row items-center gap-2">
                                 <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -100,9 +108,7 @@
                         <div class="flex items-center border rounded-lg bg-white px-6 py-1">
                             <form action="{{ route('pembelian_obats.index') }}" method="GET" id="perPageForm">
                                 <label for="perPage" class="mr-2 text-sm">Show</label>
-                                <select name="perPage" id="perPage"
-                                    onchange="document.getElementById('perPageForm').submit()"
-                                    class="border border-gray-200 rounded">
+                                <select name="perPage" id="perPage" class="border border-gray-200 rounded">
                                     <option value="5" {{ request('perPage') == 5 ? 'selected' : '' }}>5</option>
                                     <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
                                     <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
@@ -125,4 +131,17 @@
             </div>
         </div>
     </main>
+
+    @if (session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    confirmButtonText: 'OK'
+                });
+            });
+        </script>
+    @endif
 </x-app-layout>

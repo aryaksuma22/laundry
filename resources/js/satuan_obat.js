@@ -90,29 +90,109 @@ $(document).on('change', '.checkbox-row', function () {
 $(document).on('click', '.delete-satuan_obat', function (e) {
     e.preventDefault();
 
-    let idSatuanObat = $(this).data('id');
-    let row = $(this).closest('tr');
+    let idSatuanObat = $(this).data('id');  // Ambil ID obat
+    let row = $(this).closest('tr');  // Ambil baris tabel
 
-    if (!confirm('Apakah Anda yakin ingin menghapus satuan obat ini?')) {
-        return;
-    }
+    // Tampilkan SweetAlert untuk konfirmasi hapus
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: 'Satuan Obat akan dihapus secara permanen',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/satuan_obats/single/' + idSatuanObat,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (response.success) {
+                        row.fadeOut(300, function () {
+                            $(this).remove();
+                        }); x
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: 'Satuan Obat berhasil dihapus.',
+                            confirmButtonText: 'OK'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Gagal menghapus Satuan Obat.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan. Pastikan Satuan Obat masih ada.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    });
+});
 
-    $.ajax({
-        url: '/satuan_obats/single/' + idSatuanObat,
-        type: 'DELETE',
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function (response) {
-            if (response.success) {
-                row.fadeOut(300, function () { $(this).remove(); });
-                alert('Satuan Obat berhasil dihapus.');
-            } else {
-                alert('Gagal menghapus Satuan Obat.');
-            }
-        },
-        error: function (xhr) {
-            alert('Terjadi kesalahan. Pastikan Satuan Obat masih ada.');
+
+$(document).on('submit', '#deleteFormSatuanObat', function (e) {
+    e.preventDefault(); // Cegah submit form secara tradisional
+
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: 'Satuan Obat yang dipilih akan dihapus secara permanen',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let form = $(this);
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form.serialize(), // Mengirim data form (termasuk _token dan _method)
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: 'Satuan Obat Terpilih Berhasil Dihapus',
+                            confirmButtonText: 'OK'
+                        });
+                        // Refresh tabel obat via AJAX (misalnya, panggil fungsi fetchObats)
+                        fetchSatuanObats(1);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: response.message,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan saat menghapus Kategori.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
         }
     });
 });

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('satuan_id')->constrained('satuan_obats')->onDelete('cascade');
             $table->string('kode_obat');
             $table->string('nama_obat');
-            $table->text('deskripsi');
+            $table->text('deskripsi')->nullable();
             $table->integer('harga_beli');
             $table->integer('harga_jual');
             $table->integer('stok');

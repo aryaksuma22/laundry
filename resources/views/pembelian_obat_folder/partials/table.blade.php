@@ -1,11 +1,11 @@
-<form id="deleteForm" action="{{ route('pembelian_obats.destroy', ['pembelian_obat' => 0]) }}" method="POST">
+<form id="deleteFormPembelianObat" action="{{ route('pembelian_obats.destroy', ['pembelian_obat' => 0]) }}" method="POST">
     @csrf
     @method('DELETE')
     <table class="min-w-full bg-white overflow-hidden rounded-xl shadow-sm mb-5">
         <thead class="bg-slate-800 text-white">
             <tr>
                 <th class="px-4 py-2 text-left">
-                    <input type="checkbox" class="form-checkbox rounded-[4px]" id="checkbox-all" />
+                    <input type="checkbox" class="form-checkbox rounded-[4px] cursor-pointer" id="checkbox-all" />
                 </th>
                 <th class="px-4 py-2 text-left">ID</th>
                 <th class="px-4 py-2 text-left">Nama Obat</th>
@@ -19,10 +19,10 @@
         </thead>
         <tbody>
             @foreach ($pembelian_obats as $pembelian_obat)
-                <tr class="border">
+                <tr class="border hover:bg-gray-50">
                     <td class="px-4 py-3">
                         <input type="checkbox" name="pembelian_obats[]" value="{{ $pembelian_obat->id }}"
-                            class="form-checkbox rounded-[5px] checkbox-row" />
+                            class="form-checkbox rounded-[5px] checkbox-row cursor-pointer" />
                     </td>
                     <td class="px-4 py-3">{{ $pembelian_obat->id }}</td>
                     <td class="px-4 py-3">

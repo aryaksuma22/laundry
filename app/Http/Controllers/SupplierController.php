@@ -100,7 +100,7 @@ class SupplierController extends Controller
         $supplier->save();
 
         return redirect()->route('suppliers.index')
-            ->with('success', 'Supplier created successfully.');
+            ->with('success', 'Supplier berhasil ditambahkan.');
     }
 
     // Tampilan Edit Supplier
@@ -144,7 +144,7 @@ class SupplierController extends Controller
 
         $supplier->save();
 
-        return redirect()->route('suppliers.index')->with('success', 'Supplier updated successfully.');
+        return redirect()->route('suppliers.index')->with('success', 'Supplier berhasil diubah.');
     }
 
 
@@ -154,15 +154,21 @@ class SupplierController extends Controller
 
     public function destroy(Request $request)
     {
-
         $supplierIds = $request->input('suppliers');
 
         if (!empty($supplierIds)) {
             Supplier::whereIn('id', $supplierIds)->delete();
-            return redirect()->route('suppliers.index')->with('success', 'Supplier Berhasil Dihapus.');
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Supplier berhasil dihapus.']);
+            }
+            return redirect()->route('suppliers.index')->with('success', 'Supplier berhasil dihapus.');
         }
 
-        return redirect()->route('suppliers.index')->with('error', 'Tidak ada supplier yang dihapus.');
+        if ($request->ajax()) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada Supplier yang dipilih.'], 400);
+        }
+
+        return redirect()->route('suppliers.index')->with('error', 'Tidak ada Supplier yang dipilih.');
     }
 
     public function destroySingle($id)
@@ -171,9 +177,9 @@ class SupplierController extends Controller
 
         if ($supplier) {
             $supplier->delete();
-            return response()->json(['success' => true, 'message' => 'supplier deleted succesfully']);
+            return response()->json(['success' => true, 'message' => 'Supplier berhasil dihapus']);
         }
 
-        return response()->json(['success' => false, 'message' => 'Penjualan Obat tidak ditemukan'], 404);
+        return response()->json(['success' => false, 'message' => 'Supplier tidak ditemukan'], 404);
     }
 }
