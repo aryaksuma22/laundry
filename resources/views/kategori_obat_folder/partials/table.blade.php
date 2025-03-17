@@ -7,7 +7,6 @@
                 <th class="px-4 py-2 text-left">
                     <input type="checkbox" class="form-checkbox rounded-[4px]" id="checkbox-all" />
                 </th>
-                <th class="px-4 py-2 text-left">ID</th>
                 <th class="px-4 py-2 text-left">Nama Kategori</th>
                 <th class="px-4 py-2 text-left">Aksi</th>
             </tr>
@@ -15,13 +14,12 @@
         <tbody>
             @foreach ($kategori_obats as $kategori_obat)
                 <tr class="border hover:bg-gray-50">
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-3 text-left">
                         <input type="checkbox" name="kategori_obats[]" value="{{ $kategori_obat->id }}"
                             class="form-checkbox rounded-[5px] checkbox-row" />
                     </td>
-                    <td class="px-4 py-3">{{ $kategori_obat->id }}</td>
-                    <td class="px-4 py-3">{{ $kategori_obat->nama_kategori }}</td>
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-3 text-left">{{ $kategori_obat->nama_kategori }}</td>
+                    <td class="px-4 py-3 text-left">
                         <div class="flex flex-row">
                             <a href="{{ route('kategori_obats.edit', $kategori_obat->id) }}">
                                 <svg class="w-6 h-6 text-yellow-400" aria-hidden="true"

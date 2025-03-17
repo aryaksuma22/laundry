@@ -34,7 +34,8 @@
                     </div>
                     <div class="flex flex-row space-x-4 items-center">
                         {{-- SEARCH BAR --}}
-                        <form id="searchForm" action="{{ route('satuan_obats.index') }}" method="GET" class="relative">
+                        <form id="searchForm" action="{{ route('satuan_obats.index') }}" method="GET"
+                            class="relative">
                             <input type="search" name="search" id="search"
                                 class="block w-full px-10 py-3 rounded-lg border border-gray-200 placeholder:font-bold"
                                 value="" placeholder="Search" />
@@ -67,4 +68,14 @@
             </div>
         </div>
     </main>
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                confirmButtonText: 'OK'
+            });
+        </script>
+    @endif
 </x-app-layout>

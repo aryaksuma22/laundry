@@ -7,7 +7,6 @@
                 <th class="px-4 py-2 text-left">
                     <input type="checkbox" class="form-checkbox rounded-[4px]" id="checkbox-all" />
                 </th>
-                <th class="px-4 py-2 text-left">ID</th>
                 <th class="px-4 py-2 text-left">Nama Satuan</th>
                 <th class="px-4 py-2 text-left">Aksi</th>
             </tr>
@@ -19,7 +18,6 @@
                         <input type="checkbox" name="satuan_obats[]" value="{{ $satuan_obat->id }}"
                             class="form-checkbox rounded-[5px] checkbox-row" />
                     </td>
-                    <td class="px-4 py-3">{{ $satuan_obat->id }}</td>
                     <td class="px-4 py-3">{{ $satuan_obat->nama_satuan }}</td>
                     <td class="px-4 py-3">
                         <div class="flex flex-row">

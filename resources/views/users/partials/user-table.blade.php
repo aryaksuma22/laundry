@@ -7,7 +7,6 @@
                 <th class="px-4 py-2 text-left">
                     <input type="checkbox" class="form-checkbox rounded-[4px]" id="checkbox-all" />
                 </th>
-                <th class="px-4 py-2 text-left">ID</th>
                 <th class="px-4 py-2 text-left">Name</th>
                 <th class="px-4 py-2 text-left">Email</th>
                 <th class="px-4 py-2 text-left">Role</th>
@@ -22,7 +21,6 @@
                         <input type="checkbox" name="users[]" value="{{ $user->id }}"
                             class="form-checkbox rounded-[5px] checkbox-row" />
                     </td>
-                    <td class="px-4 py-3">{{ $user->id }}</td>
                     <td class="px-4 py-3">{{ $user->name }}</td>
                     <td class="px-4 py-3">{{ $user->email }}</td>
                     <td class="px-4 py-3">{{ $user->role }}</td>

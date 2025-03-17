@@ -7,7 +7,6 @@
                 <th class="px-4 py-2 text-left">
                     <input type="checkbox" class="form-checkbox rounded-[4px] cursor-pointer" id="checkbox-all" />
                 </th>
-                <th class="px-4 py-2 text-left">ID</th>
                 <th class="px-4 py-2 text-left">Nama Obat</th>
                 <th class="px-4 py-2 text-left">Supplier</th>
                 <th class="px-4 py-2 text-left">Jumlah</th>
@@ -24,7 +23,6 @@
                         <input type="checkbox" name="pembelian_obats[]" value="{{ $pembelian_obat->id }}"
                             class="form-checkbox rounded-[5px] checkbox-row cursor-pointer" />
                     </td>
-                    <td class="px-4 py-3">{{ $pembelian_obat->id }}</td>
                     <td class="px-4 py-3">
                         {{ $pembelian_obat->obat_id ? $pembelian_obat->obat->nama_obat : 'N/A' }}
                     </td>

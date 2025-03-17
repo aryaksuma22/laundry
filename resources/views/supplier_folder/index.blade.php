@@ -56,7 +56,6 @@
                                 <!-- Dropdown Sort By -->
                                 <div id="sortByPopup"
                                     class="hidden absolute w-[7.5rem] bg-white shadow-sm rounded-lg border top-[3.4rem] right-0 divide-y divide-gray-200 overflow-hidden">
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="id">ID</div>
                                     <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="nama_supplier">Nama
                                         Supplier</div>
                                 </div>

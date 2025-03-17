@@ -8,7 +8,6 @@
                 <th class="px-4 py-2 text-left">
                     <input type="checkbox" class="form-checkbox rounded-[4px]" id="checkbox-all" />
                 </th>
-                <th class="px-4 py-2 text-left">ID</th>
                 <th class="px-4 py-2 text-left">Nama Obat</th>
                 <th class="px-4 py-2 text-left">Jumlah</th>
                 <th class="px-4 py-2 text-left">Harga Jual</th>
@@ -23,7 +22,6 @@
                         <input type="checkbox" name="penjualan_obats[]" value="{{ $penjualan_obat->id }}"
                             class="form-checkbox rounded-[5px] checkbox-row" />
                     </td>
-                    <td class="px-4 py-3">{{ $penjualan_obat->id }}</td>
                     <td class="px-4 py-3">
                         {{ $penjualan_obat->obat_id ? $penjualan_obat->obat->nama_obat : 'N/A' }}
                     </td>

@@ -57,8 +57,6 @@
                                 <div id="sortByPopup"
                                     class="hidden absolute w-[7.5rem] bg-white shadow-sm rounded-lg border top-[3.4rem] right-0 divide-y divide-gray-200 overflow-hidden">
                                     <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50 text-gray-800"
-                                        data-sortby="id">ID</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50 text-gray-800"
                                         data-sortby="nama_obat">Obat</div>
                                     <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50 text-gray-800"
                                         data-sortby="nama_supplier">
