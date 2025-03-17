@@ -2,7 +2,7 @@
 <form id="deleteFormPenjualanObat" action="{{ route('penjualan_obats.destroy', ['penjualan_obat' => 0]) }}" method="POST">
     @csrf
     @method('DELETE')
-    <table class="min-w-full bg-white overflow-hidden rounded-xl shadow-sm mb-5">
+    <table class="min-w-full bg-white overflow-hidden rounded-lg shadow-sm mb-5">
         <thead class="bg-slate-800 text-white">
             <tr>
                 <th class="px-4 py-2 text-left">
@@ -18,7 +18,7 @@
         </thead>
         <tbody>
             @foreach ($penjualan_obats as $penjualan_obat)
-                <tr class="border hover:bg-gray-50">
+                <tr class="border hover:bg-sky-50">
                     <td class="px-4 py-3">
                         <input type="checkbox" name="penjualan_obats[]" value="{{ $penjualan_obat->id }}"
                             class="form-checkbox rounded-[5px] checkbox-row" />

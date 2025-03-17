@@ -41,7 +41,6 @@
             <!-- Konten Halaman -->
             <main class="flex-1" id="main-content">
                 {{ $slot }}
-                
             </main>
         </div>
     </div>

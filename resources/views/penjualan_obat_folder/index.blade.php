@@ -22,7 +22,7 @@
                         </button>
                         {{-- Delete Button --}}
                         <button form="deleteFormPenjualanObat" type="submit"
-                            class="px-4 py-2 bg-red-500 hover:bg-red-600 border rounded-lg flex items-center">
+                            class="px-4 py-2 bg-red-500 hover:bg-red-600 transition-all duration-100 border rounded-lg flex items-center">
                             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path fill-rule="evenodd"
@@ -36,7 +36,7 @@
                         <div class="flex flex-row gap-2">
                             {{-- Sorting Button --}}
                             <button id="toggleSortOrder"
-                                class="bg-white flex justify-center items-center px-3 py-2 rounded-lg border hover:bg-gray-50">
+                                class="bg-white flex justify-center items-center px-3 py-2 rounded-lg border hover:bg-gray-50 transition-all duration-100">
                                 <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     width="24" height="24" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -56,23 +56,23 @@
                                 <!-- Dropdown Sort By -->
                                 <div id="sortByPopup"
                                     class="hidden absolute w-[7.5rem] bg-white shadow-sm rounded-lg border top-[3.4rem] right-0 divide-y divide-gray-200 overflow-hidden">
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white"
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
                                         data-sortby="id">ID</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white"
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
                                         data-sortby="nama_obat">Obat</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white"
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
                                         data-sortby="nama_supplier">
                                         Supplier</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white"
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
                                         data-sortby="jumlah">Jumlah</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white"
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
                                         data-sortby="harga_beli">Harga
                                         Beli
                                     </div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white"
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
                                         data-sortby="total_harga">Total
                                         Harga</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white"
+                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
                                         data-sortby="tanggal_pemmbelian">
                                         Tanggal Pembelian</div>
                                 </div>
@@ -94,7 +94,7 @@
                         </form>
                         {{-- BUTTON TAMBAH --}}
                         <a href="{{ route('penjualan_obats.create') }}"
-                            class="px-4 py-3 gap-2 bg-[#4268F6] hover:bg-[#3a5ddc] flex flex-row border rounded-lg justify-center items-center">
+                            class="px-4 py-3 gap-2 bg-[#4268F6] hover:bg-[#3a5ddc] flex flex-row border rounded-lg justify-center items-center transition-all duration-100">
                             <div class="flex flex-row items-center gap-2">
                                 <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     width="24" height="24" fill="none" viewBox="0 0 24 24">

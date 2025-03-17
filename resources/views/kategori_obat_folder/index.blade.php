@@ -45,7 +45,7 @@
                     </form>
                     {{-- BUTTON TAMBAH --}}
                     <a href="{{ route('kategori_obats.create') }}"
-                        class="px-4 py-3 gap-2 bg-[#4268F6] flex flex-row border rounded-lg justify-center items-center">
+                        class="px-4 py-3 gap-2 bg-[#4268F6] hover:bg-[#3a5ddc] transition-all duration-100 flex flex-row border rounded-lg justify-center items-center">
                         <div class="flex flex-row items-center gap-2">
                             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="none" viewBox="0 0 24 24">

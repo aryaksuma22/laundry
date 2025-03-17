@@ -60,9 +60,9 @@
                             <!-- Pop Up Sort by -->
                             <div class="grid-cols-1 divide-y divide-gray-200 absolute w-[7.5rem] bg-white shadow-sm rounded-lg border top-[3.4rem] right-[0.1px] hidden overflow-hidden"
                                 id="sortByPopup">
-                                <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="id">ID</div>
-                                <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="name">Name</div>
-                                <div class="py-2 px-4 cursor-pointer sort-option hover:bg-[#4268F6] hover:text-white" data-sortby="role">Role</div>
+                                <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50" data-sortby="id">ID</div>
+                                <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50" data-sortby="name">Name</div>
+                                <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50" data-sortby="role">Role</div>
                             </div>
                         </button>
                     </div>

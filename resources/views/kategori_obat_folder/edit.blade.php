@@ -21,9 +21,14 @@
                         </div>
                     @enderror
 
-                    <div class="mb-4">
-                        <button type="submit"
-                            class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Update</button>
+                    <div class="flex flex-row gap-6 mb-4">
+                        <div class="">
+                            <button type="submit"
+                                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Tambah</button>
+                        </div>
+                        <a href="{{ route('kategori_obats.index') }}">
+                            <div class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Cancel</div>
+                        </a>
                     </div>
                 </form>
             </div>

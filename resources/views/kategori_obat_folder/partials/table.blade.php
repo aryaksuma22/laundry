@@ -14,7 +14,7 @@
         </thead>
         <tbody>
             @foreach ($kategori_obats as $kategori_obat)
-                <tr class="border hover:border-gray-50">
+                <tr class="border hover:bg-gray-50">
                     <td class="px-4 py-3">
                         <input type="checkbox" name="kategori_obats[]" value="{{ $kategori_obat->id }}"
                             class="form-checkbox rounded-[5px] checkbox-row" />

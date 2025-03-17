@@ -15,7 +15,7 @@ function updateActiveSidebar() {
                 .removeClass("text-gray-800 hover:text-[#4268F6]")
                 .addClass("bg-[#4268F6] text-white active");
 
-            $(this).find("svg")
+            $(this).find("#sidebarSVG")
                 .removeClass("text-gray-800 group-hover:text-[#4268F6]")
                 .addClass("text-white");
 
@@ -31,7 +31,7 @@ function updateActiveSidebar() {
                 .removeClass("bg-[#4268F6] text-white active")
                 .addClass("text-gray-800 hover:text-[#4268F6]");
 
-            $(this).find("svg")
+            $(this).find("#sidebarSVG")
                 .removeClass("text-white")
                 .addClass("text-gray-800 group-hover:text-[#4268F6]");
 
@@ -57,9 +57,9 @@ $(document).on("click", ".ajax-link", function (e) {
         window.history.pushState(null, "", url);
         updateActiveSidebar();
         $("#main-content").html(`                <div id="loadingAnimation" class="flex flex-row gap-2 w-full min-h-screen items-center justify-center">
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle1"></div>
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle2"></div>
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle3"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#4268F6] circle1"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#3d60e1] circle2"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#3758d0] circle3"></div>
                 </div>`);
 
         $.ajax({
@@ -103,9 +103,9 @@ $(document).on("click", ".ajax-link", function (e) {
             },
             error: function () {
                 $("#main-content").html(`                <div id="loadingAnimation" class="flex flex-row gap-2 w-full min-h-screen items-center justify-center">
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle1"></div>
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle2"></div>
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle3"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#4268F6] circle1"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#3d60e1] circle2"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#3758d0] circle3"></div>
                 </div>`);
             }
         });
@@ -124,9 +124,9 @@ $(document).on("click", ".dropdown-parent", function (e) {
         window.history.pushState(null, "", url);
         updateActiveSidebar();
         $("#main-content").html(`                <div id="loadingAnimation" class="flex flex-row gap-2 w-full min-h-screen items-center justify-center">
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle1"></div>
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle2"></div>
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle3"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#4268F6] circle1"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#3d60e1] circle2"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#3758d0] circle3"></div>
                 </div>`);
 
         $.ajax({
@@ -137,9 +137,9 @@ $(document).on("click", ".dropdown-parent", function (e) {
             },
             error: function () {
                 $("#main-content").html(`                <div id="loadingAnimation" class="flex flex-row gap-2 w-full min-h-screen items-center justify-center">
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle1"></div>
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle2"></div>
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle3"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#4268F6] circle1"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#3d60e1] circle2"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#3758d0] circle3"></div>
                 </div>`);
             }
         });
@@ -168,9 +168,9 @@ window.onpopstate = function () {
     const url = window.location.href;
     updateActiveSidebar();
     $("#main-content").html(`                <div id="loadingAnimation" class="flex flex-row gap-2 w-full min-h-screen items-center justify-center">
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle1"></div>
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle2"></div>
-                    <div class="w-8 h-8 rounded-full bg-[#4268F6] circle3"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#4266F6] circle1"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#4266F6] circle2"></div>
+                    <div class="w-6 h-6 rounded-full bg-[#4268F6] circle3"></div>
                 </div>`);
 
     $.ajax({
