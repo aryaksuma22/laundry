@@ -39,7 +39,7 @@
             <p
                 class="group-hover:transition-all group-hover:duration-200
           {{ request()->routeIs('navigasiobat') ? 'font-semibold' : 'font-semibold group-hover:text-[#4268F6]' }}">
-                DatabaseLlaundry
+                Database Laundry
             </p>
             <!-- Ikon panah untuk toggle dropdown -->
             <svg id="sidebarSVG"
