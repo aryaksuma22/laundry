@@ -2,25 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Obat;
-use App\Models\Satuan_obat;
+
 use Illuminate\Http\Request;
-use App\Models\Kategori_obat;
+
 use Illuminate\Validation\Rule;
 
-class ObatController extends Controller
+class PemesananController extends Controller
 {
     public function index(Request $request)
     {
 
         // Ambil parameter sorting dari request, default sort by "nama_obat" ascending
         $sortOrder = $request->get('sortOrder', 'asc');
-        $sortBy = $request->get('sortBy', 'kode_obat');
+        $sortBy = $request->get('sortBy', 'nama_pesanan');
 
 
 
         // Daftar kolom yang diizinkan untuk sorting
-        $allowedSort = ['kode_obat', 'nama_obat', 'stok', 'harga_beli', 'harga_jual', 'tanggal_kadaluarsa'];
+        $allowedSort = ['nama_pesanan', 'no_pesanan', 'tanggal', 'berat_pesanan', 'total_harga', 'status_pesanan', 'alamat', 'kontak'];
         if (!in_array($sortBy, $allowedSort)) {
             $sortBy = 'kode_obat';
         }
@@ -40,17 +39,17 @@ class ObatController extends Controller
 
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
-                $q->where('kode_obat', 'like', "%{$search}%")
-                    ->orWhere('nama_obat', 'like', "%{$search}%")
-                    ->orWhere('deskripsi', 'like', "%{$search}%")
-                    ->orWhereHas('satuan', function ($q) use ($search) {
-                        $q->where('nama_satuan', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('kategori', function ($q) use ($search) {
-                        $q->where('nama_kategori', 'like', "%{$search}%");
-                    });
+                $q->where('nama_pelanggan', 'like', "%{$search}%")
+                    ->orWhere('no_pesanan', 'like', "%{$search}%")
+                    ->orWhere('tanggal', 'like', "%{$search}%")
+                    ->orWhere('berat_pesanan', 'like', "%{$search}%")
+                    ->orWhere('total_harga', 'like', "%{$search}%")
+                    ->orWhere('status_pesanan', 'like', "%{$search}%")
+                    ->orWhere('alamat', 'like', "%{$search}%")
+                    ->orWhere('kontak', 'like', "%{$search}%");
             });
         }
+
 
 
         // Terapkan sorting dan paginasi berdasarkan parameter yang dipilih
@@ -70,7 +69,7 @@ class ObatController extends Controller
         ];
 
         // Tampilkan halaman dengan data obat
-        return view('obat.index', compact('obats', 'search', 'sortBy', 'sortOrder'));
+        return view('pemesnan.index', compact('obats', 'search', 'sortBy', 'sortOrder'));
     }
 
 

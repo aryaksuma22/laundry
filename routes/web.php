@@ -9,6 +9,14 @@ use App\Http\Controllers\SatuanObatController;
 use App\Http\Controllers\KategoriObatController;
 use App\Http\Controllers\PembelianObatController;
 use App\Http\Controllers\PenjualanObatController;
+use App\Http\Controllers\PemesananController;
+use App\Http\Controllers\LayananController;
+use App\Http\Controllers\RiwayatController;
+use App\Http\Controllers\TransaksiController;
+
+
+
+
 
 Route::get('/', function () {
     return view('auth.login');
@@ -54,6 +62,10 @@ Route::resource('penjualan_obats', PenjualanObatController::class)->middleware([
 Route::delete('/penjualan_obats/mass-delete', [PenjualanObatController::class, 'destroy'])->name('penjualan_obats.massDestroy');
 Route::delete('/penjualan_obats/single/{id}', [PenjualanObatController::class, 'destroySingle'])->name('penjualan_obats.destroySingle');
 
+Route::resource('pemesanan', PemesananController::class)->middleware(['auth', 'verified']);
+Route::resource('layanan', layananController::class)->middleware(['auth', 'verified']);
+Route::resource('transaksi', TransaksiController::class)->middleware(['auth', 'verified']);
+Route::resource('riwayat', RiwayatController::class)->middleware(['auth', 'verified']);
 
 // Route untuk Settings
 Route::get('/settings', function () {
@@ -69,3 +81,5 @@ Route::middleware('auth')->group(function () {
 
 // Include Routes dari Auth
 require __DIR__ . '/auth.php';
+
+

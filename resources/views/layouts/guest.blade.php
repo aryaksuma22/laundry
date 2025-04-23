@@ -19,10 +19,10 @@
 <body class="font-sans text-gray-900 antialiased">
     <div class="w-full h-screen overflow-hidden">
         <div class="flex flex-row h-full">
-            <div class="w-[40%] bg-[#4268F6] p-5 flex flex-col justify-center items-center">
-                <img src="{{ url('pharamacylogos.jpg') }}" alt="logo" class="h-[20rem] rounded-2xl mb-5">
-                <p class="text-white font-outfit text-[3rem] uppercase tracking-wider">Selamat Datang</p>
-                <p class="text-white font-outfit text-lg">Kesehatan Anda, kebahagiaan kami.</p>
+            <div class="w-[40%] bg-[#4769e4] p-5 flex flex-col justify-center items-center">
+                <img src="{{ url('laundry.jpg') }}" alt="logo" class="h-[20rem] rounded-2xl mb-5">
+                <p class="text-white font-outfit text-[3rem] uppercase tracking-wider">Laundry</p>
+                <p class="text-white font-outfit text-lg">Cucian numpuk? Serahkan pada kami</p>
             </div>
             <div class="w-[60%] flex flex-col p-10 justify-center items-center">
                 <div class="w-1/3">

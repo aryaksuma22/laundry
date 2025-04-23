@@ -2,7 +2,7 @@
     <div class="p-10 flex flex-col gap-6">
         {{-- ROW 1 --}}
         <div class="grid grid-cols-4 gap-6 w-full">
-            <a href="#" data-url="{{ route('obats.index') }}" class="ajax-link col-span-1">
+            <a href="#" data-url="{{ route('pemesanan.index') }}" class="ajax-link col-span-1">
                 <div
                     class="bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 duration-100 transition-all">
                     <div class="pr-4 border-r-2">
@@ -15,14 +15,14 @@
                                 clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <p class="text-[2.2rem] py-2 px-4">Obat</p>
+                    <p class="text-[2.2rem] py-2 px-4">pemesanan</p>
                 </div>
             </a>
         </div>
         <hr>
         {{-- ROW 2 --}}
         <div class="grid grid-cols-4 gap-6 w-full">
-            <a href="#" data-url="{{ route('pembelian_obats.index') }}"
+            <a href="#" data-url="{{ route('layanan.index') }}"
                 class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] col-start-1 hover:bg-gray-50 transition-all duration-100">
                 <div class="pr-4 border-r-2">
                     <svg class="w-16 h-16 text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -32,9 +32,9 @@
                             clip-rule="evenodd" />
                     </svg>
                 </div>
-                <p class="text-[2.2rem] py-2 px-4 leading-tight">Pembelian</p>
+                <p class="text-[2.2rem] py-2 px-4 leading-tight">layanan</p>
             </a>
-            <a href="#" data-url="{{ route('penjualan_obats.index') }}"
+            <a href="#" data-url="{{ route('transaksi.index') }}"
                 class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
                 <div class="pr-4 border-r-2">
                     <svg class="w-16 h-16 text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -45,9 +45,9 @@
                             clip-rule="evenodd" />
                     </svg>
                 </div>
-                <p class="text-[2.2rem] py-2 px-4 leading-tight">Penjualan</p>
+                <p class="text-[2.2rem] py-2 px-4 leading-tight">transaksi</p>
             </a>
-            <a href="#" data-url="{{ route('suppliers.index') }}"
+            <a href="#" data-url="{{ route('riwayat.index') }}"
                 class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
                 <div class="pr-4 border-r-2">
                     <svg class="w-16 h-16 text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +57,7 @@
                             clip-rule="evenodd" />
                     </svg>
                 </div>
-                <p class="text-[2.2rem] py-2 px-4 leading-tight">Supplier</p>
+                <p class="text-[2.2rem] py-2 px-4 leading-tight">riwayat pemesanan</p>
             </a>
         </div>
         <hr>

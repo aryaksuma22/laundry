@@ -36,8 +36,8 @@
         <div class="flex flex-row h-full">
             <div class="w-[40%] bg-[#4268F6] p-5 flex flex-col justify-center items-center">
                 <img src="{{ url('pharamacylogo.jpg') }}" alt="logo" class="h-[20rem] rounded-full mb-2">
-                <p class="text-white font-outfit text-[3rem] uppercase tracking-wider">Selamat Datang</p>
-                <p class="text-white font-outfit text-lg">Kesehatan Anda, kebahagiaan kami.</p>
+                <p class="text-white font-outfit text-[3rem] uppercase tracking-wider">laundry</p>
+                <p class="text-white font-outfit text-lg">Cucian numpuk? Serahkan pada ahlinya</p>
             </div>
 
             {{-- ------------------------------------------------------------------ --}}

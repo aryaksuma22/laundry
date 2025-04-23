@@ -37,10 +37,10 @@ class Obat extends Model
     {
         return $this->hasMany(Pembelian_obat::class, 'obat_id')->onDelete('cascade');
     }
-    
+
     public function penjualan()
     {
         return $this->hasMany(Penjualan_obat::class, 'obat_id')->onDelete('cascade');
     }
-    
+
 }
