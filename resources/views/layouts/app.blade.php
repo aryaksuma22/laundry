@@ -13,6 +13,15 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Scripts -->
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+
+    <!-- jQuery (needed for DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -48,7 +57,7 @@
     <!-- Stack untuk script khusus -->
     @stack('scripts')
 
-    @vite(['resources/js/app.js', 'resources/js/account-management.js', 'resources/js/obat.js', 'resources/js/pembelian_obat.js', 'resources/js/penjualan_obat.js','resources/js/supplier.js','resources/js/satuan_obat.js','resources/js/kategori_obat.js','resources/js/sidebarAjax.js'])
+    @vite(['resources/js/app.js', 'resources/js/account-management.js', 'resources/js/obat.js', 'resources/js/pembelian_obat.js', 'resources/js/penjualan_obat.js', 'resources/js/supplier.js', 'resources/js/satuan_obat.js', 'resources/js/kategori_obat.js', 'resources/js/sidebarAjax.js','resources/js/pemesanan.js'])
 
 </body>
 

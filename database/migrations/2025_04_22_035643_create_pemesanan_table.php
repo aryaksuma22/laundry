@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pemesanan', function (Blueprint $table) {
+        Schema::create('pemesanans', function (Blueprint $table) {
             $table->id();
             $table->string('nama_pelanggan');
             $table->bigInteger('no_pesanan');
@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('status_pesanan');
             $table->string('alamat');
             $table->string('kontak');
+            $table->timestamps();
         });
     }
 

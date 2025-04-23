@@ -63,6 +63,10 @@ Route::delete('/penjualan_obats/mass-delete', [PenjualanObatController::class, '
 Route::delete('/penjualan_obats/single/{id}', [PenjualanObatController::class, 'destroySingle'])->name('penjualan_obats.destroySingle');
 
 Route::resource('pemesanan', PemesananController::class)->middleware(['auth', 'verified']);
+Route::delete('/pemesanan/mass-delete', [PemesananController::class, 'destroy'])->name('pemesanan.massDestroy');
+Route::delete('/pemesanan/single/{id}', [PemesananController::class, 'destroySingle'])->name('pemesanan.destroySingle');
+
+
 Route::resource('layanan', layananController::class)->middleware(['auth', 'verified']);
 Route::resource('transaksi', TransaksiController::class)->middleware(['auth', 'verified']);
 Route::resource('riwayat', RiwayatController::class)->middleware(['auth', 'verified']);

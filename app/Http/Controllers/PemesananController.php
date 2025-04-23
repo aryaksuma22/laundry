@@ -2,40 +2,42 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Models\Pemesanan;
 use Illuminate\Http\Request;
-
 use Illuminate\Validation\Rule;
 
 class PemesananController extends Controller
 {
+    /**
+     * Display a listing of the orders.
+     */
     public function index(Request $request)
     {
-
-        // Ambil parameter sorting dari request, default sort by "nama_obat" ascending
+        // Get sorting parameters (default: nama_pelanggan asc)
         $sortOrder = $request->get('sortOrder', 'asc');
-        $sortBy = $request->get('sortBy', 'nama_pesanan');
+        $sortBy    = $request->get('sortBy', 'nama_pelanggan');
 
-
-
-        // Daftar kolom yang diizinkan untuk sorting
-        $allowedSort = ['nama_pesanan', 'no_pesanan', 'tanggal', 'berat_pesanan', 'total_harga', 'status_pesanan', 'alamat', 'kontak'];
+        // Allowed sort columns
+        $allowedSort = [
+            'nama_pelanggan',
+            'no_pesanan',
+            'tanggal',
+            'berat_pesanan',
+            'total_harga',
+            'status_pesanan',
+            'alamat',
+            'kontak'
+        ];
         if (!in_array($sortBy, $allowedSort)) {
-            $sortBy = 'kode_obat';
+            $sortBy = 'nama_pelanggan';
         }
 
-
-
-        // Ambil parameter perPage dari request, default 10
-        // Ambil nilai pencarian dari request
+        // Pagination and search parameters
         $perPage = $request->get('perPage', 10);
-        $search = $request->get('search', '');
+        $search  = $request->get('search', '');
 
-
-
-        // Mulai query dengan relasi kategori dan satuan
-        $query = Obat::with(['kategori', 'satuan']);
-
+        // Build query
+        $query = Pemesanan::query();
 
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -50,209 +52,157 @@ class PemesananController extends Controller
             });
         }
 
+        // Apply sorting and paginate
+        $pemesanans = $query->orderBy($sortBy, $sortOrder)
+            ->paginate($perPage);
 
-
-        // Terapkan sorting dan paginasi berdasarkan parameter yang dipilih
-        $obats = $query->orderBy($sortBy, $sortOrder)->paginate($perPage);
-
-
-        // Jika request AJAX (misalnya pagination, search, atau sort), kembalikan partial view
-        if ($request->ajax() && ($request->has('page') || $request->has('search') || $request->has('sortBy') || $request->has('sortOrder') || $request->has('perPage'))) {
-            $html = view('obat.partials.table', compact('obats'))->render();
+        // Handle AJAX for pagination, search, sort
+        if ($request->ajax() && (
+            $request->has('page') || $request->has('search') ||
+            $request->has('sortBy') || $request->has('sortOrder') ||
+            $request->has('perPage')
+        )) {
+            $html = view('pemesanan.partials.table', compact('pemesanans'))->render();
             return response()->json(['html' => $html]);
         }
 
-        $headers = [
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            'Pragma' => 'no-cache',
-            'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT',
-        ];
-
-        // Tampilkan halaman dengan data obat
-        return view('pemesnan.index', compact('obats', 'search', 'sortBy', 'sortOrder'));
-    }
-
-
-
-
-    public function edit($id)
-    {
-        $obat = Obat::findOrFail($id);
-        $kategori_obats = Kategori_obat::all(); // Ambil semua kategori obat
-        $satuan_obats = Satuan_obat::all(); // Ambil semua satuan obat
-
-        return view('obat.edit', compact('obat', 'kategori_obats', 'satuan_obats'));
-    }
-
-    public function create()
-    {
-        $kategori_obats = Kategori_obat::all(); // Ambil semua kategori
-        $satuan_obats = Satuan_obat::all(); // Ambil semua satuan
-
-        return view('obat.create', compact('kategori_obats', 'satuan_obats'));
-    }
-
-
-    public function store(Request $request)
-    {
-        // Validasi input dari form
-        $request->validate([
-            'kategori_id' => 'required|exists:kategori_obats,id',
-            'satuan_id' => 'required|exists:satuan_obats,id',
-            'kode_obat' => 'required|string|max:255|unique:obats,kode_obat',
-            'nama_obat' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'harga_beli' => 'required|numeric|min:0',
-            'harga_jual' => 'required|numeric|min:0',
-            'stok' => 'required|integer|min:0',
-            'tanggal_kadaluarsa' => 'required|date|after:today',
-        ], [
-            'kategori_id.required' => 'Kategori obat wajib dipilih.',
-            'kategori_id.exists' => 'Kategori obat yang dipilih tidak valid.',
-            'satuan_id.required' => 'Satuan obat wajib dipilih.',
-            'satuan_id.exists' => 'Satuan obat yang dipilih tidak valid.',
-            'kode_obat.required' => 'Kode obat wajib diisi.',
-            'kode_obat.string' => 'Kode obat harus berupa teks.',
-            'kode_obat.max' => 'Kode obat tidak boleh lebih dari 255 karakter.',
-            'kode_obat.unique' => 'Kode obat sudah terdaftar.',
-            'nama_obat.required' => 'Nama obat wajib diisi.',
-            'nama_obat.string' => 'Nama obat harus berupa teks.',
-            'nama_obat.max' => 'Nama obat tidak boleh lebih dari 255 karakter.',
-            'deskripsi.string' => 'Deskripsi harus berupa teks.',
-            'harga_beli.required' => 'Harga beli obat wajib diisi.',
-            'harga_beli.numeric' => 'Harga beli harus berupa angka.',
-            'harga_beli.min' => 'Harga beli tidak boleh kurang dari 0.',
-            'harga_jual.required' => 'Harga jual obat wajib diisi.',
-            'harga_jual.numeric' => 'Harga jual harus berupa angka.',
-            'harga_jual.min' => 'Harga jual tidak boleh kurang dari 0.',
-            'stok.required' => 'Stok obat wajib diisi.',
-            'stok.integer' => 'Stok obat harus berupa angka bulat.',
-            'stok.min' => 'Stok obat tidak boleh kurang dari 0.',
-            'tanggal_kadaluarsa.required' => 'Tanggal kadaluarsa obat wajib diisi.',
-            'tanggal_kadaluarsa.date' => 'Tanggal kadaluarsa harus berupa tanggal yang valid.',
-            'tanggal_kadaluarsa.after' => 'Tanggal kadaluarsa harus setelah hari ini.',
-        ]);
-
-        // Buat instance baru dari model Obat
-        $obat = new Obat;
-        $obat->kategori_id = $request->input('kategori_id');
-        $obat->satuan_id = $request->input('satuan_id');
-        $obat->kode_obat = $request->input('kode_obat');
-        $obat->nama_obat = $request->input('nama_obat');
-        $obat->deskripsi = $request->input('deskripsi');
-        $obat->harga_beli = $request->input('harga_beli');
-        $obat->harga_jual = $request->input('harga_jual');
-        $obat->stok = $request->input('stok');
-        $obat->tanggal_kadaluarsa = $request->input('tanggal_kadaluarsa');
-
-        // Simpan data obat ke database
-        $obat->save();
-
-        // Redirect ke halaman daftar obat dengan pesan sukses
-        return redirect()->route('obats.index')->with('success', 'Obat berhasil ditambahkan');
+        // Return view
+        return view('pemesanan.index', compact(
+            'pemesanans',
+            'search',
+            'sortBy',
+            'sortOrder'
+        ));
     }
 
     /**
-     * Memproses update data obat.
+     * Show the form for creating a new order.
      */
-
-    public function update(Request $request, $id)
+    public function create()
     {
-        // Validasi input dari form dengan pengecualian untuk kode_obat jika tidak berubah
-        $request->validate([
-            'kategori_id' => 'required|exists:kategori_obats,id',
-            'satuan_id' => 'required|exists:satuan_obats,id',
-            'kode_obat' => [
-                'required',
-                'string',
-                'max:255',
-                // Validasi kode_obat hanya unik jika kode_obat berubah
-                Rule::unique('obats', 'kode_obat')->ignore($id),
-            ],
-            'nama_obat' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'harga_beli' => 'required|numeric|min:0',
-            'harga_jual' => 'required|numeric|min:0',
-            'stok' => 'required|integer|min:0',
-            'tanggal_kadaluarsa' => 'required|date|after:today',
-        ], [
-            'kategori_id.required' => 'Kategori obat wajib dipilih.',
-            'kategori_id.exists' => 'Kategori obat yang dipilih tidak valid.',
-            'satuan_id.required' => 'Satuan obat wajib dipilih.',
-            'satuan_id.exists' => 'Satuan obat yang dipilih tidak valid.',
-            'kode_obat.required' => 'Kode obat wajib diisi.',
-            'kode_obat.string' => 'Kode obat harus berupa teks.',
-            'kode_obat.max' => 'Kode obat tidak boleh lebih dari 255 karakter.',
-            'kode_obat.unique' => 'Kode obat sudah terdaftar.',
-            'nama_obat.required' => 'Nama obat wajib diisi.',
-            'nama_obat.string' => 'Nama obat harus berupa teks.',
-            'nama_obat.max' => 'Nama obat tidak boleh lebih dari 255 karakter.',
-            'deskripsi.string' => 'Deskripsi harus berupa teks.',
-            'harga_beli.required' => 'Harga beli obat wajib diisi.',
-            'harga_beli.numeric' => 'Harga beli harus berupa angka.',
-            'harga_beli.min' => 'Harga beli tidak boleh kurang dari 0.',
-            'harga_jual.required' => 'Harga jual obat wajib diisi.',
-            'harga_jual.numeric' => 'Harga jual harus berupa angka.',
-            'harga_jual.min' => 'Harga jual tidak boleh kurang dari 0.',
-            'stok.required' => 'Stok obat wajib diisi.',
-            'stok.integer' => 'Stok obat harus berupa angka bulat.',
-            'stok.min' => 'Stok obat tidak boleh kurang dari 0.',
-            'tanggal_kadaluarsa.required' => 'Tanggal kadaluarsa obat wajib diisi.',
-            'tanggal_kadaluarsa.date' => 'Tanggal kadaluarsa harus berupa tanggal yang valid.',
-            'tanggal_kadaluarsa.after' => 'Tanggal kadaluarsa harus setelah hari ini.',
-        ]);
-
-        // Cari obat berdasarkan ID
-        $obat = Obat::findOrFail($id);
-
-        // Update data obat
-        $obat->update([
-            'kategori_id' => $request->kategori_id,
-            'satuan_id' => $request->satuan_id,
-            'kode_obat' => $request->kode_obat,
-            'nama_obat' => $request->nama_obat,
-            'deskripsi' => $request->deskripsi,
-            'harga_beli' => $request->harga_beli,
-            'harga_jual' => $request->harga_jual,
-            'stok' => $request->stok,
-            'tanggal_kadaluarsa' => $request->tanggal_kadaluarsa,
-        ]);
-
-        return redirect()->route('obats.index')->with('success', 'Obat berhasil diperbarui.');
+        return view('pemesanan.create');
     }
 
+    /**
+     * Store a newly created order in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama_pelanggan' => 'required|string|max:255',
+            'no_pesanan'     => 'required|numeric|unique:pemesanans,no_pesanan',
+            'tanggal'        => 'required|date',
+            'berat_pesanan'  => 'required|integer|min:0',
+            'total_harga'    => 'required|integer|min:0',
+            'status_pesanan' => 'required|string|max:100',
+            'alamat'         => 'required|string|max:500',
+            'kontak'         => 'required|string|max:100',
+        ], [
+            'nama_pelanggan.required' => 'Nama pelanggan wajib diisi.',
+            'no_pesanan.required'     => 'Nomor pesanan wajib diisi.',
+            'no_pesanan.unique'       => 'Nomor pesanan sudah terdaftar.',
+            'tanggal.required'        => 'Tanggal pesanan wajib diisi.',
+            'berat_pesanan.required'  => 'Berat pesanan wajib diisi.',
+            'total_harga.required'    => 'Total harga wajib diisi.',
+            'status_pesanan.required' => 'Status pesanan wajib diisi.',
+            'alamat.required'         => 'Alamat wajib diisi.',
+            'kontak.required'         => 'Kontak wajib diisi.',
+        ]);
 
+        Pemesanan::create($request->all());
+
+        return redirect()->route('pemesanan.index')
+            ->with('success', 'Pemesanan berhasil ditambahkan.');
+    }
+
+    /**
+     * Show the form for editing the specified order.
+     */
+    public function edit($id)
+    {
+        $pemesanan = Pemesanan::findOrFail($id);
+        return view('pemesanan.edit', compact('pemesanan'));
+    }
+
+    /**
+     * Update the specified order in storage.
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nama_pelanggan' => 'required|string|max:255',
+            'no_pesanan'     => [
+                'required',
+                'numeric',
+                Rule::unique('pemesanans', 'no_pesanan')->ignore($id),
+            ],
+            'tanggal'        => 'required|date',
+            'berat_pesanan'  => 'required|integer|min:0',
+            'total_harga'    => 'required|integer|min:0',
+            'status_pesanan' => 'required|string|max:100',
+            'alamat'         => 'required|string|max:500',
+            'kontak'         => 'required|string|max:100',
+        ], [
+            'no_pesanan.unique' => 'Nomor pesanan sudah terdaftar.',
+        ]);
+
+        $pemesanan = Pemesanan::findOrFail($id);
+        $pemesanan->update($request->all());
+
+        return redirect()->route('pemesanan.index')
+            ->with('success', 'Pemesanan berhasil diperbarui.');
+    }
+
+    /**
+     * Remove multiple orders from storage.
+     */
     public function destroy(Request $request)
     {
-        $obatIds = $request->input('obats'); // Ambil array ID obat
+        $ids = $request->input('pemesanans');
 
-        if (!empty($obatIds)) {
-            Obat::whereIn('id', $obatIds)->delete();
+        if (!empty($ids)) {
+            Pemesanan::whereIn('id', $ids)->delete();
+
             if ($request->ajax()) {
-                return response()->json(['success' => true, 'message' => 'Obat berhasil dihapus.']);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pemesanan berhasil dihapus.'
+                ]);
             }
-            return redirect()->route('obats.index')->with('success', 'Obat berhasil dihapus.');
+
+            return redirect()->route('pemesanan.index')
+                ->with('success', 'Pemesanan berhasil dihapus.');
         }
 
         if ($request->ajax()) {
-            return response()->json(['success' => false, 'message' => 'Tidak ada obat yang dipilih.'], 400);
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada pesanan yang dipilih.'
+            ], 400);
         }
 
-        return redirect()->route('obats.index')->with('error', 'Tidak ada obat yang dipilih.');
+        return redirect()->route('pemesanan.index')
+            ->with('error', 'Tidak ada pesanan yang dipilih.');
     }
 
+    /**
+     * Remove a single order via AJAX.
+     */
     public function destroySingle($id)
     {
-        // Cari pengguna berdasarkan ID
-        $obat = Obat::where('id', $id)->first();
+        $pemesanan = Pemesanan::find($id);
 
-        // Jika user ditemukan, hapus
-        if ($obat) {
-            $obat->delete();
-            return response()->json(['success' => true, 'message' => 'Obat deleted successfully']);
+        if ($pemesanan) {
+            $pemesanan->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Pemesanan berhasil dihapus.'
+            ]);
         }
 
-        // Jika tidak ditemukan, kirim respon error
-        return response()->json(['success' => false, 'message' => 'User not found'], 404);
+        return response()->json([
+            'success' => false,
+            'message' => 'Pesanan tidak ditemukan.'
+        ], 404);
     }
 }
