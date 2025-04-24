@@ -64,11 +64,16 @@ Route::delete('/penjualan_obats/single/{id}', [PenjualanObatController::class, '
 
 Route::resource('pemesanan', PemesananController::class)->middleware(['auth', 'verified']);
 Route::delete('/pemesanan/mass-delete', [PemesananController::class, 'destroy'])->name('pemesanan.massDestroy');
-Route::delete('/pemesanan/single/{id}', [PemesananController::class, 'destroySingle'])->name('pemesanan.destroySingle');
+Route::delete('/pemesanans/single/{id}', [PemesananController::class, 'destroySingle'])->name('pemesanan.destroySingle');
 
 
 Route::resource('layanan', layananController::class)->middleware(['auth', 'verified']);
-Route::resource('transaksi', TransaksiController::class)->middleware(['auth', 'verified']);
+
+
+Route::resource('transaksis', TransaksiController::class)->middleware(['auth', 'verified']);
+Route::delete('/transaksis/mass-delete', [TransaksiController::class, 'destroy'])->name('transaksis.massDestroy');
+Route::delete('/transaksis/single/{id}', [TransaksiController::class, 'destroySingle'])->name('transaksis.destroySingle');
+
 Route::resource('riwayat', RiwayatController::class)->middleware(['auth', 'verified']);
 
 // Route untuk Settings
@@ -85,5 +90,3 @@ Route::middleware('auth')->group(function () {
 
 // Include Routes dari Auth
 require __DIR__ . '/auth.php';
-
-

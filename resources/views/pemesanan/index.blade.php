@@ -8,17 +8,6 @@
 
                 <div class="flex flex-row justify-between mb-3">
                     <div class="flex flex-row gap-4">
-                        {{-- Export Button --}}
-                        <button
-                            class="px-4 py-2 gap-2 bg-white flex flex-row border rounded-lg justify-center items-center hover:bg-gray-50 transition-all duration-200">
-                            <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2M12 4v12m0-12l4 4m-4-4L8 8" />
-                            </svg>
-                            <p class="font-semibold">Export</p>
-                        </button>
                         {{-- Delete Button --}}
                         <button form="deleteFormPemesanan" type="submit"
                             class="px-4 py-2 bg-red-500 hover:bg-red-600 transition-all duration-100 border rounded-lg flex items-center">
@@ -35,7 +24,7 @@
                     <div class="flex flex-row space-x-4 items-center">
                         <div class="flex flex-row gap-2">
                             {{-- Toggle Sort Order Button --}}
-                            <button id="toggleSortOrder"
+                            {{-- <button id="toggleSortOrder"
                                 class="bg-white flex justify-center items-center px-3 py-2 rounded-lg border hover:bg-gray-50">
                                 <svg class="w-6 h-6 text-gray-800" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
@@ -44,9 +33,9 @@
                                         stroke-width="2"
                                         d="M8 20V10m0 10l-3-3m3 3l3-3m5-13v10m0-10l3 3m-3-3l-3 3" />
                                 </svg>
-                            </button>
+                            </button> --}}
                             <!-- Button Sort By -->
-                            <button id="sortByButton"
+                            {{-- <button id="sortByButton"
                                 class="flex flex-row gap-2 px-4 py-3 bg-white border rounded-lg justify-center items-center relative hover:bg-gray-50 transition-all duration-200">
                                 <svg class="w-6 h-6 text-gray-800" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
@@ -75,7 +64,7 @@
                                     <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
                                         data-sortby="kontak">Kontak</div>
                                 </div>
-                            </button>
+                            </button> --}}
                         </div>
                         {{-- Search Bar --}}
                         <form action="{{ route('pemesanan.index') }}" method="GET" id="searchForm"

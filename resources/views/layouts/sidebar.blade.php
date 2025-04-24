@@ -74,7 +74,7 @@
                 </svg>
                 <p class="font-semibold">Layanan</p>
             </a>
-            <a href="#" data-url="{{ route('transaksi.index') }}"
+            <a href="#" data-url="{{ route('transaksis.index') }}"
                 class="ajax-link rounded-xl flex flex-row items-center group py-4 px-8 gap-4">
                 <svg id="sidebarSVG" class="w-6 h-6 group-hover:transition-all group-hover:duration-150"
                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"

@@ -57,7 +57,7 @@
     <!-- Stack untuk script khusus -->
     @stack('scripts')
 
-    @vite(['resources/js/app.js', 'resources/js/account-management.js', 'resources/js/obat.js', 'resources/js/pembelian_obat.js', 'resources/js/penjualan_obat.js', 'resources/js/supplier.js', 'resources/js/satuan_obat.js', 'resources/js/kategori_obat.js', 'resources/js/sidebarAjax.js','resources/js/pemesanan.js'])
+    @vite(['resources/js/app.js', 'resources/js/account-management.js', 'resources/js/obat.js', 'resources/js/pembelian_obat.js', 'resources/js/penjualan_obat.js', 'resources/js/supplier.js', 'resources/js/satuan_obat.js', 'resources/js/kategori_obat.js', 'resources/js/sidebarAjax.js','resources/js/pemesanan.js','resources/js/transaksi.js'])
 
 </body>
 

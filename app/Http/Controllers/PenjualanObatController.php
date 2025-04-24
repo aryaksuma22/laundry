@@ -13,10 +13,8 @@ class PenjualanObatController extends Controller
     {
 
         $search = $request->get('search', '');
-
         $sortBy = $request->get('sortBy', 'id');
         $sortOrder = $request->get('sortOrder', 'asc');
-
         $perPage = $request->get('perPage', 10);
 
         $allowedSort = ['id', 'nama_obat', 'jumlah', 'harga_jual', 'total_harga'];

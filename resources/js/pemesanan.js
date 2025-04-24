@@ -122,7 +122,7 @@ $(document).ready(function() {
         }).then(result => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: baseUrl + '/single/' + id,
+                    url: '/pemesanans/single/' + id,
                     type: 'DELETE',
                     data: { _token: $('meta[name="csrf-token"]').attr('content') },
                     success(response) {

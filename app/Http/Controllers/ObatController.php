@@ -17,21 +17,16 @@ class ObatController extends Controller
         $sortOrder = $request->get('sortOrder', 'asc');
         $sortBy = $request->get('sortBy', 'kode_obat');
 
-
+        // Ambil parameter perPage dari request, default 10
+        // Ambil nilai pencarian dari request
+        $perPage = $request->get('perPage', 10);
+        $search = $request->get('search', '');
 
         // Daftar kolom yang diizinkan untuk sorting
         $allowedSort = ['kode_obat', 'nama_obat', 'stok', 'harga_beli', 'harga_jual', 'tanggal_kadaluarsa'];
         if (!in_array($sortBy, $allowedSort)) {
             $sortBy = 'kode_obat';
         }
-
-
-
-        // Ambil parameter perPage dari request, default 10
-        // Ambil nilai pencarian dari request
-        $perPage = $request->get('perPage', 10);
-        $search = $request->get('search', '');
-
 
 
         // Mulai query dengan relasi kategori dan satuan

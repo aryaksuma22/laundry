@@ -33,7 +33,7 @@
                 </div>
                 <p class="text-[2.2rem] py-2 px-4 leading-tight">Layanan</p>
             </a>
-            <a href="#" data-url="{{ route('transaksi.index') }}"
+            <a href="#" data-url="{{ route('transaksis.index') }}"
                 class="ajax-link bg-white flex flex-row gap-4 rounded-xl border p-10 items-center h-[10rem] hover:bg-gray-50 transition-all duration-100">
                 <div class="pr-4 border-r-2">
                     <svg class="w-16 h-16 text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"

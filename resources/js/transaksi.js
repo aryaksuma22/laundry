@@ -1,14 +1,16 @@
-// Global Variables
+const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+
+// Global variables for sorting, pagination, etc.
 let sortBy = 'id';
 let sortOrder = 'asc';
 let perPage = 10;
 
-// Initialize the account management parameters from the URL
-function initObats() {
+// Initialize parameters from URL query
+function initTransaksis() {
     const queryParams = new URLSearchParams(window.location.search);
-    sortBy = queryParams.get('sortBy') || 'kode_obat    ';
-    sortOrder = queryParams.get('sortOrder') || 'asc';
-    perPage = queryParams.get('perPage') || 10;
+    sortBy = queryParams.get('sortBy') || sortBy;
+    sortOrder = queryParams.get('sortOrder') || sortOrder;
+    perPage = queryParams.get('perPage') || perPage;
 
     // Jika ada hidden inputs, kita bisa set nilainya (opsional)
     if ($('#sort-by').length) {
@@ -22,29 +24,29 @@ function initObats() {
     }
 }
 
-// Initialize the page on document ready
-initObats();
+// Initial setup
+initTransaksis();
 
 // Event listener to reinitialize when triggered (for AJAX content load)
-$(document).on("obats:init", function () {
-    initObats();
-    fetchObats(1);  // Fetch users after initialization
+$(document).on("transaksis:init", function () {
+    initTransaksis();
+    fetchTransaksis(1);  // Fetch users after initialization
 });
 
-// Update the URL with the current parameters
+// Update browser URL without reloading
 function updateUrl(page) {
-    const newQuery = new URLSearchParams({
+    const query = new URLSearchParams({
         search: $('#search').val(),
-        sortBy: sortBy,
-        sortOrder: sortOrder,
-        perPage: perPage,
-        page: page
+        sortBy,
+        sortOrder,
+        perPage,
+        page
     }).toString();
-    window.history.pushState(null, '', '?' + newQuery);
+    window.history.replaceState(null, '', baseUrl + '?' + query);
 }
 
 // Fetch user data based on current parameters
-function fetchObats(page = 1) {
+function fetchTransaksis(page = 1) {
     const uniqueParam = new Date().getTime();  // Menambahkan timestamp untuk mencegah cache
     $.ajax({
         url: window.location.pathname + '?_=' + uniqueParam,
@@ -58,65 +60,66 @@ function fetchObats(page = 1) {
             page: page
         },
         success: function (response) {
-            $('#obatTableContainer').html(response.html);
+            $('#transaksiTableContainer').html(response.html);
             updateUrl(page);
         },
         error: function () {
-            alert('Error fetching obat data.');
+            alert('Error fetching Transaksi data.');
         }
     });
 }
 
-// Form submission to fetch users based on search input
+
+// Search
 $(document).on('submit', '#searchForm', function (e) {
     e.preventDefault();
-    fetchObats(1);
+    fetchTransaksis(1);
 });
 
 // Toggle sorting order and fetch users
 $(document).on('click', '#toggleSortOrder', function () {
     sortOrder = (sortOrder === 'asc') ? 'desc' : 'asc';
     $(this).toggleClass('bg-gray-200');
-    fetchObats(1);
+    fetchTransaksis(1);
 });
 
-// Handle sort-by button dropdown visibility
+// Select the sorting option and fetch users
+$(document).on('click', '.sort-option', function () {
+    sortBy = $(this).data('sortby');
+    fetchTransaksis(1);
+    $('#sortByPopup').fadeOut(200);
+});
+
+// Toggle sort popup
 $(document).on('click', '#sortByButton', function (e) {
     e.stopPropagation();
     $('#sortByPopup').toggleClass('hidden');
 });
 
-// Close sort-by dropdown if clicked outside
 $(document).on('click', function (e) {
     if (!$(e.target).closest('#sortByButton, #sortByPopup').length) {
         $('#sortByPopup').toggleClass('hidden');
     }
 });
 
-// Select the sorting option and fetch users
-$(document).on('click', '.sort-option', function () {
-    sortBy = $(this).data('sortby');
-    fetchObats(1);
-    $('#sortByPopup').fadeOut(200);
-});
-
-// Change the number of items per page and fetch users
+// Change entries per page
 $(document).on('change', '#perPage', function () {
     perPage = $(this).val();
-    fetchObats(1);
+    fetchTransaksis(1);
 });
 
 // Handle pagination link clicks
-$(document).on('click', '#obatTableContainer nav a', function (e) {
+$(document).on('click', '#transaksiTableContainer nav a', function (e) {
     e.preventDefault();
     const href = $(this).attr('href');
     if (href) {
         const url = new URL(href, window.location.origin);
         const page = url.searchParams.get('page') || 1;
-        fetchObats(page);
+        fetchTransaksis(page);
     }
     return false;
 });
+
 
 // Handle "select all" checkbox click
 $(document).on('change', '#checkbox-all', function () {
@@ -129,17 +132,18 @@ $(document).on('change', '.checkbox-row', function () {
     $('#checkbox-all').prop('checked', allChecked);
 });
 
+
 // Single Delete
-$(document).on('click', '.delete-obat', function (e) {
+$(document).on('click', '.delete-transaksi', function (e) {
     e.preventDefault();
 
-    let idObat = $(this).data('id');  // Ambil ID obat
+    let idTransaksi = $(this).data('id');  // Ambil ID Transaksi
     let row = $(this).closest('tr');  // Ambil baris tabel
 
     // Tampilkan SweetAlert untuk konfirmasi hapus
     Swal.fire({
         title: 'Apakah Anda yakin?',
-        text: 'Data obat akan dihapus secara permanen',
+        text: 'Data Transaksi akan dihapus secara permanen',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -149,7 +153,7 @@ $(document).on('click', '.delete-obat', function (e) {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: '/obats/single/' + idObat,
+                url: '/transaksis/single/' + idTransaksi,
                 type: 'DELETE',
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content')
@@ -162,14 +166,14 @@ $(document).on('click', '.delete-obat', function (e) {
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil',
-                            text: 'Obat berhasil dihapus.',
+                            text: 'Transaksi berhasil dihapus.',
                             confirmButtonText: 'OK'
                         });
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal',
-                            text: 'Gagal menghapus obat.',
+                            text: 'Gagal menghapus Transaksi.',
                             confirmButtonText: 'OK'
                         });
                     }
@@ -178,7 +182,7 @@ $(document).on('click', '.delete-obat', function (e) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Terjadi kesalahan. Pastikan obat masih ada.',
+                        text: 'Terjadi kesalahan. Pastikan transaksi masih ada.',
                         confirmButtonText: 'OK'
                     });
                 }
@@ -188,12 +192,12 @@ $(document).on('click', '.delete-obat', function (e) {
 });
 
 
-$(document).on('submit', '#deleteFormObat', function (e) {
+$(document).on('submit', '#deleteFormTransaksi', function (e) {
     e.preventDefault(); // Cegah submit form secara tradisional
 
     Swal.fire({
         title: 'Apakah Anda yakin?',
-        text: 'Obat-obat yang dipilih akan dihapus secara permanen',
+        text: 'Transaksi yang dipilih akan dihapus secara permanen',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -216,8 +220,8 @@ $(document).on('submit', '#deleteFormObat', function (e) {
                             text: response.message,
                             confirmButtonText: 'OK'
                         });
-                        // Refresh tabel obat via AJAX (misalnya, panggil fungsi fetchObats)
-                        fetchObats(1);
+                        // Refresh tabel transaksi via AJAX (misalnya, panggil fungsi fetchTransaksis)
+                        fetchTransaksis(1);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -231,7 +235,7 @@ $(document).on('submit', '#deleteFormObat', function (e) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Terjadi kesalahan saat menghapus obat.',
+                        text: 'Terjadi kesalahan saat menghapus Transaksi.',
                         confirmButtonText: 'OK'
                     });
                 }
