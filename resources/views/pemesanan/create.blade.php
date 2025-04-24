@@ -5,7 +5,7 @@
                 <h2 class="text-3xl font-bold mb-2 text-gray-800">Tambah Data Pemesanan</h2>
                 <!-- Form Tambah Pemesanan -->
                 <form action="{{ route('pemesanan.store') }}" method="POST" class="bg-white mb-4 p-8 rounded-lg">
-                    @csrf
+                    @csrfA
 
                     <div class="flex flex-row mb-8 gap-6">
                         <div class="w-1/2">
@@ -38,11 +38,15 @@
                     @error('berat_pesanan')<div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-lg"><p class="text-red-700 text-sm">{{ $message }}</p></div>@enderror
 
                     <div class="flex flex-row mb-8 gap-6">
-                        <div class="w-1/2">
-                            <label for="total_harga" class="block text-sm font-semibold">Total Harga (Rp)<span class="text-pink-500 ml-0.5">*</span></label>
-                            <input type="text" name="total_harga" id="total_harga" value="{{ old('total_harga') }}"
-                                class="w-full px-4 py-2 border rounded-md border-gray-300" required>
-                        </div>
+                        <input
+                        type="text"
+                        name="total_harga"
+                        id="total_harga"
+                        readonly
+                        class="w-full px-4 py-2 border rounded-md border-gray-300 bg-gray-100"
+                        value="{{ old('total_harga', $pemesanan->total_harga ?? '') }}"
+                        required
+                      >
                         <div class="w-1/2">
                             <label for="status_pesanan" class="block text-sm font-semibold">Status Pesanan<span class="text-pink-500 ml-0.5">*</span></label>
                             <select name="status_pesanan" id="status_pesanan" class="w-full px-4 py-2 border rounded-md border-gray-300" required>
@@ -90,6 +94,34 @@
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+  // 1. Inisialisasi harga per kilo
+  const unitPrice = 15000; // Rp 15.000 / kg
+
+  // 2. Inisialisasi AutoNumeric pada field total_harga
+  const totalAN = new AutoNumeric('#total_harga', {
+    currencySymbol      : 'Rp. ',
+    decimalCharacter    : ',',
+    digitGroupSeparator : '.',
+    unformatOnSubmit    : true
+  });
+
+  // 3. Tangkap elemen input berat
+  const beratInput = document.getElementById('berat_pesanan');
+
+  // 4. Fungsi hitung dan set total
+  function updateTotalHarga() {
+    const berat = parseFloat(beratInput.value) || 0;
+    const total = berat * unitPrice;
+    totalAN.set(total); // otomatis format
+  }
+
+  // 5. Jalankan sekali untuk nilai awal (edit)
+  updateTotalHarga();
+
+  // 6. Attach listener untuk setiap perubahan berat
+  beratInput.addEventListener('input', updateTotalHarga);
+});
         document.addEventListener("DOMContentLoaded", function() {
             new AutoNumeric('#total_harga', {
                 currencySymbol: 'Rp. ',
