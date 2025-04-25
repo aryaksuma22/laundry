@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('kontak');
             $table->bigInteger('status_pesanan');
             $table->bigInteger('tanggal_selesai');
+            $table->timestamps();
         });
     }
 

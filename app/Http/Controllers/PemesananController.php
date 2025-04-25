@@ -17,7 +17,7 @@ class PemesananController extends Controller
         $sortOrder = $request->get('sortOrder', 'asc');
         $sortBy    = $request->get('sortBy', 'nama_pelanggan');
 
-        // Allowed sort columns
+
         $allowedSort = [
             'nama_pelanggan',
             'no_pesanan',

@@ -8,7 +8,7 @@ $(document).ready(function() {
     let perPage = 10;
 
     // Initialize parameters from URL query
-    function initPemesanans() {
+    function initRiwayats() {
         const queryParams = new URLSearchParams(window.location.search);
         sortBy = queryParams.get('sortBy') || sortBy;
         sortOrder = queryParams.get('sortOrder') || sortOrder;
@@ -33,36 +33,36 @@ $(document).ready(function() {
     }
 
     // Fetch data via AJAX
-    function fetchPemesanans(page = 1) {
+    function fetchriwayats(page = 1) {
         $.ajax({
             url: baseUrl,
             type: 'GET',
             dataType: 'json',
             data: { search: $('#search').val(), sortBy, sortOrder, perPage, page },
             success(response) {
-                $('#pemesananTableContainer').html(response.html);
+                $('#riwayatTableContainer').html(response.html);
                 updateUrl(page);
             },
             error() {
-                Swal.fire('Error', 'Gagal memuat data pemesanan.', 'error');
+                Swal.fire('Error', 'Gagal memuat data riwayat.', 'error');
             }
         });
     }
 
     // Initial setup
-    initPemesanans();
+    initriwayats();
 
     // Search
     $(document).on('submit', '#searchForm', function(e) {
         e.preventDefault();
-        fetchPemesanans(1);
+        fetchriwayats(1);
     });
 
     // Toggle sort order
     $(document).on('click', '#toggleSortOrder', function() {
         sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
         $('#sort-order').val(sortOrder);
-        fetchPemesanans(1);
+        fetchriwayats(1);
     });
 
     // Sort by selection
@@ -70,7 +70,7 @@ $(document).ready(function() {
         sortBy = $(this).data('sortby');
         $('#sort-by').val(sortBy);
         $('#sortByPopup').addClass('hidden');
-        fetchPemesanans(1);
+        fetchriwayats(1);
     });
 
     // Toggle sort popup
@@ -87,14 +87,14 @@ $(document).ready(function() {
     // Change entries per page
     $(document).on('change', '#perPage', function() {
         perPage = $(this).val();
-        fetchPemesanans(1);
+        fetchriwayats(1);
     });
 
     // Pagination links
-    $(document).on('click', '#pemesananTableContainer nav a', function(e) {
+    $(document).on('click', '#riwayatTableContainer nav a', function(e) {
         e.preventDefault();
         const pageParam = new URL($(this).attr('href'), window.location.origin).searchParams.get('page');
-        fetchPemesanans(pageParam || 1);
+        fetchriwayats(pageParam || 1);
     });
 
     // Select all checkboxes
@@ -107,13 +107,13 @@ $(document).ready(function() {
     });
 
     // Single delete via AJAX
-    $(document).on('click', '.delete-pemesanan', function(e) {
+    $(document).on('click', '.delete-riwayat', function(e) {
         e.preventDefault();
         const id = $(this).data('id');
         const row = $(this).closest('tr');
 
         Swal.fire({
-            title: 'Hapus Pemesanan?',
+            title: 'Hapus riwayat?',
             text: 'Data ini akan dihapus permanen.',
             icon: 'warning',
             showCancelButton: true,
@@ -142,10 +142,10 @@ $(document).ready(function() {
     });
 
     // Bulk delete
-    $(document).on('submit', '#deleteFormPemesanan', function(e) {
+    $(document).on('submit', '#deleteFormriwayat', function(e) {
         e.preventDefault();
         Swal.fire({
-            title: 'Hapus Semua Pemesanan Terpilih?',
+            title: 'Hapus Semua riwayat Terpilih?',
             text: 'Data terpilih akan dihapus permanen.',
             icon: 'warning',
             showCancelButton: true,
@@ -162,7 +162,7 @@ $(document).ready(function() {
                     success(response) {
                         if (response.success) {
                             Swal.fire('Dihapus!', response.message, 'success');
-                            fetchPemesanans(1);
+                            fetchriwayats(1);
                         } else {
                             Swal.fire('Gagal', response.message, 'error');
                         }
