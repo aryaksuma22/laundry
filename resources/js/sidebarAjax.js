@@ -77,6 +77,12 @@ $(document).on("click", ".ajax-link", function (e) {
                     $(document).trigger("obats:init");
                 }
 
+                if (typeof initDashboardCharts === 'function' && $("#ordersChart").length) {
+                    initDashboardCharts();
+                }
+
+
+
                 if ($("#pembelian_obatTableContainer").length > 0) {
                     $(document).trigger("pembelian_obats:init");
                 }
@@ -177,7 +183,10 @@ window.onpopstate = function () {
         url: url,
         type: "GET",
         success: function (response) {
-            $("#main-content").html($(response).find("#main-content").html()); // Ganti konten
+            $("#main-content").html($(response).find("#main-content").html());
+            if (typeof initDashboardCharts === 'function' && $("#ordersChart").length) {
+                initDashboardCharts();
+            }
         }
     });
 };

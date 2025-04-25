@@ -56,8 +56,11 @@
 
     <!-- Stack untuk script khusus -->
     @stack('scripts')
-
-    @vite(['resources/js/app.js', 'resources/js/account-management.js', 'resources/js/obat.js', 'resources/js/pembelian_obat.js', 'resources/js/penjualan_obat.js', 'resources/js/supplier.js', 'resources/js/satuan_obat.js', 'resources/js/kategori_obat.js', 'resources/js/sidebarAjax.js','resources/js/pemesanan.js','resources/js/transaksi.js','resources/js/layanan.js'])
+    {{-- Chart.js --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart Data Labels plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    @vite(['resources/js/app.js', 'resources/js/account-management.js', 'resources/js/obat.js', 'resources/js/pembelian_obat.js', 'resources/js/penjualan_obat.js', 'resources/js/supplier.js', 'resources/js/satuan_obat.js', 'resources/js/kategori_obat.js', 'resources/js/sidebarAjax.js','resources/js/pemesanan.js','resources/js/transaksi.js','resources/js/layanan.js','resources/js/dashboard.js'])
 
 </body>
 

@@ -1,23 +1,51 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
+        <h2 class="font-semibold text-xl">{{ __('Dashboard') }}</h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div
-                class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 min-h-[90vh] flex items-center justify-center">
-                <div id="loginText" class="text-gray-900 mb-10 text-3xl font-bold">
-                    {{ __('Coming Soon...') }}
+            <div class="bg-white shadow-xl sm:rounded-lg p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
+                    <div class="p-4 border rounded">
+                        <h3 class="mb-2">Pesanan</h3>
+                        <canvas id="ordersChart"></canvas>
+                    </div>
+
+                    <div class="p-4 border rounded">
+                        <h3 class="mb-2">Status Pemesanan</h3>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+
+                    <div class="p-4 border rounded">
+                        <h3 class="mb-2">Pendapatan / Bulan</h3>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+
+                    <div class="p-4 border rounded">
+                        <h3 class="mb-2">Top 5 Layanan</h3>
+                        <canvas id="topServicesChart"></canvas>
+                    </div>
 
                 </div>
             </div>
         </div>
     </div>
 
-    <script></script>
-
+    <script>
+        window.dashboardData = {
+            yearLabels: @json($yearLabels),
+            yearlyOrders: @json($yearlyOrders),
+            revenue: @json(array_values($revenueData)),
+            status: {
+                labels: @json($statusLabels),
+                data: @json($statusData)
+            },
+            topServices: {
+                labels: @json($topServicesLabels),
+                data: @json($topServicesData)
+            }
+        };
+    </script>
 </x-app-layout>

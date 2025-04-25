@@ -13,7 +13,7 @@ use App\Http\Controllers\PemesananController;
 use App\Http\Controllers\LayananController;
 use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\TransaksiController;
-
+use App\Http\Controllers\DashboardController;
 
 
 
@@ -88,6 +88,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// routes/web.php
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('dashboard');
+
 
 // Include Routes dari Auth
 require __DIR__ . '/auth.php';
