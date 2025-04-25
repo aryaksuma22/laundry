@@ -69,7 +69,7 @@
                         </div>
 
                         {{-- Search Bar --}}
-                        <form id="searchForm" action="{{ route('transaksis.index') }}" method="GET" class="relative">
+                        <form id="searchFormTransaksi" action="{{ route('transaksis.index') }}" method="GET" class="relative">
                             <input type="search" name="search" id="search"
                                 class="block w-full px-10 py-3 rounded-lg border border-gray-200 placeholder:font-bold"
                                 value="{{ $search }}" placeholder="Search" />

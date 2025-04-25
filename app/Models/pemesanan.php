@@ -15,6 +15,7 @@ class Pemesanan extends Model
         'nama_pelanggan',
         'no_pesanan',
         'tanggal',
+        'layanan_id',
         'berat_pesanan',
         'total_harga',
         'status_pesanan',
@@ -22,4 +23,8 @@ class Pemesanan extends Model
         'kontak',
     ];
 
+    public function layanan()
+    {
+        return $this->belongsTo(Layanan::class, 'layanan_id', 'id');
+    }
 }

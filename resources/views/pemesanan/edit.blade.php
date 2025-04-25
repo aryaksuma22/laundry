@@ -10,6 +10,7 @@
                     @csrf
                     @method('PUT')
 
+                    {{-- ROW 1: Nama + No Pesanan --}}
                     <div class="flex flex-row mb-8 gap-6">
                         <div class="w-1/2">
                             <label for="nama_pelanggan" class="block text-sm font-semibold">Nama Pelanggan<span
@@ -17,6 +18,7 @@
                             <input type="text" name="nama_pelanggan" id="nama_pelanggan"
                                 class="w-full px-4 py-2 border rounded-md border-gray-300"
                                 value="{{ old('nama_pelanggan', $pemesanan->nama_pelanggan) }}" required>
+                            @error('nama_pelanggan')<p class="mt-1 text-red-600 text-sm">{{ $message }}</p>@enderror
                         </div>
 
                         <div class="w-1/2">
@@ -25,111 +27,95 @@
                             <input type="text" name="no_pesanan" id="no_pesanan"
                                 class="w-full px-4 py-2 border rounded-md border-gray-300"
                                 value="{{ old('no_pesanan', $pemesanan->no_pesanan) }}" required>
+                            @error('no_pesanan')<p class="mt-1 text-red-600 text-sm">{{ $message }}</p>@enderror
                         </div>
                     </div>
 
-                    @error('nama_pelanggan')
-                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-md relative ">
-                            <p class="text-red-700 text-sm">{{ $message }}</p>
-                        </div>
-                    @enderror
-
-                    @error('no_pesanan')
-                        <div class="mb-4 bg-red-100 border-red-400 px-4 py-3 rounded-md relative ">
-                            <p class="text-red-700 text-sm">{{ $message }}</p>
-                        </div>
-                    @enderror
-
+                    {{-- ROW 2: Pilih Layanan + Tanggal --}}
                     <div class="flex flex-row mb-8 gap-6">
                         <div class="w-1/2">
-                            <label for="tanggal" class="block text-sm font-semibold">Tanggal<span
-                                    class="text-pink-500 ml-0.5">*</span></label>
+                            <label for="layanan_id" class="block text-sm font-semibold">Layanan<span class="text-pink-500 ml-0.5">*</span></label>
+                            <select name="layanan_id" id="layanan_id" class="w-full px-4 py-2 border rounded-md border-gray-300" required>
+                                <option value="">-- Pilih Layanan --</option>
+                                @foreach($layanans as $layanan)
+                                    <option value="{{ $layanan->id }}"
+                                        {{ old('layanan_id', $pemesanan->layanan_id) == $layanan->id ? 'selected' : '' }}
+                                    >{{ $layanan->nama_layanan }} — Rp {{ number_format($layanan->harga) }}</option>
+                                @endforeach
+                            </select>
+                            @error('layanan_id')<p class="mt-1 text-red-600 text-sm">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="w-1/2">
+                            <label for="tanggal" class="block text-sm font-semibold">Tanggal<span class="text-pink-500 ml-0.5">*</span></label>
                             <input type="date" name="tanggal" id="tanggal"
                                 class="w-full px-4 py-2 border rounded-md border-gray-300"
                                 value="{{ old('tanggal', $pemesanan->tanggal) }}" required>
+                            @error('tanggal')<p class="mt-1 text-red-600 text-sm">{{ $message }}</p>@enderror
                         </div>
+                    </div>
 
+                    {{-- ROW 3: Berat + Total Harga --}}
+                    <div class="flex flex-row mb-8 gap-6">
                         <div class="w-1/2">
-                            <label for="berat_pesanan" class="block text-sm font-semibold">Berat Pesanan (kg)<span
-                                    class="text-pink-500 ml-0.5">*</span></label>
-                            <input type="number" name="berat_pesanan" id="berat_pesanan"
+                            <label for="berat_pesanan" class="block text-sm font-semibold">Berat Pesanan (kg)<span class="text-pink-500 ml-0.5">*</span></label>
+                            <input type="number" name="berat_pesanan" id="berat_pesanan" min="0"
                                 class="w-full px-4 py-2 border rounded-md border-gray-300"
                                 value="{{ old('berat_pesanan', $pemesanan->berat_pesanan) }}" required>
+                            @error('berat_pesanan')<p class="mt-1 text-red-600 text-sm">{{ $message }}</p>@enderror
                         </div>
-                    </div>
-
-                    <div class="flex flex-row mb-8 gap-6">
                         <div class="w-1/2">
-                            <label for="total_harga" class="block text-sm font-semibold">Total Harga (Rp)<span
-                                    class="text-pink-500 ml-0.5">*</span></label>
+                            <label for="total_harga" class="block text-sm font-semibold">Total Harga (Rp)<span class="text-pink-500 ml-0.5">*</span></label>
                             <input type="text" name="total_harga" id="total_harga"
-                                class="w-full px-4 py-2 border rounded-md border-gray-300"
-                                value="{{ old('total_harga', $pemesanan->total_harga) }}" required>
-                        </div>
-
-                        <div class="w-1/2">
-                            <label for="status_pesanan" class="block text-sm font-semibold">Status Pesanan<span
-                                    class="text-pink-500 ml-0.5">*</span></label>
-                            <select name="status_pesanan" id="status_pesanan"
-                                class="w-full px-4 py-2 border rounded-md border-gray-300" required>
-                                <option value="Pending"
-                                    {{ old('status_pesanan', $pemesanan->status_pesanan) == 'Pending' ? 'selected' : '' }}>
-                                    Pending</option>
-                                <option value="Sedang Diproses"
-                                    {{ old('status_pesanan', $pemesanan->status_pesanan) == 'Sedang Diproses' ? 'selected' : '' }}>
-                                    Sedang Diproses</option>
-                                <option value="Terkirim"
-                                    {{ old('status_pesanan', $pemesanan->status_pesanan) == 'Terkirim' ? 'selected' : '' }}>
-                                    Terkirim</option>
-                                <option value="Diterima"
-                                    {{ old('status_pesanan', $pemesanan->status_pesanan) == 'Diterima' ? 'selected' : '' }}>
-                                    Diterima</option>
-                                <option value="Dibatalkan"
-                                    {{ old('status_pesanan', $pemesanan->status_pesanan) == 'Dibatalkan' ? 'selected' : '' }}>
-                                    Dibatalkan</option>
-                                <option value="Dikembalikan"
-                                    {{ old('status_pesanan', $pemesanan->status_pesanan) == 'Dikembalikan' ? 'selected' : '' }}>
-                                    Dikembalikan</option>
-                                <option value="Selesai"
-                                    {{ old('status_pesanan', $pemesanan->status_pesanan) == 'Selesai' ? 'selected' : '' }}>
-                                    Selesai</option>
-                            </select>
+                                class="w-full px-4 py-2 border rounded-md border-gray-300 bg-gray-100"
+                                value="{{ old('total_harga', $pemesanan->total_harga) }}" readonly>
+                            @error('total_harga')<p class="mt-1 text-red-600 text-sm">{{ $message }}</p>@enderror
                         </div>
                     </div>
 
+                    {{-- ROW 4: Status + Alamat --}}
                     <div class="flex flex-row mb-8 gap-6">
                         <div class="w-1/2">
-                            <label for="alamat" class="block text-sm font-semibold">Alamat<span
-                                    class="text-pink-500 ml-0.5">*</span></label>
+                            <label for="status_pesanan" class="block text-sm font-semibold">Status Pesanan<span class="text-pink-500 ml-0.5">*</span></label>
+                            <select name="status_pesanan" id="status_pesanan" class="w-full px-4 py-2 border rounded-md border-gray-300" required>
+                                <option value="">-- Pilih Status --</option>
+                                @foreach(['Pending','Sedang Diproses','Terkirim','Diterima','Dibatalkan','Dikembalikan','Selesai'] as $status)
+                                    <option value="{{ $status }}"
+                                        {{ old('status_pesanan', $pemesanan->status_pesanan) == $status ? 'selected' : '' }}
+                                    >{{ $status }}</option>
+                                @endforeach
+                            </select>
+                            @error('status_pesanan')<p class="mt-1 text-red-600 text-sm">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="w-1/2">
+                            <label for="alamat" class="block text-sm font-semibold">Alamat<span class="text-pink-500 ml-0.5">*</span></label>
                             <input type="text" name="alamat" id="alamat"
                                 class="w-full px-4 py-2 border rounded-md border-gray-300"
                                 value="{{ old('alamat', $pemesanan->alamat) }}" required>
-                        </div>
-
-                        <div class="w-1/2">
-                            <label for="kontak" class="block text-sm font-semibold">Kontak<span
-                                    class="text-pink-500 ml-0.5">*</span></label>
-                            <input type="text" name="kontak" id="kontak"
-                                class="w-full px-4 py-2 border rounded-md border-gray-300"
-                                value="{{ old('kontak', $pemesanan->kontak) }}" required>
+                            @error('alamat')<p class="mt-1 text-red-600 text-sm">{{ $message }}</p>@enderror
                         </div>
                     </div>
 
-                    <div class="flex flex-row gap-6 mb-8">
-                        <div class="">
-                            <button type="submit"
-                                class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold flex flex-row gap-2 items-center justify-center">
-                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                    width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd"
-                                        d="M11.32 6.176H5c-1.105 0-2 .949-2 2.118v10.588C3 20.052 3.895 21 5 21h11c1.105 0 2-.948 2-2.118v-7.75l-3.914 4.144A2.46 2.46 0 0 1 12.81 16l-2.681.568c-1.75.37-3.292-1.263-2.942-3.115l.536-2.839c.097-.512.335-.983.684-1.352l2.914-3.086Z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <p>Edit</p>
-                            </button>
+                    {{-- ROW 5: Kontak --}}
+                    <div class="flex flex-row mb-8 gap-6">
+                        <div class="w-1/2">
+                            <label for="kontak" class="block text-sm font-semibold">Kontak<span class="text-pink-500 ml-0.5">*</span></label>
+                            <input type="text" name="kontak" id="kontak"
+                                class="w-full px-4 py-2 border rounded-md border-gray-300"
+                                value="{{ old('kontak', $pemesanan->kontak) }}" required>
+                            @error('kontak')<p class="mt-1 text-red-600 text-sm">{{ $message }}</p>@enderror
                         </div>
-                        <a href="{{ route('pemesanan.index') }}">
-                            <div class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">Cancel</div>
+                    </div>
+
+                    {{-- ACTION --}}
+                    <div class="flex flex-row gap-6 mb-8">
+                        <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold inline-flex items-center gap-2">
+                            <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4.243a1 1 0 1 0-2 0V11H7.757a1 1 0 1 0 0 2H11v3.243a1 1 0 1 0 2 0V13h3.243a1 1 0 1 0 0-2H13V7.757Z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Edit</span>
+                        </button>
+                        <a href="{{ route('pemesanan.index') }}" class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 inline-flex items-center justify-center">
+                            Cancel
                         </a>
                     </div>
                 </form>
@@ -138,13 +124,34 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            new AutoNumeric('#total_harga', {
-                currencySymbol: 'Rp. ',
-                decimalCharacter: ',',
-                digitGroupSeparator: '.',
-                unformatOnSubmit: true
-            });
+    document.addEventListener("DOMContentLoaded", function() {
+        const beratEl       = document.getElementById('berat_pesanan');
+        const layananSelect = document.getElementById('layanan_id');
+
+        // Initialize AutoNumeric on total_harga
+        const anTotal = new AutoNumeric('#total_harga', {
+            currencySymbol: 'Rp. ',
+            decimalCharacter: ',',
+            digitGroupSeparator: '.',
+            unformatOnSubmit: true
         });
+
+        // Build a JS map: layanan_id => harga
+        const hargaMapping = {};
+        @foreach($layanans as $layanan)
+            hargaMapping['{{ $layanan->id }}'] = {{ $layanan->harga }};
+        @endforeach
+
+        function updateTotal() {
+            const berat      = parseFloat(beratEl.value) || 0;
+            const layananId  = layananSelect.value;
+            const harga      = hargaMapping[layananId] || 0;
+            anTotal.set(berat * harga);
+        }
+
+        beratEl.addEventListener('input', updateTotal);
+        layananSelect.addEventListener('change', updateTotal);
+        updateTotal();
+    });
     </script>
 </x-app-layout>

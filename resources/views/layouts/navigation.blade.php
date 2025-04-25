@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <img src="{{ url('pharamacylogos.jpg') }}" alt="logo" class="h-[4rem] rounded-full">
+                        <p class="text-xl font-bold text-[#4268F6]">Laundry <span class="text-gray-600">Panel</span></p>
                     </a>
                 </div>
             </div>

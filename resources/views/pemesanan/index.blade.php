@@ -67,7 +67,7 @@
                             </button> --}}
                         </div>
                         {{-- Search Bar --}}
-                        <form action="{{ route('pemesanan.index') }}" method="GET" id="searchForm"
+                        <form action="{{ route('pemesanan.index') }}" method="GET" id="searchFormPemesanan"
                             class="relative">
                             <input type="search" name="search" id="search"
                                 class="block w-full px-10 py-3 rounded-lg border border-gray-200 placeholder:font-bold"

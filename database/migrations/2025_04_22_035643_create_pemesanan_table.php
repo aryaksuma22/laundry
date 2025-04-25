@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama_pelanggan');
             $table->bigInteger('no_pesanan');
             $table->date('tanggal');
+            $table->foreignId('layanan_id')->constrained('layanans')->onDelete('restrict');
             $table->integer('berat_pesanan');
             $table->integer('total_harga');
             $table->string('status_pesanan');

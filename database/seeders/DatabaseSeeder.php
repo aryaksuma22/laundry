@@ -36,6 +36,8 @@ class DatabaseSeeder extends Seeder
             'harga' => 20000,
         ]);
 
+
+        Pemesanan::factory(20)->create();
         Transaksi::factory(20)->create();
     }
 }

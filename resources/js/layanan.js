@@ -1,19 +1,18 @@
-
 const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
 
 // Global variables for sorting, pagination, etc.
-let sortBy = 'nama_pelanggan';
+let sortBy = 'id';
 let sortOrder = 'asc';
 let perPage = 10;
 
 // Initialize parameters from URL query
-function initPemesanans() {
+function initLayanans() {
     const queryParams = new URLSearchParams(window.location.search);
     sortBy = queryParams.get('sortBy') || sortBy;
     sortOrder = queryParams.get('sortOrder') || sortOrder;
     perPage = queryParams.get('perPage') || perPage;
 
-    // Set hidden inputs and selects accordingly
+    // Jika ada hidden inputs, kita bisa set nilainya (opsional)
     if ($('#sort-by').length) {
         $('#sort-by').val(sortBy);
     }
@@ -26,15 +25,13 @@ function initPemesanans() {
 }
 
 // Initial setup
-initPemesanans();
-
+initLayanans();
 
 // Event listener to reinitialize when triggered (for AJAX content load)
-$(document).on("pemesanans:init", function () {
-    initPemesanans();
-    fetchPemesanans(1);  // Fetch users after initialization
+$(document).on("layanans:init", function () {
+    initLayanans();
+    fetchLayanans(1);  // Fetch users after initialization
 });
-
 
 // Update browser URL without reloading
 function updateUrl(page) {
@@ -48,9 +45,9 @@ function updateUrl(page) {
     window.history.replaceState(null, '', baseUrl + '?' + query);
 }
 
-// Fetch pemesanan data based on current parameters
-const url = $('#searchFormPemesanan').attr('action');
-function fetchPemesanans(page = 1) {
+// Fetch layanan data based on current parameters
+const url = $('#searchFormLayanan').attr('action');
+function fetchLayanans(page = 1) {
     const uniqueParam = new Date().getTime();  // Menambahkan timestamp untuk mencegah cache
     $.ajax({
         url: url,
@@ -64,34 +61,33 @@ function fetchPemesanans(page = 1) {
             page: page
         },
         success: function (response) {
-            $('#pemesananTableContainer').html(response.html);
+            $('#layananTableContainer').html(response.html);
             updateUrl(page);
         },
         error: function () {
-            alert('Error fetching Pemesanan data.');
+            alert('Error fetching Layanan data.');
         }
     });
 }
 
 
-
 // Search
-$(document).on('submit', '#searchFormPemesanan', function (e) {
+$(document).on('submit', '#searchFormLayanan', function (e) {
     e.preventDefault();
-    fetchPemesanans(1);
+    fetchLayanans(1);
 });
 
-// Toggle sort order
+// Toggle sorting order and fetch layanan
 $(document).on('click', '#toggleSortOrder', function () {
-    sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-    $('#sort-order').val(sortOrder);
-    fetchPemesanans(1);
+    sortOrder = (sortOrder === 'asc') ? 'desc' : 'asc';
+    $(this).toggleClass('bg-gray-200');
+    fetchLayanans(1);
 });
 
-// Select the sorting option and fetch pemesanan
+// Select the sorting option and fetch layanan
 $(document).on('click', '.sort-option', function () {
     sortBy = $(this).data('sortby');
-    fetchPemesanans(1);
+    fetchLayanans(1);
     $('#sortByPopup').fadeOut(200);
 });
 
@@ -110,20 +106,21 @@ $(document).on('click', function (e) {
 // Change entries per page
 $(document).on('change', '#perPage', function () {
     perPage = $(this).val();
-    fetchPemesanans(1);
+    fetchLayanans(1);
 });
 
 // Handle pagination link clicks
-$(document).on('click', '#pemesananTableContainer nav a', function (e) {
+$(document).on('click', '#layananTableContainer nav a', function (e) {
     e.preventDefault();
     const href = $(this).attr('href');
     if (href) {
         const url = new URL(href, window.location.origin);
         const page = url.searchParams.get('page') || 1;
-        fetchPemesanans(page);
+        fetchLayanans(page);
     }
     return false;
 });
+
 
 // Handle "select all" checkbox click
 $(document).on('change', '#checkbox-all', function () {
@@ -138,16 +135,16 @@ $(document).on('change', '.checkbox-row', function () {
 
 
 // Single Delete
-$(document).on('click', '.delete-pemesanan', function (e) {
+$(document).on('click', '.delete-layanan', function (e) {
     e.preventDefault();
 
-    let idPemesanan = $(this).data('id');  // Ambil ID pemesanan
+    let idLayanan = $(this).data('id');  // Ambil ID Layanan
     let row = $(this).closest('tr');  // Ambil baris tabel
 
     // Tampilkan SweetAlert untuk konfirmasi hapus
     Swal.fire({
         title: 'Apakah Anda yakin?',
-        text: 'Data pemesanan akan dihapus secara permanen',
+        text: 'Data Layanan akan dihapus secara permanen',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -157,7 +154,7 @@ $(document).on('click', '.delete-pemesanan', function (e) {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: '/pemesanans/single/' + idPemesanan,
+                url: '/layanans/single/' + idLayanan,
                 type: 'DELETE',
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content')
@@ -170,14 +167,14 @@ $(document).on('click', '.delete-pemesanan', function (e) {
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil',
-                            text: 'Pemesanan berhasil dihapus.',
+                            text: 'Layanan berhasil dihapus.',
                             confirmButtonText: 'OK'
                         });
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal',
-                            text: 'Gagal menghapus Pemesanan.',
+                            text: 'Gagal menghapus Layanan.',
                             confirmButtonText: 'OK'
                         });
                     }
@@ -186,7 +183,7 @@ $(document).on('click', '.delete-pemesanan', function (e) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Terjadi kesalahan. Pastikan Pemesanan masih ada.',
+                        text: 'Terjadi kesalahan. Pastikan Layanan masih ada.',
                         confirmButtonText: 'OK'
                     });
                 }
@@ -196,12 +193,12 @@ $(document).on('click', '.delete-pemesanan', function (e) {
 });
 
 
-$(document).on('submit', '#deleteFormPemesanan', function (e) {
+$(document).on('submit', '#deleteFormLayanan', function (e) {
     e.preventDefault(); // Cegah submit form secara tradisional
 
     Swal.fire({
         title: 'Apakah Anda yakin?',
-        text: 'Pemesanan yang dipilih akan dihapus secara permanen',
+        text: 'Layanan yang dipilih akan dihapus secara permanen',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -224,8 +221,8 @@ $(document).on('submit', '#deleteFormPemesanan', function (e) {
                             text: response.message,
                             confirmButtonText: 'OK'
                         });
-                        // Refresh tabel Pemesanan via AJAX (misalnya, panggil fungsi fetchPemesanans)
-                        fetchPemesanans(1);
+                        // Refresh tabel Layanan via AJAX (misalnya, panggil fungsi fetchLayanans)
+                        fetchLayanans(1);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -239,7 +236,7 @@ $(document).on('submit', '#deleteFormPemesanan', function (e) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Terjadi kesalahan saat menghapus Pemesanan.',
+                        text: 'Terjadi kesalahan saat menghapus Layanan.',
                         confirmButtonText: 'OK'
                     });
                 }
@@ -247,4 +244,3 @@ $(document).on('submit', '#deleteFormPemesanan', function (e) {
         }
     });
 });
-

@@ -46,10 +46,11 @@ function updateUrl(page) {
 }
 
 // Fetch user data based on current parameters
+const url = $('#searchFormTransaksi').attr('action');
 function fetchTransaksis(page = 1) {
     const uniqueParam = new Date().getTime();  // Menambahkan timestamp untuk mencegah cache
     $.ajax({
-        url: window.location.pathname + '?_=' + uniqueParam,
+        url: url,
         type: 'GET',
         dataType: 'json',
         data: {
@@ -71,7 +72,7 @@ function fetchTransaksis(page = 1) {
 
 
 // Search
-$(document).on('submit', '#searchForm', function (e) {
+$(document).on('submit', '#searchFormTransaksi', function (e) {
     e.preventDefault();
     fetchTransaksis(1);
 });

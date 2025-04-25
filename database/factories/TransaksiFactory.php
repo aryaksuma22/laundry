@@ -13,22 +13,13 @@ class TransaksiFactory extends Factory
 
     public function definition()
     {
-        // Ambil satu pemesanan yang sudah ada
         $pemesanan = Pemesanan::inRandomOrder()->first();
-
-        // Ambil satu layanan yang sudah ada
-        $layanan = Layanan::inRandomOrder()->first();
-
-        // Hitung total harga berdasar berat di pemesanan + harga layanan
-        $totalHarga = $pemesanan->berat_pesanan * $layanan->harga;
-
         return [
             'pemesanan_id' => $pemesanan->id,
-            'layanan_id'   => $layanan->id,
-            'invoice'      => 'INV-' . $this->faker->unique()->numerify('########'),
-            // total bayar acak antara 0 hingga total harga
-            'dibayar'      => $this->faker->numberBetween(0, $totalHarga),
-            // timestamps akan otomatis di-handle oleh Eloquent
+            'layanan_id'   => $pemesanan->layanan_id,
+            'invoice'      => 'INV-'.$this->faker->unique()->numerify('########'),
+            'total_harga'  => $pemesanan->berat_pesanan * $pemesanan->layanan->harga,
+            'dibayar'      => $this->faker->numberBetween(0, $pemesanan->total_harga),
         ];
     }
 }

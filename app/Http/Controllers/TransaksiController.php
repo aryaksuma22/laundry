@@ -84,80 +84,50 @@ class TransaksiController extends Controller
 
     public function create()
     {
-        $pemesanans = Pemesanan::all();   // untuk dropdown pilih pemesanan (nama_pelanggan)
-        $layanans   = Layanan::all();     // untuk dropdown pilih layanan
-
-        return view('transaksi.create', compact('pemesanans', 'layanans'));
+        $pemesanans = Pemesanan::with('layanan')->get();
+        return view('transaksi.create', compact('pemesanans'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'pemesanan_id'   => 'required|exists:pemesanans,id',
-            'layanan_id'     => 'required|exists:layanans,id',
-            'berat_pesanan'  => 'required|integer|min:1',
-            'dibayar'        => 'required|numeric|min:0',
-        ], [
-            'pemesanan_id.required'  => 'Pemesanan wajib dipilih.',
-            'pemesanan_id.exists'    => 'Pemesanan tidak valid.',
-            'layanan_id.required'    => 'Layanan wajib dipilih.',
-            'layanan_id.exists'      => 'Layanan tidak valid.',
-            'berat_pesanan.required' => 'Berat pesanan wajib diisi.',
-            'berat_pesanan.integer'  => 'Berat harus angka bulat.',
-            'berat_pesanan.min'      => 'Berat minimal 1.',
-            'dibayar.required'       => 'Jumlah dibayar wajib diisi.',
-            'dibayar.numeric'        => 'Dibayar harus angka.',
-            'dibayar.min'            => 'Dibayar tidak boleh negatif.',
+        $data = $request->validate([
+            'pemesanan_id' => 'required|exists:pemesanans,id',
+            'dibayar'      => 'required|numeric|min:0',
         ]);
 
-        $transaksi = new Transaksi();
-        $transaksi->pemesanan_id  = $request->pemesanan_id;
-        $transaksi->layanan_id    = $request->layanan_id;
-        $transaksi->invoice       = 'INV-' . time(); // contoh generate, sesuaikan bila perlu
-        $transaksi->berat_pesanan = $request->berat_pesanan;
+        $pemesanan          = Pemesanan::with('layanan')->findOrFail($data['pemesanan_id']);
+        $data['layanan_id'] = $pemesanan->layanan_id;                 // auto–copy
+        $hargaTotal         = $pemesanan->berat_pesanan * $pemesanan->layanan->harga;
 
-        // hitung total_harga berdasarkan berat × harga layanan
-        $layanan = Layanan::find($request->layanan_id);
-        $transaksi->total_harga = $layanan->harga * $request->berat_pesanan;
+        $transaksi = Transaksi::create([
+            'pemesanan_id' => $pemesanan->id,
+            'layanan_id'   => $pemesanan->layanan_id,
+            'invoice'      => 'INV-' . now()->format('ymdHis'),
+            'total_harga'  => $hargaTotal,       // simpan snapshot bila kolomnya ada
+            'dibayar'      => $data['dibayar'],
+        ]);
 
-        $transaksi->dibayar = $request->dibayar;
-        $transaksi->save();
-
-        return redirect()->route('transaksis.index')
-            ->with('success', 'Transaksi berhasil ditambahkan.');
+        return to_route('transaksis.index')->withSuccess('Transaksi berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
-        $transaksi  = Transaksi::findOrFail($id);
-        $pemesanans = Pemesanan::all();
-        $layanans   = Layanan::all();
-
-        return view('transaksi.edit', compact('transaksi', 'pemesanans', 'layanans'));
+        $transaksi = Transaksi::with(['pemesanan.layanan'])->findOrFail($id);
+        return view('transaksi.edit', compact('transaksi'));
     }
 
     public function update(Request $request, $id)
     {
+        $transaksi = Transaksi::with(['pemesanan.layanan'])->findOrFail($id);
+
         $request->validate([
-            'pemesanan_id'   => 'required|exists:pemesanans,id',
-            'layanan_id'     => 'required|exists:layanans,id',
-            'berat_pesanan'  => 'required|integer|min:1',
-            'dibayar'        => 'required|numeric|min:0',
+            'dibayar' => 'required|numeric|min:0',
         ]);
-
-        $transaksi = Transaksi::findOrFail($id);
-        $transaksi->pemesanan_id  = $request->pemesanan_id;
-        $transaksi->layanan_id    = $request->layanan_id;
-        $transaksi->berat_pesanan = $request->berat_pesanan;
-
-        $layanan = Layanan::find($request->layanan_id);
-        $transaksi->total_harga = $layanan->harga * $request->berat_pesanan;
 
         $transaksi->dibayar = $request->dibayar;
         $transaksi->save();
 
-        return redirect()->route('transaksis.index')
-            ->with('success', 'Transaksi berhasil diperbarui.');
+        return to_route('transaksis.index')->withSuccess('Transaksi berhasil diperbarui.');
     }
 
     public function destroy(Request $request)

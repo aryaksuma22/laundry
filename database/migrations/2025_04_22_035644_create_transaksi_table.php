@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('pemesanan_id')->constrained('pemesanans')->onDelete('cascade');
             $table->string('invoice');
             $table->foreignId('layanan_id')->constrained('layanans')->onDelete('restrict');
+            $table->integer('total_harga');
             $table->integer('dibayar');
             $table->timestamps();
         });

@@ -1,9 +1,14 @@
 <div class="h-full flex flex-col px-4 py-5 bg-white">
     <div class="flex flex-row gap-5 p-6 mb-2">
-        <img src="{{ url('new.jpg') }}" alt="" class="rounded-full h-[50px] w-[50px]">
+        <svg class="rounded-full h-[50px] w-[50px] text-[#4268F6]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd"
+                d="M12 20a7.966 7.966 0 0 1-5.002-1.756l.002.001v-.683c0-1.794 1.492-3.25 3.333-3.25h3.334c1.84 0 3.333 1.456 3.333 3.25v.683A7.966 7.966 0 0 1 12 20ZM2 12C2 6.477 6.477 2 12 2s10 4.477 10 10c0 5.5-4.44 9.963-9.932 10h-.138C6.438 21.962 2 17.5 2 12Zm10-5c-1.84 0-3.333 1.455-3.333 3.25S10.159 13.5 12 13.5c1.84 0 3.333-1.455 3.333-3.25S13.841 7 12 7Z"
+                clip-rule="evenodd" />
+        </svg>
         <div class="flex flex-col justify-center">
-            <p class="font-semibold">Fachry Alfarissi</p>
-            <p class="font-normal text-gray-500 text-sm">Admin</p>
+            <p class="font-semibold">{{ auth()->user()->name }}</p>
+            <p class="font-normal text-gray-500 text-sm">{{ auth()->user()->role }}</p>
         </div>
     </div>
     <div class="flex flex-col p-4">
@@ -63,7 +68,7 @@
                 </svg>
                 <p class="font-semibold">Pemesanan</p>
             </a>
-            <a href="#" data-url="{{ route('layanan.index') }}"
+            <a href="#" data-url="{{ route('layanans.index') }}"
                 class="ajax-link rounded-xl flex flex-row items-center group py-4 px-8 gap-4">
                 <svg id="sidebarSVG" class="w-6 h-6 group-hover:transition-all group-hover:duration-150"
                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -89,9 +94,9 @@
             <a href="#" data-url="{{ route('riwayat.index') }}"
                 class="ajax-link rounded-xl flex flex-row items-center group py-4 px-8 gap-4">
                 <svg id="sidebarSVG" class="w-6 h-6 group-hover:transition-all group-hover:duration-150"
-                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-logs">
+                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-logs">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M4 12h.01" />
                     <path d="M4 6h.01" />
@@ -104,29 +109,6 @@
                     <path d="M14 18h6" />
                 </svg>
                 <p class="font-semibold">Riwayat pemesanan</p>
-            </a>
-            <a href="#" data-url="{{ route('satuan_obats.index') }}"
-                class="ajax-link rounded-xl flex flex-row items-center group py-4 px-8 gap-4">
-                <svg id="sidebarSVG" class="w-6 h-6 group-hover:transition-all group-hover:duration-150"
-                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                    fill="currentColor" viewBox="0 0 24 24">
-                    <path fill-rule="evenodd"
-                        d="M5 9a7 7 0 1 1 8 6.93V21a1 1 0 1 1-2 0v-5.07A7.001 7.001 0 0 1 5 9Zm5.94-1.06A1.5 1.5 0 0 1 12 7.5a1 1 0 1 0 0-2A3.5 3.5 0 0 0 8.5 9a1 1 0 0 0 2 0c0-.398.158-.78.44-1.06Z"
-                        clip-rule="evenodd" />
-                </svg>
-                <p class="font-semibold">Satuan Obat</p>
-            </a>
-            <a href="#" data-url="{{ route('kategori_obats.index') }}"
-                class="ajax-link rounded-xl flex flex-row items-center group py-4 px-8 gap-4">
-                <svg id="sidebarSVG"
-                    class="w-6 h-6 group-hover:transition-all group-hover:duration-150 aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                    viewBox="0 0 24 24">
-                    <path fill-rule="evenodd"
-                        d="M4.857 3A1.857 1.857 0 0 0 3 4.857v4.286C3 10.169 3.831 11 4.857 11h4.286A1.857 1.857 0 0 0 11 9.143V4.857A1.857 1.857 0 0 0 9.143 3H4.857Zm10 0A1.857 1.857 0 0 0 13 4.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 9.143V4.857A1.857 1.857 0 0 0 19.143 3h-4.286Zm-10 10A1.857 1.857 0 0 0 3 14.857v4.286C3 20.169 3.831 21 4.857 21h4.286A1.857 1.857 0 0 0 11 19.143v-4.286A1.857 1.857 0 0 0 9.143 13H4.857ZM18 14a1 1 0 1 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 1 0 2 0v-2h2a1 1 0 1 0 0-2h-2v-2Z"
-                        clip-rule="evenodd" />
-                </svg>
-                <p class="font-semibold">Kategori Obat</p>
             </a>
         </div>
 
@@ -148,7 +130,7 @@
         </a>
 
         <!-- Settings Link -->
-        <a href="#" data-url="{{ route('settings') }}"
+        {{-- <a href="#" data-url="{{ route('settings') }}"
             class="ajax-link group rounded-xl flex flex-row gap-4 p-4 {{ request()->routeIs('settings') ? 'bg-[#4268F6] text-white' : 'text-gray-800 hover:text-[#4268F6]' }}">
             <svg id="sidebarSVG"
                 class="w-6 h-6 group-hover:transition-all group-hover:duration-150 {{ request()->routeIs('settings') ? 'text-white' : 'text-gray-800 group-hover:text-[#4268F6] ' }}"
@@ -161,7 +143,7 @@
             <p
                 class="group-hover:transition-all group-hover:duration-150 {{ request()->routeIs('settings') ? 'font-semibold' : 'font-semibold group-hover:text-[#4268F6]' }}">
                 Settings</p>
-        </a>
+        </a> --}}
     </div>
 
 </div>
