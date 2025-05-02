@@ -14,18 +14,17 @@ return new class extends Migration
         Schema::create('pemesanans', function (Blueprint $table) {
             $table->id();
             $table->string('nama_pelanggan');
-            $table->bigInteger('no_pesanan');
-            $table->date('tanggal');
+            $table->string('no_pesanan')->unique();
+            $table->datetime('tanggal');
             $table->foreignId('layanan_id')->constrained('layanans')->onDelete('restrict');
-            $table->integer('berat_pesanan');
-            $table->integer('total_harga');
+            $table->decimal('berat_pesanan', 8, 2)->default(0);
+            $table->integer('total_harga')->default(0);
             $table->string('status_pesanan');
             $table->string('alamat');
             $table->string('kontak');
             $table->timestamps();
         });
     }
-
     /**
      * Reverse the migrations.
      */

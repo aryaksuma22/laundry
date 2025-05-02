@@ -23,7 +23,6 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        Pemesanan::factory(20)->create();
         Layanan::create([
             'nama_layanan' => 'Regular',
             'deskripsi' => 'Layanan pengiriman standar dengan waktu estimasi 3-5 hari kerja. Biaya lebih terjangkau untuk pengiriman jarak jauh.',
@@ -37,7 +36,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        Pemesanan::factory(20)->create();
+        Pemesanan::factory(2)->create();
         Transaksi::factory(20)->create();
     }
 }

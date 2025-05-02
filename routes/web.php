@@ -17,6 +17,13 @@ use App\Http\Controllers\DashboardController;
 
 
 
+// Route untuk MENAMPILKAN halaman form pemesanan
+Route::get('/buat-pesanan', [PemesananController::class, 'showGuestOrderForm'])->name('guest.order.form');
+
+// Route untuk MENYIMPAN data dari form pemesanan guest
+Route::post('/buat-pesanan', [PemesananController::class, 'storeGuestOrder'])->name('guest.order.store');
+
+
 
 Route::get('/', function () {
     return view('auth.login');
@@ -29,6 +36,8 @@ Route::get('/dashboard', function () {
 Route::get('/navigasiobat', function () {
     return view('navigasiobat');
 })->middleware(['auth', 'verified'])->name('navigasiobat');
+
+
 
 
 Route::get('/account-management', [UserController::class, 'index'])->middleware(['auth', 'verified'])->name('account.management');

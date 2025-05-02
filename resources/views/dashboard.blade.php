@@ -8,7 +8,7 @@
             <div class="bg-white shadow-xl sm:rounded-lg p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    <div class="p-4 border rounded">
+                    <div class="p-4 border rounded h-full">
                         <h3 class="mb-2">Pesanan</h3>
                         <canvas id="ordersChart"></canvas>
                     </div>

@@ -25,9 +25,8 @@
                 <p class="text-white font-outfit text-lg">Cucian numpuk? Serahkan pada kami</p>
             </div>
             <div class="w-[60%] flex flex-col p-10 justify-center items-center">
-                <div class="w-1/3">
-
-                    <div>
+                <div class="flex">
+                    <div class="w-full">
                         {{ $slot }}
                     </div>
                 </div>
