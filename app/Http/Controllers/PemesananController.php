@@ -141,7 +141,7 @@ class PemesananController extends Controller
             'layanan_id.exists'       => 'Jenis layanan tidak valid.',
             'alamat.required'         => 'Alamat wajib diisi.',
             'kontak.required'         => 'Nomor kontak wajib diisi.',
-        ]);
+        ]); 
 
         // 2. Generate Nomor Pesanan Otomatis (contoh)
         $noPesanan = 'LNDRY-' . now()->format('ymd') . strtoupper(Str::random(4));
