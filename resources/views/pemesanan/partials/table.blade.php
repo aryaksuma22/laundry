@@ -1,66 +1,92 @@
+{{-- pemesanan/partials/table.blade.php --}}
 <form id="deleteFormPemesanan" action="{{ route('pemesanan.destroy', ['pemesanan' => 0]) }}" method="POST">
     @csrf
     @method('DELETE')
-    <table class="min-w-full bg-white overflow-hidden rounded-lg shadow-sm mb-5">
-        <thead class="bg-slate-800 text-white">
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-slate-800">
             <tr>
-                <th class="px-4 py-2 text-left">
-                    <input type="checkbox" class="form-checkbox rounded cursor-pointer" id="checkbox-all" />
+                <th scope="col" class="p-4 text-left">
+                    <input type="checkbox" class="form-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer" id="checkbox-all" />
                 </th>
-                <th class="px-4 py-2 text-left">Nama Pelanggan</th>
-                <th class="px-4 py-2 text-left">No Pesanan</th>
-                <th class="px-4 py-2 text-left">Tanggal</th>
-                <th class="px-4 py-2 text-left">Berat (KG)</th>
-                <th class="px-4 py-2 text-left">Total Harga</th>
-                <th class="px-4 py-2 text-left">Status Pesanan</th>
-                <th class="px-4 py-2 text-left">Alamat</th>
-                <th class="px-4 py-2 text-left">Kontak</th>
-                <th class="px-4 py-2 text-left">Aksi</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">No Pesanan</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Pelanggan</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Tgl Pesan</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Layanan Utama</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Metode</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Berat Final (Kg)</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Total Harga</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Status</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Kontak</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Aksi</th>
             </tr>
         </thead>
-        <tbody>
-            @foreach ($pemesanans as $pemesanan)
-                <tr class="border hover:bg-sky-50">
-                    <td class="px-4 py-3">
-                        <input type="checkbox" name="pemesanans[]" value="{{ $pemesanan->id }}"
-                            class="form-checkbox rounded checkbox-row cursor-pointer" />
+        <tbody class="bg-white divide-y divide-gray-200">
+            @forelse ($pemesanans as $pemesanan)
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 whitespace-nowrap">
+                        <input type="checkbox" name="ids[]" value="{{ $pemesanan->id }}" class="form-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 checkbox-row cursor-pointer" />
                     </td>
-                    <td class="px-4 py-3">{{ $pemesanan->nama_pelanggan }}</td>
-                    <td class="px-4 py-3">{{ $pemesanan->no_pesanan }}</td>
-                    <td class="px-4 py-3">{{ $pemesanan->tanggal }}</td>
-                    <td class="px-4 py-3">{{ $pemesanan->berat_pesanan }}</td>
-                    <td class="px-4 py-3">{{ $pemesanan->total_harga }}</td>
-                    <td class="px-4 py-3">{{ $pemesanan->status_pesanan }}</td>
-                    <td class="px-4 py-3">{{ $pemesanan->alamat }}</td>
-                    <td class="px-4 py-3">{{ $pemesanan->kontak }}</td>
-                    <td class="px-4 py-3">
-                        <div class="flex flex-row">
-                            <!-- Edit -->
-                            <a href="{{ route('pemesanan.edit', $pemesanan->id) }}">
-                                <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd" d="M11.32 6.176H5c-1.105 0-2 .949-2 2.118v10.588C3 20.052 3.895 21 5 21h11c1.105 0 2-.948 2-2.118v-7.75l-3.914 4.144A2.46 2.46 0 0 1 12.81 16l-2.681.568c-1.75.37-3.292-1.263-2.942-3.115l.536-2.839c.097-.512.335-.983.684-1.352l2.914-3.086Z" clip-rule="evenodd"/>
-                                    <path fill-rule="evenodd" d="M19.846 4.318a2.148 2.148 0 0 0-.437-.692 2.014 2.014 0 0 0-.654-.463 1.92 1.92 0 0 0-1.544 0 2.014 2.014 0 0 0-.654.463l-.546.578 2.852 3.02.546-.579a2.14 2.14 0 0 0 .437-.692 2.244 2.244 0 0 0 0-1.635Z" clip-rule="evenodd"/>
-                                </svg>
-                            </a>
-                            <!-- Delete -->
-                            <a href="#" class="delete-pemesanan ml-4" data-id="{{ $pemesanan->id }}">
-                                <svg class="w-6 h-6 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd" d="M8.586 2.586A2 2 0 0 1 10 2h4a2 2 0 0 1 2 2v2h3a1 1 0 1 1 0 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a1 1 0 0 1 0-2h3V4a2 2 0 0 1 .586-1.414ZM10 6h4V4h-4v2Zm1 4a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Zm4 0a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Z" clip-rule="evenodd"/>
-                                </svg>
-                            </a>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $pemesanan->no_pesanan }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{{ $pemesanan->nama_pelanggan }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $pemesanan->tanggal_pesan ? $pemesanan->tanggal_pesan->isoFormat('DD MMM YYYY, HH:mm') : '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $pemesanan->layananUtama->nama_layanan ?? 'N/A' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $pemesanan->metode_layanan }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">{{ $pemesanan->berat_final !== null ? number_format($pemesanan->berat_final, 2, ',', '.') : '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold text-right">Rp {{ number_format($pemesanan->total_harga ?? 0, 0, ',', '.') }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {{-- >>> TAMBAHKAN BLOK PHP INI <<< --}}
+                        @php
+                            $statusClass = '';
+                            // Konversi ke huruf kecil untuk perbandingan case-insensitive
+                            $statusLower = strtolower($pemesanan->status_pesanan ?? '');
+
+                            switch ($statusLower) {
+                                case 'baru':
+                                    $statusClass = 'bg-blue-100 text-blue-800'; // Baru masuk
+                                    break;
+                                case 'menunggu diterima': // Pelanggan antar sendiri, laundry menunggu
+                                case 'menunggu dijemput': // Laundry harus jemput
+                                    $statusClass = 'bg-yellow-100 text-yellow-800'; // Status menunggu/pending action
+                                    break;
+                                case 'diproses':
+                                    $statusClass = 'bg-purple-100 text-purple-800'; // Sedang aktif dikerjakan
+                                    break;
+                                case 'siap diantar': // Selesai, menunggu diantar oleh laundry
+                                case 'siap diambil': // Selesai, menunggu diambil pelanggan
+                                    $statusClass = 'bg-teal-100 text-teal-800'; // Siap untuk langkah selanjutnya
+                                    break;
+                                case 'selesai': // Sudah diterima/diambil pelanggan
+                                    $statusClass = 'bg-green-100 text-green-800'; // Selesai sepenuhnya
+                                    break;
+                                case 'dibatalkan':
+                                    $statusClass = 'bg-red-100 text-red-800'; // Dibatalkan
+                                    break;
+                                default:
+                                    $statusClass = 'bg-gray-100 text-gray-800'; // Status tidak dikenal
+                                    break;
+                            }
+                        @endphp
+                        {{-- >>> BATAS BLOK PHP <<< --}}
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
+                            {{ $pemesanan->status_pesanan ?? 'N/A' }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $pemesanan->kontak_pelanggan }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div class="flex items-center space-x-3">
+                            <a href="{{ route('pemesanan.edit', $pemesanan->id) }}" class="text-indigo-600 hover:text-indigo-900" title="Edit"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg></a>
+                            <a href="#" class="delete-pemesanan text-red-600 hover:text-red-900" data-id="{{ $pemesanan->id }}" title="Hapus"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg></a>
                         </div>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                 <tr><td colspan="11" class="text-center py-10 text-gray-500">Tidak ada data pemesanan ditemukan.@if(request('search'))<br>Coba ubah kata kunci pencarian Anda.@endif</td></tr>
+            @endforelse
         </tbody>
     </table>
+</div>
 </form>
-
-<div class="mt-4">
-    {{ $pemesanans->appends([
-            'search'    => request('search'),
-            'perPage'   => request('perPage'),
-            'sortBy'    => request('sortBy'),
-            'sortOrder' => request('sortOrder'),
-        ])->links() }}
+<div class="px-6 py-4 border-t border-gray-200">
+    {{ $pemesanans->appends(request()->query())->links() }}
 </div>

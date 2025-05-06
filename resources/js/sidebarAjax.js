@@ -81,7 +81,10 @@ $(document).on("click", ".ajax-link", function (e) {
                     initDashboardCharts();
                 }
 
-
+                if ($("#pemesananTableContainer").length > 0) {
+                    console.log('Triggering pemesanans:init from sidebarAjax');
+                    $(document).trigger("pemesanans:init"); // Picu event untuk pemesanan.js
+                }
 
                 if ($("#pembelian_obatTableContainer").length > 0) {
                     $(document).trigger("pembelian_obats:init");

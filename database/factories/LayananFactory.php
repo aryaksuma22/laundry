@@ -12,9 +12,9 @@ class LayananFactory extends Factory
     public function definition()
     {
         return [
-            'nama_layanan' => $this->faker->word,  // Generates a random service name
-            'deskripsi' => $this->faker->paragraph, // Generates a random description
-            'harga' => $this->faker->numberBetween(10000, 500000), // Generates a random price between 10k to 500k
+            'nama_layanan' => fake()->words(2, true), // Contoh nama generik
+            'deskripsi' => fake()->sentence(),      // Contoh deskripsi generik
+            'harga' => fake()->numberBetween(5000, 50000), // Contoh harga generik
         ];
     }
 }

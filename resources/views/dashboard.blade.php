@@ -34,18 +34,6 @@
     </div>
 
     <script>
-        window.dashboardData = {
-            yearLabels: @json($yearLabels),
-            yearlyOrders: @json($yearlyOrders),
-            revenue: @json(array_values($revenueData)),
-            status: {
-                labels: @json($statusLabels),
-                data: @json($statusData)
-            },
-            topServices: {
-                labels: @json($topServicesLabels),
-                data: @json($topServicesData)
-            }
-        };
+        window.dashboardData = @json($dashboardData);
     </script>
 </x-app-layout>

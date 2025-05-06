@@ -1,133 +1,172 @@
+{{-- pemesanan/index.blade.php --}}
 <x-app-layout>
     <main id="main-content">
-        <div class="p-4">
-            <div class="w-full p-10 mx-auto">
-                <div class="text-gray-900 text-4xl font-semibold mb-5">
+        <div class="p-4 sm:p-6 lg:p-8">
+            <div class="w-full mx-auto">
+                <div class="text-gray-900 text-2xl md:text-3xl lg:text-4xl font-semibold mb-6">
                     {{ __('Data Pemesanan') }}
                 </div>
+                <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
 
-                <div class="flex flex-row justify-between mb-3">
-                    <div class="flex flex-row gap-4">
-                        {{-- Delete Button --}}
-                        <button form="deleteFormPemesanan" type="submit"
-                            class="px-4 py-2 bg-red-500 hover:bg-red-600 transition-all duration-100 border rounded-lg flex items-center">
-                            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    {{-- Aksi Kiri: Delete Button --}}
+                    <div class="flex-shrink-0"> {{-- Cegah tombol delete memakan lebar tidak perlu --}}
+                        <button type="button" id="bulkDeleteButton" {{-- Change type to "button" and add the ID --}}
+                            class="px-3 py-2 bg-red-500 hover:bg-red-600 transition-colors duration-150 border rounded-lg flex items-center text-white shadow-sm">
+                            {{-- SVG Icon (remains the same) --}}
+                            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor" viewBox="0 0 24 24">
                                 <path fill-rule="evenodd"
                                     d="M8.586 2.586A2 2 0 0 1 10 2h4a2 2 0 0 1 2 2v2h3a1 1 0 1 1 0 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a1 1 0 0 1 0-2h3V4a2 2 0 0 1 .586-1.414ZM10 6h4V4h-4v2Zm1 4a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Zm4 0a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Z"
                                     clip-rule="evenodd" />
                             </svg>
-                            <span class="ml-2 text-white font-semibold">Delete</span>
+                            {{-- Text (remains the same) --}}
+                            <span class="ml-2 font-semibold text-sm">Delete Selected</span>
                         </button>
                     </div>
 
-                    <div class="flex flex-row space-x-4 items-center">
-                        <div class="flex flex-row gap-2">
-                            {{-- Toggle Sort Order Button --}}
-                            {{-- <button id="toggleSortOrder"
-                                class="bg-white flex justify-center items-center px-3 py-2 rounded-lg border hover:bg-gray-50">
-                                <svg class="w-6 h-6 text-gray-800" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                    viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M8 20V10m0 10l-3-3m3 3l3-3m5-13v10m0-10l3 3m-3-3l-3 3" />
+                    {{-- Aksi Kanan: Gunakan flex-wrap tapi kontrol spacing dan alignment --}}
+                    {{-- Hilangkan flex-col, gunakan flex-row dari awal. justify-end agar rata kanan --}}
+                    <div class="flex flex-row items-center justify-start md:justify-end gap-3 w-full md:w-auto">
+
+                        {{-- Tombol Sortir --}}
+                        <div class="relative inline-block text-left flex-shrink-0"> {{-- flex-shrink-0 agar tidak mengecil --}}
+                            <button id="sortByButtonPemesanan" type="button"
+                                class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                aria-haspopup="true" aria-expanded="true">
+                                <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                        clip-rule="evenodd" />
                                 </svg>
-                            </button> --}}
-                            <!-- Button Sort By -->
-                            {{-- <button id="sortByButton"
-                                class="flex flex-row gap-2 px-4 py-3 bg-white border rounded-lg justify-center items-center relative hover:bg-gray-50 transition-all duration-200">
-                                <svg class="w-6 h-6 text-gray-800" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                    viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
-                                        d="M5 7h14M5 12h14M5 17h10" />
-                                </svg>
-                                <p class="font-semibold text-black">Sort By</p>
-                                <!-- Dropdown Sort By -->
-                                <div id="sortByPopup"
-                                    class="hidden absolute w-48 bg-white shadow-sm rounded-lg border top-14 right-0 divide-y divide-gray-200 overflow-hidden">
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
-                                        data-sortby="nama_pelanggan">Nama Pelanggan</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
-                                        data-sortby="no_pesanan">No Pesanan</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
-                                        data-sortby="tanggal">Tanggal</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
-                                        data-sortby="berat_pesanan">Berat Pesanan </div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
-                                        data-sortby="total_harga">Total Harga</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
-                                        data-sortby="status_pesanan">Status Pesanan</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
-                                        data-sortby="alamat">Alamat</div>
-                                    <div class="py-2 px-4 cursor-pointer sort-option hover:bg-gray-50"
-                                        data-sortby="kontak">Kontak</div>
+                                <span id="sortByButtonPemesananText">Sort By:
+                                    {{ ucwords(str_replace('_', ' ', $sortBy)) }}</span>
+                            </button>
+                            {{-- Popup Sort (tetap sama) --}}
+                            <div id="sortByPopupPemesanan"
+                                class="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                                role="menu" aria-orientation="vertical" aria-labelledby="sortByButton">
+                                <div class="py-1" role="none">
+                                    <a href="#"
+                                        class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 sort-optionPemesanan"
+                                        role="menuitem" data-sortby="tanggal_pesan">Tgl Pesan</a>
+                                    <a href="#"
+                                        class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 sort-optionPemesanan"
+                                        role="menuitem" data-sortby="nama_pelanggan">Nama Pelanggan</a>
+                                    <a href="#"
+                                        class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 sort-optionPemesanan"
+                                        role="menuitem" data-sortby="no_pesanan">No Pesanan</a>
+                                    <a href="#"
+                                        class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 sort-optionPemesanan"
+                                        role="menuitem" data-sortby="status_pesanan">Status Pesanan</a>
+                                    <a href="#"
+                                        class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 sort-optionPemesanan"
+                                        role="menuitem" data-sortby="total_harga">Total Harga</a>
+                                    <a href="#"
+                                        class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 sort-optionPemesanan"
+                                        role="menuitem" data-sortby="metode_layanan">Metode Layanan</a>
                                 </div>
-                            </button> --}}
+                            </div>
                         </div>
-                        {{-- Search Bar --}}
+
+                        {{-- Tombol Toggle Order --}}
+                        <button id="toggleSortOrderPemesanan"
+                            title="Toggle Sort Order ({{ $sortOrder == 'asc' ? 'Ascending' : 'Descending' }})"
+                            class="flex-shrink-0 bg-white flex justify-center items-center p-2 rounded-md border border-gray-300 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <svg class="w-5 h-5 text-gray-500 {{ $sortOrder == 'desc' ? '' : 'rotate-180' }}"
+                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 10 16">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M9 5 5 1 1 5m0 6 4 4 4-4" />
+                            </svg>
+                        </button>
+
+                        {{-- Search Bar: Pastikan form punya relative dan icon absolute --}}
+                        {{-- Tambahkan min-w-[...] agar tidak terlalu kecil di layar sempit --}}
                         <form action="{{ route('pemesanan.index') }}" method="GET" id="searchFormPemesanan"
-                            class="relative">
-                            <input type="search" name="search" id="search"
-                                class="block w-full px-10 py-3 rounded-lg border border-gray-200 placeholder:font-bold"
-                                value="{{ $search }}" placeholder="Search" />
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                <svg class="w-4 h-4 text-gray-500" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                </svg>
+                            class="flex-shrink-0 min-w-[200px] overflow-hidden">
+                            <div
+                                class="flex items-center border border-gray-300 rounded-md shadow-sm focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500">
+                                <!-- inline icon, no absolute -->
+                                <span class="flex items-center px-3 pointer-events-none">
+                                    <svg class="w-5 h-5 text-gray-400" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                    </svg>
+                                </span>
+                                <!-- input flexes to fill -->
+                                <input type="search" name="search" id="search"
+                                    class="flex-1 block w-full border-0 pl-3 pr-4 py-2 focus:outline-none focus:ring-0 sm:text-sm rounded-r-md"
+                                    value="{{ $search }}" placeholder="Cari..." />
                             </div>
                         </form>
+
+
                         {{-- Button Tambah --}}
                         <a href="{{ route('pemesanan.create') }}"
-                            class="px-4 py-3 gap-2 bg-[#4268F6] hover:bg-[#3a5ddc] transition-all duration-100 flex flex-row border rounded-lg justify-center items-center">
-                            <div class="flex flex-row items-center gap-2">
-                                <svg class="w-6 h-6 text-white" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                    viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="M5 12h14m-7 7V5" />
-                                </svg>
-                                <p class="font-semibold text-white">Pemesanan Baru</p>
-                            </div>
+                            class="flex-shrink-0 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <svg class="-ml-1 mr-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M5 12h14m-7 7V5" />
+                            </svg>
+                            Pemesanan Baru
                         </a>
-                        <!-- Dropdown Per Page -->
-                        <div class="flex items-center border rounded-lg bg-white px-6 py-1">
-                            <form action="{{ route('pemesanan.index') }}" method="GET" id="perPageForm">
-                                <label for="perPage" class="mr-2 text-sm">Show</label>
-                                <select name="perPage" id="perPage"
-                                    class="border border-gray-200 rounded">
-                                    <option value="5" {{ request('perPage') == 5 ? 'selected' : '' }}>5</option>
-                                    <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
-                                    <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
-                                    <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
-                                </select>
-                                <span class="ml-1 text-sm">entries</span>
-                            </form>
+
+                        {{-- Dropdown Per Page --}}
+                        <div
+                            class="flex-shrink-0 flex items-center bg-white border border-gray-300 rounded-md shadow-sm px-2 py-1 text-sm">
+                            <label for="perPage" class="mr-2 text-gray-700">Show:</label>
+                            <select name="perPage" id="perPagePemesanan"
+                                class="border-none focus:ring-0 focus:outline-none text-sm py-1 bg-gray-100 rounded-md">
+                                <option value="5" {{ request('perPage', $perPage) == 5 ? 'selected' : '' }}>5
+                                </option>
+                                <option value="10" {{ request('perPage', $perPage) == 10 ? 'selected' : '' }}>
+                                    10</option>
+                                <option value="25" {{ request('perPage', $perPage) == 25 ? 'selected' : '' }}>
+                                    25</option>
+                                <option value="50" {{ request('perPage', $perPage) == 50 ? 'selected' : '' }}>
+                                    50</option>
+                            </select>
+                            <span class="ml-1 text-gray-700">entries</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Hidden inputs untuk menyimpan nilai sort-by dan sort-order -->
-                <input type="hidden" id="sort-by" value="{{ $sortBy }}">
+                <!-- Hidden inputs JS state (tetap sama) -->
+                <input type="hidden" id="sort-byPemesanan" value="{{ $sortBy }}">
                 <input type="hidden" id="sort-order" value="{{ $sortOrder }}">
 
-                <!-- Container untuk memuat partial view tabel Pemesanan via AJAX -->
-                <div id="pemesananTableContainer" class="">
-                    @include('pemesanan.partials.table')
+                <!-- Container tabel (tetap sama) -->
+                <div id="pemesananTableContainer"
+                    class="relative bg-white overflow-x-auto shadow-sm rounded-lg border min-h-[250px]">
+                    <div class="text-center p-10 text-gray-500">Memuat data pemesanan...</div>
                 </div>
+
             </div>
         </div>
     </main>
 
+    {{-- SweetAlert (tetap sama) --}}
     @if (session('success'))
         <script>
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil!',
                 text: "{{ session('success') }}",
+                confirmButtonText: 'OK',
+                timer: 2500,
+                timerProgressBar: true
+            });
+        </script>
+    @endif
+    @if (session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: "{{ session('error') }}",
                 confirmButtonText: 'OK'
             });
         </script>

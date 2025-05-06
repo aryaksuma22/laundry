@@ -1,5 +1,5 @@
 <x-app-layout>
-    <main id="main-content">
+    <main id="main-content" >
         <div class="p-4">
             <div class="w-full p-10 mx-auto">
                 <div class="text-gray-900 text-4xl font-semibold mb-5">
