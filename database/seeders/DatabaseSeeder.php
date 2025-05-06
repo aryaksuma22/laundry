@@ -66,7 +66,7 @@ class DatabaseSeeder extends Seeder
         $layananIds = Layanan::pluck('id')->toArray();
 
         if (!empty($layananIds)) {
-            Pemesanan::factory(20)->create([
+            Pemesanan::factory(200)->create([
                 'layanan_utama_id' => function () use ($layananIds) {
                     return $layananIds[array_rand($layananIds)];
                 },
