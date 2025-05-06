@@ -19,16 +19,15 @@
 <body class="font-sans text-gray-900 antialiased">
     <div class="w-full h-screen overflow-hidden">
         <div class="flex flex-row h-full">
-            <div class="w-[40%] bg-[#4769e4] p-5 flex flex-col justify-center items-center">
-                <img src="{{ url('laundry.jpg') }}" alt="logo" class="h-[20rem] rounded-2xl mb-5">
-                <p class="text-white font-outfit text-[3rem] uppercase tracking-wider">Laundry</p>
-                <p class="text-white font-outfit text-lg">Cucian numpuk? Serahkan pada kami</p>
+            <div class="w-[30%] bg-[#4769e4] p-5 flex flex-col justify-center items-center shrink-0">
+                <img src="{{ url('laundry.jpg') }}" alt="logo" class="h-auto max-h-[20rem] w-auto rounded-2xl mb-5">
+                <p class="text-white font-outfit text-2xl sm:text-3xl text-center uppercase tracking-wider">Laundry</p>
+                <p class="text-white font-outfit text-base sm:text-lg text-center">Cucian numpuk? Serahkan pada kami</p>
             </div>
-            <div class="w-[60%] flex flex-col p-10 justify-center items-center">
-                <div class="flex">
-                    <div class="w-full">
-                        {{ $slot }}
-                    </div>
+
+            <div class="w-[70%] flex-1 flex flex-col overflow-y-auto">
+                <div class="w-full p-6 md:p-10">
+                    {{ $slot }}
                 </div>
             </div>
         </div>

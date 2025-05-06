@@ -17,28 +17,28 @@ class PemesananController extends Controller
      */
     public function index(Request $request)
     {
+        // --- Existing Pagination/Sort/Search Params ---
         $sortOrder = $request->get('sortOrder', 'desc');
         $sortBy    = $request->get('sortBy', 'tanggal_pesan');
         $perPage = $request->get('perPage', 10);
         $search  = $request->get('search', '');
 
-        $allowedSort = [
-            'nama_pelanggan',
-            'no_pesanan',
-            'tanggal_pesan',
-            'status_pesanan',
-            'total_harga',
-            'metode_layanan',
-            'kontak_pelanggan'
-        ];
+        // --- NEW: Filter Params ---
+        $filterMetode = $request->get('filter_metode', ''); // Default to empty (all)
+        $filterLayanan = $request->get('filter_layanan', '');
+        $filterStatus = $request->get('filter_status', '');
+
+        // --- Existing Allowed Sort Columns ---
+        $allowedSort = [ /* ... */'nama_pelanggan', 'no_pesanan', 'tanggal_pesan', 'status_pesanan', 'total_harga', 'metode_layanan', 'kontak_pelanggan'];
         if (!in_array($sortBy, $allowedSort)) {
             $sortBy = 'tanggal_pesan';
         }
 
-        $query = Pemesanan::with(['layananUtama']);
+        // --- Build the Query ---
+        $query = Pemesanan::with(['layananUtama']); // Eager load layanan
 
+        // Apply Search Filter
         if (!empty($search)) {
-            // Logika search (sudah oke)
             $query->where(function ($q) use ($search) {
                 $q->where('nama_pelanggan', 'like', "%{$search}%")
                     ->orWhere('no_pesanan', 'like', "%{$search}%")
@@ -52,18 +52,40 @@ class PemesananController extends Controller
             });
         }
 
+        // --- Apply NEW Dropdown Filters ---
+        $query->when($filterMetode, function ($q, $metode) {
+            return $q->where('metode_layanan', $metode);
+        });
+
+        $query->when($filterLayanan, function ($q, $layananId) {
+            return $q->where('layanan_utama_id', $layananId);
+        });
+
+        $query->when($filterStatus, function ($q, $status) {
+            return $q->where('status_pesanan', $status);
+        });
+        // --- End NEW Filter Application ---
+
+
+        // Apply Sorting and Paginate
         $pemesanans = $query->orderBy($sortBy, $sortOrder)->paginate($perPage);
 
-        // ================== PERUBAHAN LOGIKA AJAX ==================
-        // Hanya kembalikan JSON partial jika request AJAX DAN
-        // merupakan request untuk update tabel (ada parameter spesifik)
-        if ($request->ajax() && (
-            $request->has('page') || $request->has('search') || $request->has('sortBy') ||
-            $request->has('sortOrder') || $request->has('perPage')
-        )) {
-            // Ini adalah request untuk sorting, pagination, search via pemesanan.js
-            Log::info('AJAX request for Pemesanan TABLE update detected.');
+        // --- Data for Filters (Only needed for full page load) ---
+        $filterData = [];
+        if (!$request->ajax() || !$request->hasAny(['page', 'search', 'sortBy', 'sortOrder', 'perPage', 'filter_metode', 'filter_layanan', 'filter_status'])) {
+            // Fetch data needed to populate the dropdowns ONLY on initial load
+            $filterData['metodeOptions'] = Pemesanan::query()->distinct()->pluck('metode_layanan')->sort()->toArray();
+            $filterData['layananOptions'] = Layanan::orderBy('nama_layanan', 'asc')->get(['id', 'nama_layanan']);
+            // Use a predefined list for statuses for consistency
+            $filterData['statusOptions'] = ['Baru', 'Menunggu Dijemput', 'Menunggu Diantar', 'Dijemput', 'Diproses', 'Siap Diantar', 'Siap Diambil', 'Selesai', 'Dibatalkan'];
+        }
+
+
+        // Handle AJAX request for table update
+        if ($request->ajax() && $request->hasAny(['page', 'search', 'sortBy', 'sortOrder', 'perPage', 'filter_metode', 'filter_layanan', 'filter_status'])) {
+            Log::info('AJAX request for Pemesanan TABLE update detected (including filters).');
             try {
+                // Pass current filter values to the partial view if needed for display (usually not)
                 $html = view('pemesanan.partials.table', compact('pemesanans'))->render();
                 return response()->json(['html' => $html]);
             } catch (\Exception $e) {
@@ -71,17 +93,21 @@ class PemesananController extends Controller
                 return response()->json(['error' => 'Gagal memuat tabel.'], 500);
             }
         }
-        // ================== AKHIR PERUBAHAN ==================
 
-        // Jika request BUKAN AJAX, ATAU request AJAX tapi dari sidebar (tidak ada param page/sort/dll)
-        // Maka render view LENGKAP (index.blade.php)
+        // Render Full View for initial load or non-table AJAX requests
         Log::info('Full page request (or initial AJAX load) for Pemesanan index.');
         return view('pemesanan.index', compact(
-            'pemesanans', // Kirim data untuk render awal jika JS gagal
+            'pemesanans', // Data for initial table render (if JS fails)
             'search',
             'sortBy',
             'sortOrder',
-            'perPage'
+            'perPage',
+            // Pass current filter selections
+            'filterMetode',
+            'filterLayanan',
+            'filterStatus',
+            // Pass options for filter dropdowns
+            'filterData'
         ));
     }
 
@@ -93,7 +119,7 @@ class PemesananController extends Controller
     {
         // Fetch layanan WITHOUT tipe_layanan
         $layanans = Layanan::orderBy('nama_layanan', 'asc')
-                           ->get(['id', 'nama_layanan', 'harga']); // Select only existing columns
+            ->get(['id', 'nama_layanan', 'harga']); // Select only existing columns
 
         // Define additional costs (adjust values as needed)
         $biayaTambahan = [
@@ -111,7 +137,7 @@ class PemesananController extends Controller
         ];
 
         // Other necessary data for the view
-        $statuses = ['Baru', 'Menunggu Dijemput','Menunggu Diantar', 'Dijemput', 'Diproses', 'Siap Diantar', 'Siap Diambil', 'Selesai', 'Dibatalkan'];
+        $statuses = ['Baru', 'Menunggu Dijemput', 'Menunggu Diantar', 'Dijemput', 'Diproses', 'Siap Diantar', 'Siap Diambil', 'Selesai', 'Dibatalkan'];
         $kecepatanOptions = ['Reguler', 'Express', 'Kilat'];
         $metodeOptions = ['Antar Jemput', 'Datang Langsung', 'Antar Sendiri Minta Diantar', 'Minta Dijemput Ambil Sendiri'];
 
@@ -169,87 +195,120 @@ class PemesananController extends Controller
     // == METHOD UNTUK GUEST / PELANGGAN ==
     // ======================================================
 
-    /**
-     * Show the form for GUEST to create a new order.
-     * Pastikan view 'guest.order_form' memiliki field-field baru.
-     */
     public function showGuestOrderForm()
     {
-        $layanans = Layanan::orderBy('nama_layanan', 'asc')->get(['id', 'nama_layanan']); // Hanya perlu id dan nama
-        // Anda mungkin perlu mengirim data lain ke view (misal: list kecepatan, metode layanan jika statis)
+        $layanans = Layanan::orderBy('nama_layanan', 'asc')->get(['id', 'nama_layanan', 'harga']);
         return view('guest.order_form', compact('layanans'));
     }
 
-    /**
-     * Store a newly created order from GUEST form.
-     */
     public function storeGuestOrder(Request $request)
     {
         // 1. Validasi input dari guest sesuai form baru
         $validatedData = $request->validate([
-            'nama_pelanggan' => 'required|string|max:255',
-            'kontak_pelanggan' => 'required|string|max:100', // Ganti nama field
-            // Alamat wajib jika metode layanan melibatkan penjemputan/pengantaran
-            'alamat_pelanggan' => [
+            'nama_pelanggan'    => 'required|string|max:255',
+            'kontak_pelanggan'  => 'required|string|max:100',
+            'alamat_pelanggan'  => [
                 Rule::requiredIf(function () use ($request) {
-                    // Contoh: Wajib jika metode layanan adalah 'Antar Jemput' atau 'Minta Diantar' atau 'Minta Dijemput'
-                    return in_array($request->input('metode_layanan'), ['Antar Jemput', 'Minta Diantar', 'Minta Dijemput']);
+                    return in_array($request->input('metode_layanan'), ['Antar Jemput', 'Antar Sendiri Minta Diantar', 'Minta Dijemput Ambil Sendiri']);
                 }),
-                'nullable', // Boleh null jika tidak wajib
+                'nullable',
                 'string',
                 'max:1000'
             ],
-            'layanan_utama_id' => 'required|exists:layanans,id', // Ganti nama field
-            'kecepatan_layanan' => 'required|string|max:50', // Tambah validasi
-            'metode_layanan' => 'required|string|max:100', // Tambah validasi
-            'estimasi_berat' => 'nullable|numeric|min:0', // Tambah validasi
-            'daftar_item' => 'nullable|string', // Tambah validasi
-            'catatan_pelanggan' => 'nullable|string', // Tambah validasi
-            // Tanggal & Waktu Jemput wajib jika metode melibatkan penjemputan
-            'tanggal_penjemputan' => ['nullable', 'date', Rule::requiredIf(fn() => in_array($request->input('metode_layanan'), ['Antar Jemput', 'Minta Dijemput']))],
-            'waktu_penjemputan' => ['nullable', 'string', 'max:50', Rule::requiredIf(fn() => in_array($request->input('metode_layanan'), ['Antar Jemput', 'Minta Dijemput']))],
-            'instruksi_alamat' => 'nullable|string', // Tambah validasi
-            'kode_promo' => 'nullable|string|max:50', // Tambah validasi
+            'metode_layanan'    => 'required|string|in:Datang Langsung,Antar Jemput,Antar Sendiri Minta Diantar,Minta Dijemput Ambil Sendiri',
+            'layanan_utama_id'  => 'required|exists:layanans,id',
+            'kecepatan_layanan' => 'required|string|in:Reguler,Express,Kilat',
+            'estimasi_berat'    => [
+                'nullable',
+                'numeric',
+                'min:0',
+                Rule::requiredIf(function () use ($request) {
+                    $layananId = $request->input('layanan_utama_id');
+                    if (!$layananId) {
+                        return false; // If no layanan_id, don't require estimasi_berat
+                    }
+                    $layanan = Layanan::find($layananId);
+                    if (!$layanan) {
+                        return false; // If layanan not found, don't require
+                    }
+                    // Infer type: if 'nama_layanan' contains 'kiloan' (case-insensitive)
+                    return Str::contains(strtolower($layanan->nama_layanan), 'kiloan');
+                }),
+            ],
+            'daftar_item'       => [
+                'nullable',
+                'string',
+                Rule::requiredIf(function () use ($request) {
+                    $layananId = $request->input('layanan_utama_id');
+                    if (!$layananId) {
+                        return false; // If no layanan_id, don't require daftar_item
+                    }
+                    $layanan = Layanan::find($layananId);
+                    if (!$layanan) {
+                        return false; // If layanan not found, don't require
+                    }
+                    // Infer type: if 'nama_layanan' does NOT contain 'kiloan', assume it's satuan for this rule
+                    return !Str::contains(strtolower($layanan->nama_layanan), 'kiloan');
+                }),
+            ],
+            'catatan_pelanggan' => 'nullable|string|max:1000',
+            'tanggal_penjemputan' => [
+                'nullable',
+                'date',
+                'after_or_equal:today',
+                Rule::requiredIf(fn() => in_array($request->input('metode_layanan'), ['Antar Jemput', 'Minta Dijemput Ambil Sendiri']))
+            ],
+            'waktu_penjemputan' => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::requiredIf(fn() => in_array($request->input('metode_layanan'), ['Antar Jemput', 'Minta Dijemput Ambil Sendiri']))
+            ],
+            'instruksi_alamat'  => 'nullable|string|max:1000',
+            'kode_promo'        => 'nullable|string|max:50',
         ], [
-            // Custom messages bisa ditambahkan di sini
-            'nama_pelanggan.required' => 'Nama Anda wajib diisi.',
-            'kontak_pelanggan.required' => 'Nomor kontak wajib diisi.',
-            'alamat_pelanggan.required' => 'Alamat wajib diisi jika memilih layanan antar/jemput.',
-            'layanan_utama_id.required' => 'Silakan pilih jenis layanan utama.',
+            // Custom messages for standard rules
+            'nama_pelanggan.required'    => 'Nama Anda wajib diisi.',
+            'kontak_pelanggan.required'  => 'Nomor kontak wajib diisi.',
+            'metode_layanan.required'    => 'Silakan pilih metode layanan.',
+            'alamat_pelanggan.required'  => 'Alamat wajib diisi jika memilih layanan antar/jemput.',
+            'layanan_utama_id.required'  => 'Silakan pilih jenis layanan utama.',
             'kecepatan_layanan.required' => 'Silakan pilih kecepatan layanan.',
-            'metode_layanan.required' => 'Silakan pilih metode layanan.',
             'tanggal_penjemputan.required' => 'Tanggal penjemputan wajib diisi jika minta dijemput.',
-            'waktu_penjemputan.required' => 'Waktu penjemputan wajib diisi jika minta dijemput.',
+            'tanggal_penjemputan.after_or_equal' => 'Tanggal penjemputan tidak boleh tanggal yang sudah lalu.',
+            'waktu_penjemputan.required'   => 'Waktu penjemputan wajib diisi jika minta dijemput.',
+            // Custom messages for the conditional fields (these will be shown if the Rule::requiredIf evaluates to true and the field is empty)
+            'estimasi_berat.required' => 'Estimasi berat wajib diisi untuk layanan kiloan.',
+            'daftar_item.required' => 'Daftar item wajib diisi untuk layanan satuan.',
         ]);
 
-        // 2. Generate Nomor Pesanan Otomatis (sudah oke)
+        // 2. Generate Nomor Pesanan Otomatis
         $noPesanan = 'LNDRY-' . now()->format('ymd') . strtoupper(Str::random(4));
         while (Pemesanan::where('no_pesanan', $noPesanan)->exists()) {
             $noPesanan = 'LNDRY-' . now()->format('ymd') . strtoupper(Str::random(5));
         }
 
         // 3. Siapkan data lengkap untuk disimpan
-        $orderData = $validatedData; // Ambil semua data yang sudah divalidasi
+        $orderData = $validatedData;
         $orderData['no_pesanan']     = $noPesanan;
-        $orderData['tanggal_pesan']  = now(); // Gunakan field baru
-        $orderData['status_pesanan'] = 'Baru'; // Status awal yang lebih jelas
-        $orderData['berat_final']    = null; // Berat final belum ada
-        $orderData['total_harga']    = 0; // Total harga belum final
-        // Field lain sudah masuk dari $validatedData
+        $orderData['tanggal_pesan']  = now();
+        $orderData['status_pesanan'] = 'Baru'; // Status awal
+        $orderData['berat_final']    = null;   // Admin akan mengisi ini nanti
+        $orderData['total_harga']    = 0;      // Admin akan mengisi ini nanti
 
         // 4. Simpan ke database
         try {
             $pemesanan = Pemesanan::create($orderData);
 
-            // 5. Beri feedback (sudah oke, pastikan route 'guest.order.form' benar)
-            return redirect()->route('guest.order.form') // Pastikan nama route ini benar
+            // 5. Beri feedback
+            return redirect()->route('guest.order.form')
                 ->with('swal_success_message', 'Pesanan Anda berhasil dibuat!')
                 ->with('order_number', $pemesanan->no_pesanan);
         } catch (\Exception $e) {
-            Log::error('Gagal menyimpan pesanan guest: ' . $e->getMessage() . ' Data: ' . json_encode($orderData)); // Log data juga
-            return redirect()->route('guest.order.form') // Pastikan nama route ini benar
+            Log::error('Gagal menyimpan pesanan guest: ' . $e->getMessage() . ' Data: ' . json_encode($orderData));
+            return redirect()->route('guest.order.form')
                 ->withInput() // Kembalikan input lama
-                ->with('error', 'Terjadi kesalahan. Pesanan Anda gagal disimpan. Silakan coba lagi.');
+                ->with('error', 'Terjadi kesalahan. Pesanan Anda gagal disimpan. Silakan coba lagi atau hubungi kami.');
         }
     }
 
@@ -263,63 +322,83 @@ class PemesananController extends Controller
      */
     public function edit($id)
     {
-        // Ganti relasi ke layananUtama
         $pemesanan = Pemesanan::with('layananUtama')->findOrFail($id);
-        $layanans  = Layanan::orderBy('nama_layanan', 'asc')->get(['id', 'nama_layanan']);
-        // Kirim data lain yang mungkin dibutuhkan di form edit
-        // Misal: daftar status, daftar kecepatan, daftar metode
-        $statuses = ['Baru', 'Menunggu Dijemput','Menunggu Diantar', 'Dijemput', 'Diproses', 'Siap Diantar', 'Siap Diambil', 'Selesai', 'Dibatalkan']; // Contoh
-        $kecepatanOptions = ['Reguler', 'Express', 'Kilat']; // Contoh
-        $metodeOptions = ['Antar Jemput', 'Datang Langsung', 'Antar Sendiri Minta Diantar', 'Minta Dijemput Ambil Sendiri']; // Contoh
 
-        return view('pemesanan.edit', compact('pemesanan', 'layanans', 'statuses', 'kecepatanOptions', 'metodeOptions'));
+        $layanans  = Layanan::orderBy('nama_layanan', 'asc')
+            ->get(['id', 'nama_layanan', 'harga']);
+
+        $biayaTambahan = [
+            'kecepatan' => [
+                'Reguler' => 0,
+                'Express' => 10000,
+                'Kilat' => 20000,
+            ],
+            'metode' => [
+                'Antar Jemput' => 5000,
+                'Antar Sendiri Minta Diantar' => 3000,
+                'Minta Dijemput Ambil Sendiri' => 3000,
+                'Datang Langsung' => 0,
+            ]
+        ];
+
+        // Keep existing options
+        $statuses = ['Baru', 'Menunggu Dijemput', 'Menunggu Diantar', 'Dijemput', 'Diproses', 'Siap Diantar', 'Siap Diambil', 'Selesai', 'Dibatalkan'];
+        $kecepatanOptions = array_keys($biayaTambahan['kecepatan']);
+        $metodeOptions = array_keys($biayaTambahan['metode']);
+        return view('pemesanan.edit', compact(
+            'pemesanan',
+            'layanans',
+            'statuses',
+            'kecepatanOptions',
+            'metodeOptions',
+            'biayaTambahan'
+        ));
     }
 
     /**
      * Update the specified order in storage (ADMIN).
-     * Tempat Admin mengisi Berat Final, Harga Final, dan mengubah Status.
      */
     public function update(Request $request, $id)
     {
         $pemesanan = Pemesanan::findOrFail($id);
 
-        // Validasi semua field yang bisa diubah admin
+        // Validation rules for update
         $validatedData = $request->validate([
             'nama_pelanggan' => 'required|string|max:255',
             'kontak_pelanggan' => 'required|string|max:100',
-            'alamat_pelanggan' => ['nullable', 'string', 'max:1000', Rule::requiredIf(fn() => in_array($request->input('metode_layanan'), ['Antar Jemput', 'Minta Diantar', 'Minta Dijemput']))],
-            // no_pesanan mungkin tidak perlu diubah, jika perlu:
-            // 'no_pesanan' => ['required', 'string', Rule::unique('pemesanans', 'no_pesanan')->ignore($id)],
+            'alamat_pelanggan' => ['nullable', 'string', 'max:1000', Rule::requiredIf(fn() => in_array($request->input('metode_layanan'), ['Antar Jemput', 'Antar Sendiri Minta Diantar', 'Minta Dijemput Ambil Sendiri']))],
             'layanan_utama_id' => 'required|exists:layanans,id',
             'kecepatan_layanan' => 'required|string|max:50',
             'metode_layanan' => 'required|string|max:100',
             'estimasi_berat' => 'nullable|numeric|min:0',
             'daftar_item' => 'nullable|string',
             'catatan_pelanggan' => 'nullable|string',
-            'tanggal_penjemputan' => 'nullable|date',
-            'waktu_penjemputan' => 'nullable|string|max:50',
+            'tanggal_penjemputan' => ['nullable', 'date', Rule::requiredIf(fn() => in_array($request->input('metode_layanan'), ['Antar Jemput', 'Minta Dijemput Ambil Sendiri']))],
+            'waktu_penjemputan' => ['nullable', 'string', 'max:50', Rule::requiredIf(fn() => in_array($request->input('metode_layanan'), ['Antar Jemput', 'Minta Dijemput Ambil Sendiri']))],
             'instruksi_alamat' => 'nullable|string',
-            // Field yang diisi/diupdate oleh Admin setelah verifikasi
-            'berat_final' => 'nullable|numeric|min:0', // Berat aktual
-            'total_harga' => 'nullable|numeric|min:0', // Harga final (input manual)
-            'status_pesanan' => 'required|string|max:100', // Status diupdate admin
+            // Fields updated by Admin
+            'berat_final' => 'nullable|numeric|min:0',
+            'total_harga' => 'required|numeric|min:0',
+            'status_pesanan' => 'required|string|max:100',
             'kode_promo' => 'nullable|string|max:50',
-            'tanggal_selesai' => 'nullable|date', // Admin bisa set tanggal selesai
+            'tanggal_selesai' => 'nullable|date',
+        ], [
+            // Custom validation messages if needed
+            'total_harga.required' => 'Total harga (otomatis) gagal dihitung atau kosong.',
+            'total_harga.numeric' => 'Total harga harus berupa angka.',
         ]);
 
-        // Hapus logika kalkulasi harga otomatis & status otomatis.
-        // Admin bertanggung jawab penuh mengisi berat_final, total_harga, dan status_pesanan
-        // sesuai kondisi nyata.
 
-        // Jika status diubah menjadi 'Selesai' atau status akhir lainnya, set tanggal_selesai
-        if (in_array($validatedData['status_pesanan'], ['Selesai', 'Diambil', 'Sudah Diantar']) && is_null($pemesanan->tanggal_selesai)) {
-            // Cek jika tanggal selesai belum diinput manual oleh admin
-            if (empty($validatedData['tanggal_selesai'])) {
-                $validatedData['tanggal_selesai'] = now(); // Set otomatis jika kosong dan status selesai
-            }
+        // Logic to set tanggal_selesai automatically if status is 'Selesai' etc. and it's not already set
+        if (
+            in_array($validatedData['status_pesanan'], ['Selesai', 'Diambil', 'Sudah Diantar']) &&
+            is_null($pemesanan->tanggal_selesai) &&
+            empty($validatedData['tanggal_selesai'])
+        ) {
+            $validatedData['tanggal_selesai'] = now();
         }
 
-        // Update data pemesanan di database
+        // Update the Pemesanan record
         $pemesanan->update($validatedData);
 
         return redirect()->route('pemesanan.index')

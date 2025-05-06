@@ -1,29 +1,21 @@
 {{-- resources/views/guest/order_form.blade.php --}}
+{{-- This is the version using max-w-4xl and 2-column grids where appropriate --}}
 <x-guest-layout>
-    <div class="w-full px-4">
+    {{-- Container within the scrollable slot --}}
+    <div class="w-full max-w-4xl mx-auto px-4 py-2 md:py-6">
 
-        <h2 class="text-[3rem] font-semibold text-center text-gray-800 mb-6">
+        <h2 class="text-2xl md:text-3xl font-semibold text-center text-gray-800 mb-6 md:mb-8">
             Buat Pesanan Laundry Anda
         </h2>
 
-        {{-- HAPUS BAGIAN INI: Pesan Sukses Standar
-        @if (session('success'))
-            <div class="mb-4 rounded-lg bg-green-100 p-4 text-sm text-green-700" role="alert">
-                <span class="font-bold">Berhasil!</span> {{ session('success') }}
-            </div>
-        @endif
-        --}}
-
-        {{-- Menampilkan Pesan Error Umum (Biarkan ini) --}}
         @if (session('error'))
-            <div class="mb-4 rounded-lg bg-red-100 p-4 text-sm text-red-700" role="alert">
+            <div class="mb-6 rounded-lg bg-red-100 p-4 text-sm text-red-700" role="alert">
                 <span class="font-bold">Oops!</span> {{ session('error') }}
             </div>
         @endif
 
-        {{-- Menampilkan Error Validasi Umum (Biarkan ini) --}}
         @if ($errors->any())
-            <div class="mb-4 rounded-lg bg-red-100 p-4 text-sm text-red-700">
+            <div class="mb-6 rounded-lg bg-red-100 p-4 text-sm text-red-700">
                 <span class="font-medium">Terdapat kesalahan pada input Anda:</span>
                 <ul class="mt-1.5 ml-4 list-disc list-inside">
                     @foreach ($errors->all() as $error)
@@ -33,98 +25,366 @@
             </div>
         @endif
 
-
-        <form method="POST" action="{{ route('guest.order.store') }}" class="space-y-5">
+        {{-- Form Start --}}
+        <form method="POST" action="{{ route('guest.order.store') }}"
+            class="space-y-5 bg-white p-6 sm:p-8 rounded-lg shadow-xl">
             @csrf
 
-            <!-- Nama Pelanggan -->
-            <div>
-                <label for="nama_pelanggan" class="block text-base font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                <input type="text" name="nama_pelanggan" id="nama_pelanggan" required
-                    class="block w-full rounded-md placeholder-gray-400 border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('nama_pelanggan') border-red-500 @enderror"
-                    value="{{ old('nama_pelanggan') }}" placeholder="Masukkan nama lengkap Anda">
-                @error('nama_pelanggan')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+            {{-- Section 1: Informasi Pelanggan --}}
+            <fieldset>
+                <legend class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">1. Informasi Anda</legend>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                    <div>
+                        <label for="nama_pelanggan" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap
+                            <span class="text-red-500">*</span></label>
+                        <input type="text" name="nama_pelanggan" id="nama_pelanggan" required
+                            class="block w-full rounded-md placeholder-gray-400 border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('nama_pelanggan') border-red-500 @enderror"
+                            value="{{ old('nama_pelanggan') }}" placeholder="Masukkan nama lengkap Anda">
+                        @error('nama_pelanggan')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-            <!-- Kontak -->
-            <div>
-                <label for="kontak" class="block text-base font-medium text-gray-700 mb-1">Nomor Telepon /
-                    WhatsApp</label>
-                <input type="tel" name="kontak" id="kontak" required
-                    class="block w-full rounded-md placeholder-gray-400 border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('kontak') border-red-500 @enderror"
-                    value="{{ old('kontak') }}" placeholder="Contoh: 081234567890">
-                @error('kontak')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+                    <div>
+                        <label for="kontak_pelanggan" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon
+                            / WhatsApp <span class="text-red-500">*</span></label>
+                        <input type="tel" name="kontak_pelanggan" id="kontak_pelanggan" required
+                            class="block w-full rounded-md placeholder-gray-400 border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('kontak_pelanggan') border-red-500 @enderror"
+                            value="{{ old('kontak_pelanggan') }}" placeholder="Contoh: 081234567890">
+                        @error('kontak_pelanggan')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+            </fieldset>
+            {{-- End Section 1 --}}
 
-            <!-- Alamat -->
-            <div>
-                <label for="alamat" class="block text-base font-medium text-gray-700 mb-1">Alamat Lengkap</label>
-                <textarea name="alamat" id="alamat" rows="3" required
-                    class="block w-full rounded-md placeholder-gray-400 border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('alamat') border-red-500 @enderror"
-                    placeholder="Masukkan alamat lengkap (jalan, nomor rumah, RT/RW, kelurahan, kecamatan, dll)">{{ old('alamat') }}</textarea>
-                @error('alamat')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <!-- Layanan -->
-            <div>
-                <label for="layanan_id" class="block text-base font-medium text-gray-700 mb-1">Pilih Layanan</label>
-                <select name="layanan_id" id="layanan_id" required
-                    class="block w-full rounded-md  border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('layanan_id') border-red-500 @enderror">
-                    <option value="" disabled {{ old('layanan_id') ? '' : 'selected' }}>-- Pilih Jenis Layanan --
-                    </option>
-                    @forelse ($layanans as $layanan)
-                        {{-- Pastikan $layanan adalah objek atau array yang memiliki properti/key 'id', 'nama_layanan', dan 'harga' --}}
-                        @if (isset($layanan->id) && isset($layanan->nama_layanan) && isset($layanan->harga))
-                            <option value="{{ $layanan->id }}"
-                                {{ old('layanan_id') == $layanan->id ? 'selected' : '' }}>
-                                {{ $layanan->nama_layanan }}
-                                {{-- Menampilkan harga yang diformat --}}
-                                (Rp {{ number_format($layanan->harga, 0, ',', '.') }} / Kg)
-                                {{-- CATATAN: Asumsi satuan adalah 'Kg'. Jika ada layanan non-kiloan, idealnya tambahkan kolom 'satuan' di DB Layanan --}}
+            {{-- Section 2: Metode Layanan & Alamat --}}
+            <fieldset>
+                <legend class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">2. Metode & Alamat</legend>
+                <div class="space-y-3">
+                    <div>
+                        <label for="metode_layanan" class="block text-sm font-medium text-gray-700 mb-1">Metode Layanan
+                            <span class="text-red-500">*</span></label>
+                        <select name="metode_layanan" id="metode_layanan" required
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('metode_layanan') border-red-500 @enderror">
+                            <option value="">-- Pilih Metode Layanan --</option>
+                            <option value="Datang Langsung"
+                                {{ old('metode_layanan') == 'Datang Langsung' ? 'selected' : '' }}>Saya Antar & Ambil
+                                Sendiri</option>
+                            <option value="Antar Jemput"
+                                {{ old('metode_layanan') == 'Antar Jemput' ? 'selected' : '' }}>Minta Dijemput & Diantar
                             </option>
-                        @endif
-                    @empty
-                        <option value="" disabled>Tidak ada layanan tersedia</option>
-                    @endforelse
-                </select>
-                @error('layanan_id')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-                {{-- Anda bisa menambahkan deskripsi layanan di sini jika diperlukan --}}
-                {{-- <p class="mt-1 text-xs text-gray-500">Deskripsi singkat layanan...</p> --}}
-            </div>
+                            <option value="Antar Sendiri Minta Diantar"
+                                {{ old('metode_layanan') == 'Antar Sendiri Minta Diantar' ? 'selected' : '' }}>Saya
+                                Antar, Minta Diantar</option>
+                            <option value="Minta Dijemput Ambil Sendiri"
+                                {{ old('metode_layanan') == 'Minta Dijemput Ambil Sendiri' ? 'selected' : '' }}>Minta
+                                Dijemput, Saya Ambil Sendiri</option>
+                        </select>
+                        @error('metode_layanan')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-            <!-- Tombol Submit -->
-            <div class="pt-2">
+                    {{-- Alamat Section (Conditional) --}}
+                    <div id="alamat_section" class="hidden">
+                        <label for="alamat_pelanggan" class="block text-sm font-medium text-gray-700 mb-1">Alamat
+                            Lengkap <span id="alamat_required_star" class="text-red-500 hidden">*</span></label>
+                        <textarea name="alamat_pelanggan" id="alamat_pelanggan" rows="2"
+                            class="block w-full rounded-md placeholder-gray-400 border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('alamat_pelanggan') border-red-500 @enderror"
+                            placeholder="Jalan, No Rumah, RT/RW, Kelurahan, Kecamatan, Kota/Kab, Kodepos">{{ old('alamat_pelanggan') }}</textarea>
+                        @error('alamat_pelanggan')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Penjemputan Section (Conditional) - Grid --}}
+                    <div id="penjemputan_section" class="hidden grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                        <div>
+                            <label for="tanggal_penjemputan" class="block text-sm font-medium text-gray-700 mb-1">Tgl
+                                Jemput <span class="text-red-500">*</span></label>
+                            <input type="date" name="tanggal_penjemputan" id="tanggal_penjemputan"
+                                min="{{ date('Y-m-d') }}"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('tanggal_penjemputan') border-red-500 @enderror"
+                                value="{{ old('tanggal_penjemputan') }}">
+                            @error('tanggal_penjemputan')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="waktu_penjemputan" class="block text-sm font-medium text-gray-700 mb-1">Waktu
+                                Jemput <span class="text-red-500">*</span></label>
+                            <select name="waktu_penjemputan" id="waktu_penjemputan"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('waktu_penjemputan') border-red-500 @enderror">
+                                <option value="">-- Pilih Slot --</option>
+                                <option value="Pagi (09:00 - 12:00)"
+                                    {{ old('waktu_penjemputan') == 'Pagi (09:00 - 12:00)' ? 'selected' : '' }}>Pagi
+                                    (09-12)</option>
+                                <option value="Siang (13:00 - 16:00)"
+                                    {{ old('waktu_penjemputan') == 'Siang (13:00 - 16:00)' ? 'selected' : '' }}>Siang
+                                    (13-16)</option>
+                                <option value="Sore (16:00 - 18:00)"
+                                    {{ old('waktu_penjemputan') == 'Sore (16:00 - 18:00)' ? 'selected' : '' }}>Sore
+                                    (16-18)</option>
+                            </select>
+                            @error('waktu_penjemputan')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Instruksi Alamat Section (Conditional) --}}
+                    <div id="instruksi_alamat_section" class="hidden">
+                        <label for="instruksi_alamat" class="block text-sm font-medium text-gray-700 mb-1">Instruksi
+                            Alamat/Jemput</label>
+                        <textarea name="instruksi_alamat" id="instruksi_alamat" rows="2"
+                            class="block w-full rounded-md placeholder-gray-400 border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('instruksi_alamat') border-red-500 @enderror"
+                            placeholder="Patokan, pesan untuk kurir, dll.">{{ old('instruksi_alamat') }}</textarea>
+                        @error('instruksi_alamat')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+            </fieldset>
+            {{-- End Section 2 --}}
+
+            {{-- Section 3: Detail Layanan --}}
+            <fieldset>
+                <legend class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">3. Detail Layanan</legend>
+                <div class="space-y-3">
+                    <div>
+                        <label for="layanan_utama_id" class="block text-sm font-medium text-gray-700 mb-1">Layanan Utama
+                            <span class="text-red-500">*</span></label>
+                        <select name="layanan_utama_id" id="layanan_utama_id" required
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('layanan_utama_id') border-red-500 @enderror">
+                            <option value="" disabled {{ old('layanan_utama_id') ? '' : 'selected' }}>-- Pilih
+                                Jenis Layanan --</option>
+                            @forelse ($layanans as $layanan)
+                                @if (isset($layanan->id) && isset($layanan->nama_layanan))
+                                    @php
+                                        $isKiloan = \Illuminate\Support\Str::contains(
+                                            strtolower($layanan->nama_layanan),
+                                            'kiloan',
+                                        );
+                                        $dataType = $isKiloan ? 'kiloan' : 'satuan';
+                                        $priceUnit = $isKiloan ? 'Kg' : 'Pcs';
+                                    @endphp
+                                    <option value="{{ $layanan->id }}" data-type="{{ $dataType }}"
+                                        {{ old('layanan_utama_id') == $layanan->id ? 'selected' : '' }}>
+                                        {{ $layanan->nama_layanan }}
+                                        @if (isset($layanan->harga) && $layanan->harga > 0)
+                                            (Rp {{ number_format($layanan->harga, 0, ',', '.') }} /
+                                            {{ $priceUnit }})
+                                        @endif
+                                    </option>
+                                @endif
+                            @empty
+                                <option value="" disabled>Tidak ada layanan tersedia</option>
+                            @endforelse
+                        </select>
+                        @error('layanan_utama_id')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Grid for Estimasi Berat & Daftar Item --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                        {{-- Estimasi Berat Section (Conditional) --}}
+                        <div id="estimasi_berat_section" class="hidden">
+                            <label for="estimasi_berat" class="block text-sm font-medium text-gray-700 mb-1">Estimasi
+                                Berat (Kg)</label>
+                            <input type="number" step="0.1" name="estimasi_berat" id="estimasi_berat"
+                                class="block w-full rounded-md placeholder-gray-400 border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('estimasi_berat') border-red-500 @enderror"
+                                value="{{ old('estimasi_berat') }}" placeholder="Contoh: 2.5">
+                            @error('estimasi_berat')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Daftar Item Section (Conditional) --}}
+                        <div id="daftar_item_section" class="hidden md:col-span-1">
+                            <label for="daftar_item" class="block text-sm font-medium text-gray-700 mb-1">Daftar Item
+                                (layanan satuan)</label>
+                            <textarea name="daftar_item" id="daftar_item" rows="3"
+                                class="block w-full rounded-md placeholder-gray-400 border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('daftar_item') border-red-500 @enderror"
+                                placeholder="Contoh: 3 Kemeja, 2 Celana">{{ old('daftar_item') }}</textarea>
+                            @error('daftar_item')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            {{-- End Section 3 --}}
+
+            {{-- Section 4: Preferensi Tambahan --}}
+            <fieldset>
+                <legend class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">4. Preferensi Tambahan</legend>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                    <div>
+                        <label for="kecepatan_layanan" class="block text-sm font-medium text-gray-700 mb-1">Kecepatan
+                            <span class="text-red-500">*</span></label>
+                        <select name="kecepatan_layanan" id="kecepatan_layanan" required
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('kecepatan_layanan') border-red-500 @enderror">
+                            <option value="Reguler"
+                                {{ old('kecepatan_layanan', 'Reguler') == 'Reguler' ? 'selected' : '' }}>Reguler
+                                (Normal)</option>
+                            <option value="Express" {{ old('kecepatan_layanan') == 'Express' ? 'selected' : '' }}>
+                                Express</option>
+                            <option value="Kilat" {{ old('kecepatan_layanan') == 'Kilat' ? 'selected' : '' }}>Kilat
+                            </option>
+                        </select>
+                        <p class="mt-1 text-xs text-gray-500">Dapat mempengaruhi harga.</p>
+                        @error('kecepatan_layanan')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="kode_promo" class="block text-sm font-medium text-gray-700 mb-1">Kode Promo /
+                            Voucher</label>
+                        <input type="text" name="kode_promo" id="kode_promo"
+                            class="block w-full rounded-md placeholder-gray-400 border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('kode_promo') border-red-500 @enderror"
+                            value="{{ old('kode_promo') }}" placeholder="Masukkan kode promo">
+                        @error('kode_promo')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="catatan_pelanggan" class="block text-sm font-medium text-gray-700 mb-1">Instruksi
+                            Khusus / Catatan</label>
+                        <textarea name="catatan_pelanggan" id="catatan_pelanggan" rows="2"
+                            class="block w-full rounded-md placeholder-gray-400 border-gray-300 shadow-sm focus:border-[#4769e4] focus:ring-[#4769e4] sm:text-sm @error('catatan_pelanggan') border-red-500 @enderror"
+                            placeholder="Misal: Jangan pakai pewangi, pisahkan baju putih, noda di kemeja X, dll.">{{ old('catatan_pelanggan') }}</textarea>
+                        @error('catatan_pelanggan')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+            </fieldset>
+            {{-- End Section 4 --}}
+
+            {{-- Submit Button --}}
+            <div class="pt-3 md:pt-4">
                 <button type="submit"
-                    class="w-full inline-flex justify-center py-2.5 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#4769e4] hover:bg-[#3a58c4] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4769e4] transition duration-150 ease-in-out">
+                    class="w-full inline-flex justify-center py-2.5 md:py-3 px-4 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-[#4769e4] hover:bg-[#3a58c4] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4769e4] transition duration-150 ease-in-out">
                     Kirim Pesanan
                 </button>
             </div>
+            {{-- End Submit Button --}}
+
         </form>
+        {{-- Form End --}}
     </div>
 
-    {{-- ======================================================= --}}
-    {{-- ============ TAMBAHKAN SCRIPT SWEETALERT DI SINI ======== --}}
-    {{-- ======================================================= --}}
+    {{-- JavaScript for Conditional Fields (No changes needed) --}}
     <script>
-        // Jalankan script setelah halaman siap
         document.addEventListener('DOMContentLoaded', function() {
-            // Cek apakah ada session data dari controller untuk SweetAlert
+            const metodeLayananSelect = document.getElementById('metode_layanan');
+            const alamatSection = document.getElementById('alamat_section');
+            const alamatInput = document.getElementById('alamat_pelanggan');
+            const alamatRequiredStar = document.getElementById('alamat_required_star');
+            const penjemputanSection = document.getElementById('penjemputan_section');
+            const tanggalPenjemputanInput = document.getElementById('tanggal_penjemputan');
+            const waktuPenjemputanInput = document.getElementById('waktu_penjemputan');
+            const instruksiAlamatSection = document.getElementById('instruksi_alamat_section');
+
+            const layananUtamaSelect = document.getElementById('layanan_utama_id');
+            const estimasiBeratSection = document.getElementById('estimasi_berat_section');
+            const estimasiBeratInput = document.getElementById('estimasi_berat');
+            const daftarItemSection = document.getElementById('daftar_item_section');
+
+            function toggleConditionalFields() {
+                // Add checks for element existence before accessing value or classList
+                if (!metodeLayananSelect) return;
+                const selectedMetode = metodeLayananSelect.value;
+                const needsPickup = ['Antar Jemput', 'Minta Dijemput Ambil Sendiri'].includes(selectedMetode);
+                const needsDeliveryAddress = ['Antar Jemput', 'Antar Sendiri Minta Diantar',
+                    'Minta Dijemput Ambil Sendiri'
+                ].includes(selectedMetode);
+
+                if (alamatSection) {
+                    if (needsDeliveryAddress) {
+                        alamatSection.classList.remove('hidden');
+                        if (alamatInput) alamatInput.required = true;
+                        if (alamatRequiredStar) alamatRequiredStar.classList.remove('hidden');
+                        if (instruksiAlamatSection) instruksiAlamatSection.classList.remove('hidden');
+                    } else {
+                        alamatSection.classList.add('hidden');
+                        if (alamatInput) alamatInput.required = false;
+                        if (alamatRequiredStar) alamatRequiredStar.classList.add('hidden');
+                        if (instruksiAlamatSection) instruksiAlamatSection.classList.add('hidden');
+                    }
+                }
+
+                if (penjemputanSection) {
+                    if (needsPickup) {
+                        penjemputanSection.classList.remove('hidden');
+                        if (tanggalPenjemputanInput) tanggalPenjemputanInput.required = true;
+                        if (waktuPenjemputanInput) waktuPenjemputanInput.required = true;
+                    } else {
+                        penjemputanSection.classList.add('hidden');
+                        if (tanggalPenjemputanInput) tanggalPenjemputanInput.required = false;
+                        if (waktuPenjemputanInput) waktuPenjemputanInput.required = false;
+                    }
+                }
+            }
+
+            function toggleLayananDetailFields() {
+                // Add checks for element existence
+                if (!layananUtamaSelect || !estimasiBeratSection || !daftarItemSection) return;
+                const selectedLayananOption = layananUtamaSelect.options[layananUtamaSelect.selectedIndex];
+
+                if (!selectedLayananOption || !selectedLayananOption.dataset.type) {
+                    estimasiBeratSection.classList.add('hidden');
+                    daftarItemSection.classList.add('hidden');
+                    if (estimasiBeratInput) estimasiBeratInput.required = false;
+                    return;
+                }
+
+                const layananType = selectedLayananOption.dataset.type;
+
+                if (layananType === 'kiloan') {
+                    estimasiBeratSection.classList.remove('hidden');
+                    if (estimasiBeratInput) estimasiBeratInput.required = false;
+                    daftarItemSection.classList.add('hidden');
+                } else if (layananType === 'satuan') {
+                    estimasiBeratSection.classList.add('hidden');
+                    if (estimasiBeratInput) estimasiBeratInput.required = false;
+                    daftarItemSection.classList.remove('hidden');
+                } else {
+                    estimasiBeratSection.classList.add('hidden');
+                    daftarItemSection.classList.add('hidden');
+                    if (estimasiBeratInput) estimasiBeratInput.required = false;
+                }
+            }
+
+            if (metodeLayananSelect) {
+                metodeLayananSelect.addEventListener('change', toggleConditionalFields);
+                toggleConditionalFields();
+            }
+            if (layananUtamaSelect) {
+                layananUtamaSelect.addEventListener('change', toggleLayananDetailFields);
+                toggleLayananDetailFields();
+            }
+
+        });
+    </script>
+    {{-- End JavaScript --}}
+
+
+    {{-- SweetAlert Script (Keep as is) --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
             @if (session('swal_success_message') && session('order_number'))
-                const successMessage = @json(session('swal_success_message')); // Ambil pesan dari session
-                const orderNumber = @json(session('order_number')); // Ambil nomor pesanan dari session
+                const successMessage = @json(session('swal_success_message'));
+                const orderNumber = @json(session('order_number'));
 
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil!',
-                    // Gunakan `html` untuk memformat konten dengan tombol copy
                     html: `
                         <div class="text-gray-700">${successMessage}</div>
                         <div class="mt-3 text-gray-600 text-sm">Nomor Pesanan Anda (mohon disimpan):</div>
@@ -139,18 +399,14 @@
                         </button>
                     `,
                     confirmButtonText: 'OK',
-                    confirmButtonColor: '#3085d6', // Warna tombol OK
-                    // Fungsi yang dijalankan setelah alert muncul
+                    confirmButtonColor: '#3085d6',
                     didOpen: () => {
                         const copyBtn = document.getElementById('copyOrderNumberBtn');
-                        const numberText = document.getElementById('orderNumberText')
-                            .innerText; // Ambil teks nomor pesanan
-
-                        if (copyBtn && navigator
-                            .clipboard) { // Pastikan tombol ada dan clipboard API didukung
+                        const numberTextElement = document.getElementById('orderNumberText');
+                        if (copyBtn && numberTextElement && navigator.clipboard) {
+                            const numberText = numberTextElement.innerText;
                             copyBtn.addEventListener('click', () => {
                                 navigator.clipboard.writeText(numberText).then(() => {
-                                    // Feedback bahwa teks berhasil disalin
                                     const originalButtonHtml = copyBtn.innerHTML;
                                     copyBtn.innerHTML = `
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline -mt-0.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -158,35 +414,25 @@
                                         </svg>
                                         Tersalin!
                                     `;
-                                    copyBtn.disabled =
-                                        true; // Nonaktifkan tombol sementara
-
-                                    // Kembalikan teks tombol setelah beberapa saat
+                                    copyBtn.disabled = true;
                                     setTimeout(() => {
                                         copyBtn.innerHTML = originalButtonHtml;
                                         copyBtn.disabled = false;
-                                    }, 2000); // Kembalikan setelah 2 detik
-
+                                    }, 2000);
                                 }).catch(err => {
-                                    console.error('Gagal menyalin nomor pesanan: ',
-                                        err);
-                                    // Anda bisa menambahkan alert fallback jika copy gagal
+                                    console.error('Gagal menyalin: ', err);
                                     alert(
-                                        'Gagal menyalin nomor pesanan. Silakan salin manual.'
-                                    );
+                                    'Gagal menyalin nomor pesanan. Salin manual.');
                                 });
                             });
                         } else if (copyBtn) {
-                            // Fallback jika clipboard API tidak didukung (browser lama)
-                            copyBtn.style.display = 'none'; // Sembunyikan tombol copy
+                            copyBtn.style.display = 'none';
                         }
                     }
                 });
             @endif
         });
     </script>
-    {{-- ======================================================= --}}
-    {{-- ============ AKHIR SCRIPT SWEETALERT ================== --}}
-    {{-- ======================================================= --}}
+    {{-- End SweetAlert Script --}}
 
 </x-guest-layout>
