@@ -1,80 +1,153 @@
-{{-- resources/views/transaksi_folder/partials/table.blade.php --}}
-<form id="deleteFormTransaksi" action="{{ route('transaksis.destroy', ['transaksi' => 0]) }}" method="POST">
+{{-- transaksi/partials/table.blade.php --}}
+{{-- Form untuk bulk delete (opsional, jika tidak semua transaksi boleh dihapus massal) --}}
+<form id="deleteFormTransaksi" action="{{ route('transaksis.massDestroy') }}" method="POST">
+    {{-- Ganti route --}}
     @csrf
     @method('DELETE')
-    <table class="min-w-full bg-white overflow-hidden rounded-lg shadow-sm mb-5">
-        <thead class="bg-slate-800 text-white">
-            <tr>
-                <th class="px-4 py-2 text-left">
-                    <input type="checkbox" class="form-checkbox rounded-[4px]" id="checkbox-all" />
-                </th>
-                <th class="px-4 py-2 text-left">Invoice</th>
-                <th class="px-4 py-2 text-left">Pelanggan</th>
-                <th class="px-4 py-2 text-left">Layanan</th>
-                <th class="px-4 py-2 text-left">Berat</th>
-                <th class="px-4 py-2 text-left">Total Harga</th>
-                <th class="px-4 py-2 text-left">Dibayar</th>
-                <th class="px-4 py-2 text-left">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($transaksis as $transaksi)
-                <tr class="border hover:bg-sky-50">
-                    <td class="px-4 py-3">
-                        <input type="checkbox" name="transaksis[]" value="{{ $transaksi->id }}"
-                            class="form-checkbox rounded-[5px] checkbox-row" />
-                    </td>
-                    <td class="px-4 py-3">{{ $transaksi->invoice }}</td>
-                    <td class="px-4 py-3">
-                        {{ $transaksi->pemesanan ? $transaksi->pemesanan->nama_pelanggan : 'N/A' }}
-                    </td>
-                    <td class="px-4 py-3">
-                        {{ $transaksi->layanan ? $transaksi->layanan->nama_layanan : 'N/A' }}
-                    </td>
-                    <td class="px-4 py-3">
-                        {{ $transaksi->pemesanan ? $transaksi->pemesanan->berat_pesanan : 'N/A' }}
-                    </td>
-                    <td class="px-4 py-3">
-                        {{ $transaksi->pemesanan ? $transaksi->pemesanan->total_harga : 'N/A' }}
-                    </td>
-                    <td class="px-4 py-3">{{ $transaksi->dibayar }}</td>
-                    <td class="px-4 py-3">
-                        <div class="flex flex-row gap-2">
-                            {{-- Edit --}}
-                            <a href="{{ route('transaksis.edit', $transaksi->id) }}">
-                                <svg class="w-6 h-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg"
-                                    fill="currentColor" viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd"
-                                        d="M11.32 6.176H5c-1.105 0-2 .949-2 2.118v10.588C3 20.052 3.895 21 5 21h11c1.105 0 2-.948 2-2.118v-7.75l-3.914 4.144A2.46 2.46 0 0 1 12.81 16l-2.681.568c-1.75.37-3.292-1.263-2.942-3.115l.536-2.839c.097-.512.335-.983.684-1.352l2.914-3.086Z"
-                                        clip-rule="evenodd" />
-                                    <path fill-rule="evenodd"
-                                        d="M19.846 4.318a2.148 2.148 0 0 0-.437-.692 2.014 2.014 0 0 0-.654-.463 1.92 1.92 0 0 0-1.544 0 2.014 2.014 0 0 0-.654.463l-.546.578 2.852 3.02.546-.579a2.14 2.14 0 0 0 .437-.692 2.244 2.244 0 0 0 0-1.635ZM17.45 8.721 14.597 5.7 9.82 10.76a.54.54 0 0 0-.137.27l-.536 2.84c-.07.37.239.696.588.622l2.682-.567a.492.492 0 0 0 .255-.145l4.778-5.06Z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                            {{-- Single Delete --}}
-                            <a href="#" class="delete-transaksi" data-id="{{ $transaksi->id }}">
-                                <svg class="w-6 h-6 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd"
-                                        d="M8.586 2.586A2 2 0 0 1 10 2h4a2 2 0 0 1 2 2v2h3a1 1 0 1 1 0 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a1 1 0 0 1 0-2h3V4a2 2 0 0 1 .586-1.414ZM10 6h4V4h-4v2Zm1 4a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Zm4 0a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        </div>
-                    </td>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-slate-800">
+                <tr>
+                    <th scope="col" class="p-4 text-left">
+                        <input type="checkbox"
+                            class="form-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
+                            id="checkbox-all" />
+                    </th>
+                    {{-- Sesuaikan Kolom Tabel Transaksi --}}
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Tgl
+                        Transaksi</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">No Invoice
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">No Pesanan
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Pelanggan
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider text-right">
+                        Total Tagihan</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider text-right">
+                        Jumlah Dibayar</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Status Bayar
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Metode Bayar
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Tgl Bayar
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Aksi</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {{-- Ganti variabel loop --}}
+                @forelse ($transaksis as $transaksi)
+                    <tr
+                        class="hover:bg-gray-50 {{ $transaksi->status_pembayaran == 'Lunas' ? 'bg-green-50' : 'bg-red-50' }}">
+                        <td class="p-4 whitespace-nowrap">
+                            {{-- Ganti value jika ID transaksi berbeda dari pemesanan --}}
+                            <input type="checkbox" name="ids[]" value="{{ $transaksi->id }}"
+                                class="form-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 checkbox-row cursor-pointer" />
+                        </td>
+                        {{-- Sesuaikan Data Kolom --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ $transaksi->created_at->isoFormat('DD MMM YYYY, HH:mm') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {{ $transaksi->no_invoice ?: $transaksi->pemesanan->no_pesanan ?? 'N/A' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-indigo-700 hover:text-indigo-900">
+                            @if ($transaksi->pemesanan)
+                                <a href="{{ route('pemesanan.edit', $transaksi->pemesanan->id) }}"
+                                    title="Lihat Detail Pesanan">
+                                    {{ $transaksi->pemesanan->no_pesanan }}
+                                </a>
+                            @else
+                                N/A
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                            {{ $transaksi->pemesanan->nama_pelanggan ?? 'N/A' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-semibold text-right">Rp
+                            {{ number_format($transaksi->pemesanan->total_harga ?? 0, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold text-right">
+                            {{-- Menggunakan accessor jika ada: $transaksi->formatted_jumlah_dibayar --}}
+                            Rp {{ number_format($transaksi->jumlah_dibayar ?? 0, 0, ',', '.') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @php
+                                $statusClass = '';
+                                switch (strtolower($transaksi->status_pembayaran ?? '')) {
+                                    case 'lunas':
+                                        $statusClass = 'bg-green-100 text-green-800';
+                                        break;
+                                    case 'belum lunas':
+                                        $statusClass = 'bg-red-100 text-red-800';
+                                        break;
+                                    default:
+                                        $statusClass = 'bg-gray-100 text-gray-800';
+                                        break;
+                                }
+                            @endphp
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
+                                {{ $transaksi->status_pembayaran ?? 'N/A' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ $transaksi->metode_pembayaran ?? '-' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ $transaksi->tanggal_pembayaran ? $transaksi->tanggal_pembayaran->isoFormat('DD MMM YYYY, HH:mm') : '-' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex items-center space-x-3">
+                                {{-- Link ke detail transaksi jika ada halaman show --}}
+                                {{-- <a href="{{ route('transaksi.show', $transaksi->id) }}" class="text-blue-600 hover:text-blue-900" title="Lihat Detail Transaksi">
+                                    <svg class="w-5 h-5" <!-- ikon mata/detail --> </svg>
+                                </a> --}}
+                                <a href="{{ route('transaksis.edit', $transaksi->id) }}"
+                                    class="text-indigo-600 hover:text-indigo-900" title="Edit Transaksi">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                        fill="currentColor" aria-hidden="true">
+                                        <path
+                                            d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                                        <path fill-rule="evenodd"
+                                            d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                                {{-- Ganti class dan data-id --}}
+                                <a href="#" class="delete-transaksi text-red-600 hover:text-red-900"
+                                    data-id="{{ $transaksi->id }}" title="Hapus Transaksi">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                        fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd"
+                                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    {{-- Ganti colspan & teks --}}
+                    <tr>
+                        <td colspan="11" class="text-center py-10 text-gray-500">Tidak ada data transaksi ditemukan.
+                            @if (request('search'))
+                                <br>Coba ubah kata kunci pencarian Anda.
+                            @endif
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </form>
-
-<!-- Pagination links -->
-<div class="mt-4">
-    {{ $transaksis->appends([
-            'search' => request('search'),
-            'perPage' => request('perPage'),
-            'sortBy' => request('sortBy'),
-            'sortOrder' => request('sortOrder'),
-        ])->links() }}
+<div class="px-6 py-4 border-t border-gray-200">
+    {{-- Ganti variabel --}}
+    {{ $transaksis->appends(request()->query())->links() }}
 </div>

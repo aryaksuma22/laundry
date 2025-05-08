@@ -27,15 +27,15 @@ class PemesananController extends Controller
         $filterMetode = $request->get('filter_metode', ''); // Default to empty (all)
         $filterLayanan = $request->get('filter_layanan', '');
         $filterStatus = $request->get('filter_status', '');
-
+        $filterStatusBayar = $request->get('filter_status_bayar', '');
         // --- Existing Allowed Sort Columns ---
-        $allowedSort = [ /* ... */'nama_pelanggan', 'no_pesanan', 'tanggal_pesan', 'status_pesanan', 'total_harga', 'metode_layanan', 'kontak_pelanggan'];
+        $allowedSort = [ /* ... */'nama_pelanggan', 'no_pesanan', 'tanggal_pesan', 'status_pesanan', 'total_harga', 'metode_layanan', 'kontak_pelanggan', 'status_pembayaran'];
         if (!in_array($sortBy, $allowedSort)) {
             $sortBy = 'tanggal_pesan';
         }
 
         // --- Build the Query ---
-        $query = Pemesanan::with(['layananUtama']); // Eager load layanan
+        $query = Pemesanan::with(['layananUtama', 'transaksi']); // Eager load layanan
 
         // Apply Search Filter
         if (!empty($search)) {
@@ -48,7 +48,10 @@ class PemesananController extends Controller
                     })
                     ->orWhere('status_pesanan', 'like', "%{$search}%")
                     ->orWhere('alamat_pelanggan', 'like', "%{$search}%")
-                    ->orWhere('kontak_pelanggan', 'like', "%{$search}%");
+                    ->orWhere('kontak_pelanggan', 'like', "%{$search}%")
+                    ->orWhereHas('transaksi', function ($subq) use ($search) {
+                        $subq->where('status_pembayaran', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -64,6 +67,25 @@ class PemesananController extends Controller
         $query->when($filterStatus, function ($q, $status) {
             return $q->where('status_pesanan', $status);
         });
+
+        $query->when($filterStatusBayar, function ($q, $status) {
+            if ($status === 'Lunas') {
+                // Hanya tampilkan yang punya transaksi dengan status 'Lunas'
+                $q->whereHas('transaksi', function ($tq) {
+                    $tq->where('status_pembayaran', 'Lunas');
+                });
+            } elseif ($status === 'Belum Lunas') {
+                // Tampilkan yang TIDAK punya transaksi ATAU punya transaksi tapi statusnya 'Belum Lunas'
+                $q->where(function ($subq) {
+                    $subq->doesntHave('transaksi')
+                        ->orWhereHas('transaksi', function ($tq) {
+                            $tq->where('status_pembayaran', 'Belum Lunas');
+                        });
+                });
+            }
+            // Jika status filter kosong, tidak ada yang dilakukan (tampilkan semua)
+        });
+
         // --- End NEW Filter Application ---
 
 
@@ -72,17 +94,18 @@ class PemesananController extends Controller
 
         // --- Data for Filters (Only needed for full page load) ---
         $filterData = [];
-        if (!$request->ajax() || !$request->hasAny(['page', 'search', 'sortBy', 'sortOrder', 'perPage', 'filter_metode', 'filter_layanan', 'filter_status'])) {
+        if (!$request->ajax() || !$request->hasAny(['page', 'search', 'sortBy', 'sortOrder', 'perPage', 'filter_metode', 'filter_layanan', 'filter_status', 'filter_status_bayar'])) {
             // Fetch data needed to populate the dropdowns ONLY on initial load
             $filterData['metodeOptions'] = Pemesanan::query()->distinct()->pluck('metode_layanan')->sort()->toArray();
             $filterData['layananOptions'] = Layanan::orderBy('nama_layanan', 'asc')->get(['id', 'nama_layanan']);
             // Use a predefined list for statuses for consistency
             $filterData['statusOptions'] = ['Baru', 'Menunggu Dijemput', 'Menunggu Diantar', 'Dijemput', 'Diproses', 'Siap Diantar', 'Siap Diambil', 'Selesai', 'Dibatalkan'];
+            $filterData['statusBayarOptions'] = ['Belum Lunas', 'Lunas'];
         }
 
 
         // Handle AJAX request for table update
-        if ($request->ajax() && $request->hasAny(['page', 'search', 'sortBy', 'sortOrder', 'perPage', 'filter_metode', 'filter_layanan', 'filter_status'])) {
+        if ($request->ajax() && $request->hasAny(['page', 'search', 'sortBy', 'sortOrder', 'perPage', 'filter_metode', 'filter_layanan', 'filter_status', 'filterStatusBayar'])) {
             Log::info('AJAX request for Pemesanan TABLE update detected (including filters).');
             try {
                 // Pass current filter values to the partial view if needed for display (usually not)
@@ -106,6 +129,7 @@ class PemesananController extends Controller
             'filterMetode',
             'filterLayanan',
             'filterStatus',
+            'filterStatusBayar',
             // Pass options for filter dropdowns
             'filterData'
         ));

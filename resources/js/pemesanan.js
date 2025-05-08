@@ -34,6 +34,7 @@ function initPemesanans() {
     const filterMetode = queryParams.get('filter_metode') || '';
     const filterLayanan = queryParams.get('filter_layanan') || '';
     const filterStatus = queryParams.get('filter_status') || '';
+    const filterStatusBayar = queryParams.get('filter_status_bayar') || '';
 
     // Update hidden input values used to store state (ensure IDs match HTML)
     $('#sort-byPemesanan').val(sortBy);
@@ -45,6 +46,7 @@ function initPemesanans() {
     $('#filter_metode').val(filterMetode);
     $('#filter_layanan').val(filterLayanan);
     $('#filter_status').val(filterStatus);
+    $('#filter_status_bayar').val(filterStatusBayar);
 
     // Update the "Sort By" button text
     const initialSortByText = $('#sortByPopupPemesanan .sort-optionPemesanan[data-sortby="' + sortBy + '"]').text();
@@ -71,7 +73,8 @@ function updateUrl(page) {
         page: page,
         filter_metode: $('#filter_metode').val() || '',
         filter_layanan: $('#filter_layanan').val() || '',
-        filter_status: $('#filter_status').val() || ''
+        filter_status: $('#filter_status').val() || '',
+        filter_status_bayar: $('#filter_status_bayar').val() || ''
     }).toString();
     const newUrl = baseUrl + '?' + query;
 
@@ -91,9 +94,10 @@ function fetchPemesanans(page = 1) {
     const filterMetodeVal = $('#filter_metode').val() || '';
     const filterLayananVal = $('#filter_layanan').val() || '';
     const filterStatusVal = $('#filter_status').val() || '';
+    const filterStatusBayarVal = $('#filter_status_bayar').val() || '';
 
     // Log the parameters being sent for debugging
-    console.log(`Fetching page: ${page} | Sort: ${sortBy} ${sortOrder} | PerPage: ${perPage} | Search: ${searchVal} | F_Metode: ${filterMetodeVal} | F_Layanan: ${filterLayananVal} | F_Status: ${filterStatusVal} | URL: ${baseUrl}`);
+    console.log(`Fetching page: ${page} | Sort: ${sortBy} ${sortOrder} | PerPage: ${perPage} | Search: ${searchVal} | F_Metode: ${filterMetodeVal} | F_Layanan: ${filterLayananVal} | F_Status: ${filterStatusVal} | F_StatusBayar: ${filterStatusBayarVal} | URL: ${baseUrl}`);
 
     // Data object for the AJAX request
     const requestData = {
@@ -104,7 +108,8 @@ function fetchPemesanans(page = 1) {
         page: page,
         filter_metode: filterMetodeVal,
         filter_layanan: filterLayananVal,
-        filter_status: filterStatusVal
+        filter_status: filterStatusVal,
+        filter_status_bayar: filterStatusBayarVal
     };
 
     // Ensure the base URL has been set
@@ -246,7 +251,7 @@ $(document).on('click', function (e) {
 });
 
 // Filtering: Handle changes on any filter dropdown
-$(document).on('change', '#filter_metode, #filter_layanan, #filter_status', function () {
+$(document).on('change', '#filter_metode, #filter_layanan, #filter_status, #filter_status_bayar', function () {
     const filterType = $(this).attr('id'); // e.g., 'filter_metode'
     const filterValue = $(this).val();
     console.log(`Filter changed - ${filterType}: ${filterValue}`);
@@ -260,6 +265,7 @@ $(document).on('click', '#resetFiltersButton', function () {
     $('#filter_metode').val('');
     $('#filter_layanan').val('');
     $('#filter_status').val('');
+    $('#filter_status_bayar').val('');
     // Refetch data with cleared filters (will pick up current sort/search)
     fetchPemesanans(1);
 });

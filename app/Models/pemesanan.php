@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany; // Tambahkan ini jika Anda membuat model Transaction
 
 class Pemesanan extends Model
@@ -67,38 +68,12 @@ class Pemesanan extends Model
      */
     public function layananUtama(): BelongsTo
     {
-        // Nama relasi diubah menjadi layananUtama
-        // Foreign key diubah menjadi layanan_utama_id
         return $this->belongsTo(Layanan::class, 'layanan_utama_id', 'id');
     }
 
-    /**
-     * Mendapatkan data User (jika ada) yang terkait dengan Pemesanan.
-     * Aktifkan jika Anda punya sistem user.
-     */
-    // public function user(): BelongsTo
-    // {
-    //     return $this->belongsTo(User::class, 'user_id', 'id');
-    // }
-
-    /**
-     * Mendapatkan semua data Transaksi yang terkait dengan Pemesanan ini.
-     * (Asumsi Anda akan membuat model Transaction)
-     */
-    // public function transactions(): HasMany
-    // {
-    //     // Sesuaikan 'App\Models\Transaction' dengan namespace dan nama model transaksi Anda
-    //     // Asumsi tabel 'transactions' punya kolom 'pemesanan_id'
-    //     return $this->hasMany(Transaction::class, 'pemesanan_id', 'id');
-    // }
-
-    // --- Anda bisa menambahkan Accessor & Mutator atau method helper lain di sini ---
-
-    /**
-     * Contoh Accessor untuk mendapatkan total harga terformat
-     */
-    // public function getFormattedTotalHargaAttribute(): string
-    // {
-    //     return 'Rp ' . number_format($this->total_harga, 0, ',', '.');
-    // }
+    public function transaksi(): HasOne
+    {
+        // Argumen: Class Model terkait, foreign_key (opsional jika mengikuti konvensi 'pemesanan_id'), local_key (opsional jika 'id')
+        return $this->hasOne(Transaksi::class, 'pemesanan_id', 'id');
+    }
 }

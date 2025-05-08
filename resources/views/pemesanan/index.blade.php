@@ -67,7 +67,8 @@
                                             stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                                     </svg></span><input type="search" name="search" id="search"
                                     class="flex-1 block w-full border-0 pl-0 pr-4 py-2 focus:ring-0 sm:text-sm rounded-r-md"
-                                    value="{{ $search }}" placeholder="Cari..." /></div>
+                                    value="{{ $search }}" placeholder="Cari..." />
+                            </div>
                         </form>
                         {{-- Add --}}
                         <a href="{{ route('pemesanan.create') }}"
@@ -86,7 +87,8 @@
                                 <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
                                 <option value="25" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
                                 <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
-                            </select><span class="ml-1 text-gray-700">entries</span></div>
+                            </select><span class="ml-1 text-gray-700">entries</span>
+                        </div>
                     </div>
                 </div>
 
@@ -132,6 +134,24 @@
                             @foreach ($filterData['statusOptions'] ?? [] as $status)
                                 <option value="{{ $status }}" {{ $filterStatus == $status ? 'selected' : '' }}>
                                     {{ $status }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Filter by Status Bayar --}}
+                    <div class="flex-grow w-full sm:w-auto">
+                        <label for="filter_status_bayar" class="sr-only">Filter Status Pembayaran</label>
+                        {{-- ID baru: filter_status_bayar --}}
+                        <select name="filter_status_bayar" id="filter_status_bayar"
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-200 text-sm">
+                            <option value="">-- Semua Status Bayar --</option>
+                            {{-- Ambil opsi dari controller --}}
+                            @foreach ($filterData['statusBayarOptions'] ?? [] as $statusBayar)
+                                {{-- Variabel filter: $filterStatusBayar --}}
+                                <option value="{{ $statusBayar }}"
+                                    {{ ($filterStatusBayar ?? '') == $statusBayar ? 'selected' : '' }}>
+                                    {{ $statusBayar }}
+                                </option>
                             @endforeach
                         </select>
                     </div>

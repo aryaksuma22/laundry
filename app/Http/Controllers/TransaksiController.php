@@ -217,7 +217,7 @@ class TransaksiController extends Controller
 
         Transaksi::create($validatedData);
 
-        return redirect()->route('transaksi.index')
+        return redirect()->route('transaksis.index')
             ->with('success', 'Transaksi berhasil ditambahkan.');
     }
 
@@ -229,7 +229,7 @@ class TransaksiController extends Controller
     {
         $transaksi->load('pemesanan.layananUtama'); // Load relasi yang mungkin dibutuhkan
         // Pastikan view 'transaksi.show' sudah dibuat
-        return view('transaksi.show', compact('transaksi'));
+        return view('transaksis.show', compact('transaksi'));
     }
 
     /**
@@ -290,7 +290,7 @@ class TransaksiController extends Controller
 
         $transaksi->update($validatedData);
 
-        return redirect()->route('transaksi.index')
+        return redirect()->route('transaksis.index')
             ->with('success', 'Transaksi (No Invoice: ' . $transaksi->no_invoice . ') berhasil diperbarui.');
     }
 
@@ -305,13 +305,13 @@ class TransaksiController extends Controller
             if ($request->ajax()) {
                 return response()->json(['success' => true, 'message' => $deletedCount . ' Transaksi berhasil dihapus.']);
             }
-            return redirect()->route('transaksi.index')->with('success', $deletedCount . ' Transaksi berhasil dihapus.');
+            return redirect()->route('transaksis.index')->with('success', $deletedCount . ' Transaksi berhasil dihapus.');
         }
         $errorMessage = 'Tidak ada transaksi yang dipilih atau format ID salah.';
         if ($request->ajax()) {
             return response()->json(['success' => false, 'message' => $errorMessage], 400);
         }
-        return redirect()->route('transaksi.index')->with('error', $errorMessage);
+        return redirect()->route('transaksis.index')->with('error', $errorMessage);
     }
 
     /**
