@@ -26,7 +26,7 @@
             </div>
 
             <div class="w-[70%] flex-1 flex flex-col overflow-y-auto">
-                <div class="w-full p-6 md:p-10">
+                <div class="w-full min- flex-col justify-center items-center p-6 md:p-10 flex">
                     {{ $slot }}
                 </div>
             </div>

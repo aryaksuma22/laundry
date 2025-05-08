@@ -27,7 +27,7 @@
 
         {{-- Form Start --}}
         <form method="POST" action="{{ route('guest.order.store') }}"
-            class="space-y-5 bg-white p-6 sm:p-8 rounded-lg shadow-xl">
+            class="space-y-5 bg-white p-6 sm:p-8 rounded-lg shadow-xl border">
             @csrf
 
             {{-- Section 1: Informasi Pelanggan --}}
