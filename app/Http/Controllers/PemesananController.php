@@ -3,18 +3,112 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pemesanan;
-use App\Models\Layanan; // Pastikan model Layanan ada dan benar
+use App\Models\Layanan;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator; // Tambahkan ini untuk validasi kondisional
+use Illuminate\Support\Facades\Validator;
 
 class PemesananController extends Controller
 {
+
     /**
-     * Display a listing of the orders for ADMIN.
+     * Update only the status of an order (inline edit via AJAX).
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
      */
+    public function updateStatus(Request $request, $id)
+    {
+        $pemesanan = Pemesanan::findOrFail($id);
+
+        // Definisikan status yang diizinkan. Anda bisa mengambil ini dari konstanta atau config jika lebih baik.
+        $allowedStatuses = ['Baru', 'Menunggu Dijemput', 'Menunggu Diantar', 'Dijemput', 'Diproses', 'Siap Diantar', 'Siap Diambil', 'Selesai', 'Dibatalkan'];
+
+        $validator = Validator::make($request->all(), [
+            'status_pesanan' => ['required', 'string', Rule::in($allowedStatuses)],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first('status_pesanan') // Berikan pesan error spesifik
+            ], 422); // HTTP 422 Unprocessable Entity untuk error validasi
+        }
+
+        $newStatus = $request->input('status_pesanan');
+        $oldStatus = $pemesanan->status_pesanan; // Simpan status lama jika perlu
+
+        $pemesanan->status_pesanan = $newStatus;
+
+        // Logika untuk otomatis set tanggal_selesai
+        // Jika status baru adalah salah satu dari status akhir DAN tanggal_selesai belum diisi
+        if (
+            in_array($newStatus, ['Selesai', 'Diambil', 'Sudah Diantar']) && // Sesuaikan status akhir Anda
+            is_null($pemesanan->tanggal_selesai)
+        ) {
+            $pemesanan->tanggal_selesai = now();
+        } elseif (
+            // Jika status diubah dari 'Selesai' ke status lain, dan Anda ingin tanggal_selesai di-null-kan lagi
+            // Ini opsional, tergantung kebutuhan bisnis Anda
+            !in_array($newStatus, ['Selesai', 'Diambil', 'Sudah Diantar']) &&
+            in_array($oldStatus, ['Selesai', 'Diambil', 'Sudah Diantar']) &&
+            !is_null($pemesanan->tanggal_selesai) // Pastikan ada tanggal selesai sebelumnya
+        ) {
+            // $pemesanan->tanggal_selesai = null; // Uncomment jika ingin reset tanggal selesai
+        }
+
+
+        try {
+            $pemesanan->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status pesanan berhasil diperbarui.',
+                'new_status' => $pemesanan->status_pesanan,
+                // Kirim juga kelas badge baru menggunakan accessor dari model
+                'status_badge_class' => $pemesanan->status_badge_class,
+                // Kirim tanggal selesai yang diformat jika ada perubahan
+                'tanggal_selesai_formatted' => $pemesanan->tanggal_selesai ? $pemesanan->tanggal_selesai->isoFormat('DD MMM YYYY, HH:mm') : null,
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Gagal update status pesanan #{$id}: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan internal saat memperbarui status.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get data for quick view modal via AJAX.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showQuickView($id)
+    {
+        try {
+            // Eager load relasi yang dibutuhkan untuk quick view
+            $pemesanan = Pemesanan::with(['layananUtama', 'transaksi'])->findOrFail($id);
+
+            // Render partial view untuk konten modal
+            $html = view('pemesanan.partials.quick-view-modal-content', compact('pemesanan'))->render();
+
+            return response()->json(['success' => true, 'html' => $html]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::warning("Quick view gagal: Pemesanan #{$id} tidak ditemukan.");
+            return response()->json(['success' => false, 'message' => 'Data pemesanan tidak ditemukan.'], 404);
+        } catch (\Exception $e) {
+            Log::error("Error saat generate quick view untuk pemesanan #{$id}: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal memuat detail pemesanan.'], 500);
+        }
+    }
+
+
+
     public function index(Request $request)
     {
         // --- Existing Pagination/Sort/Search Params ---

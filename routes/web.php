@@ -74,6 +74,8 @@ Route::delete('/penjualan_obats/single/{id}', [PenjualanObatController::class, '
 Route::resource('pemesanan', PemesananController::class)->middleware(['auth', 'verified']);
 Route::delete('/pemesanan/mass-delete', [PemesananController::class, 'destroy'])->name('pemesanan.massDestroy');
 Route::delete('/pemesanan/single/{id}', [PemesananController::class, 'destroySingle'])->name('pemesanan.destroySingle');
+Route::patch('/pemesanan/{id}/status', [PemesananController::class, 'updateStatus'])->name('pemesanan.updateStatus');
+Route::get('/pemesanan/{id}/quick-view', [PemesananController::class, 'showQuickView'])->name('pemesanan.quickView');
 
 
 Route::resource('layanans', layananController::class)->middleware(['auth', 'verified']);

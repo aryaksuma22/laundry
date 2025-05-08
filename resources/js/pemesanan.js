@@ -2,30 +2,42 @@
  * pemesanan.js
  *
  * Handles dynamic interactions for the Admin Pemesanan (Orders) index page.
- * Features: AJAX table loading, sorting, pagination, search-as-you-type (debounced),
- * filtering, selection, single/bulk delete, and back/forward navigation support.
+ * Features: AJAX table loading, sorting, pagination, search, filtering,
+ * selection, single/bulk delete, inline status update, and Quick View Modal.
  */
 
 // --- Global State Variables ---
 let sortBy = 'tanggal_pesan';    // Default sort column
 let sortOrder = 'desc';           // Default sort direction
 let perPage = 10;                 // Default items per page
-let baseUrl = '';                 // Base URL for the pemesanan index route (determined on init)
+let baseUrl = '';                 // Base URL for the pemesanan index route
 let debounceTimer;                // Timer ID for debouncing search input
 const DEBOUNCE_DELAY = 400;       // Delay in milliseconds for search debounce
 
-// --- Initialization Functions ---
+// --- Flowbite Modal Instance ---
+let quickViewModalInstance = null; // Holds the initialized Flowbite Modal object
 
 /**
- * Initializes the state (sortBy, sortOrder, perPage, search, filters)
- * based on URL query parameters and updates corresponding UI elements.
+ * Initializes essential page elements, states, and the Quick View Modal.
+ * This function should be called on document ready and potentially on AJAX content reloads
+ * if the modal structure or its trigger buttons are part of the reloaded content.
  */
-function initPemesanans() {
-    // Determine the base URL (e.g., /pemesanan) from the current window location
-    baseUrl = window.location.pathname.replace(/\/$/, "");
-    console.log('Pemesanan Initialized. Base URL set to:', baseUrl);
+function initializePemesananPage() {
+    console.log('Initializing Pemesanan Page...');
 
-    // Read parameters from the current URL's query string
+    // 1. Determine Base URL
+    // Prioritize a globally set URL from Blade, then try to infer, then fallback.
+    if (window.PEMESANAN_BASE_URL) {
+        baseUrl = window.PEMESANAN_BASE_URL;
+    } else if (window.location.pathname.includes('/pemesanan')) {
+        baseUrl = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/pemesanan') + '/pemesanan'.length).replace(/\/index$/, '').replace(/\/$/, "");
+    } else {
+        baseUrl = '/pemesanan'; // Default fallback
+        console.warn("PEMESANAN_BASE_URL not found or path inference failed. Using default:", baseUrl);
+    }
+    console.log('Base URL set to:', baseUrl);
+
+    // 2. Initialize UI states from URL parameters (Sort, Filter, PerPage, Search)
     const queryParams = new URLSearchParams(window.location.search);
     sortBy = queryParams.get('sortBy') || 'tanggal_pesan';
     sortOrder = queryParams.get('sortOrder') || 'desc';
@@ -36,11 +48,8 @@ function initPemesanans() {
     const filterStatus = queryParams.get('filter_status') || '';
     const filterStatusBayar = queryParams.get('filter_status_bayar') || '';
 
-    // Update hidden input values used to store state (ensure IDs match HTML)
     $('#sort-byPemesanan').val(sortBy);
     $('#sort-order').val(sortOrder);
-
-    // Update visible UI elements to match the current state
     $('#perPagePemesanan').val(perPage);
     $('#search').val(currentSearch);
     $('#filter_metode').val(filterMetode);
@@ -48,24 +57,77 @@ function initPemesanans() {
     $('#filter_status').val(filterStatus);
     $('#filter_status_bayar').val(filterStatusBayar);
 
-    // Update the "Sort By" button text
-    const initialSortByText = $('#sortByPopupPemesanan .sort-optionPemesanan[data-sortby="' + sortBy + '"]').text();
-    $('#sortByButtonPemesananText').text('Sort By: ' + (initialSortByText || 'Tgl Pesan')); // Default text
+    const initialSortByTextEl = $('#sortByPopupPemesanan .sort-optionPemesanan[data-sortby="' + sortBy + '"]');
+    const initialSortByText = initialSortByTextEl.length ? initialSortByTextEl.text() : 'Tgl Pesan';
+    $('#sortByButtonPemesananText').text('Sort By: ' + initialSortByText);
+    $('#toggleSortOrderPemesanan svg').toggleClass('rotate-180', sortOrder === 'desc'); // Corrected: rotate if desc
 
-    // Update the Sort Order button's icon rotation
-    $('#toggleSortOrderPemesanan svg').toggleClass('rotate-180', sortOrder !== 'asc');
+    // 3. Initialize Flowbite Quick View Modal
+    const modalElement = document.getElementById('quickViewModal');
+    if (modalElement) {
+        if (typeof Modal !== 'undefined') { // Check if Flowbite's Modal class is available
+            const modalOptions = {
+                placement: 'center-center', // Optional: customize as needed
+                backdrop: 'static', // Matches your data-modal-backdrop="static"
+                closable: true, // Essential for data-modal-hide and ESC to work
+                // onHide: () => { console.log('Quick view modal is hidden.'); },
+                // onShow: () => { console.log('Quick view modal is shown.'); }
+            };
+            quickViewModalInstance = new Modal(modalElement, modalOptions);
+            console.log('Flowbite Quick View Modal instance initialized.');
+        } else {
+            console.error("Flowbite 'Modal' class not found. Ensure Flowbite is installed via NPM, imported in your main JS (e.g., app.js), and Vite is bundling correctly.");
+        }
+    } else {
+        console.warn("#quickViewModal element not found in the DOM. Cannot initialize modal.");
+    }
+    $('body').data('pemesanan-initialized', true); // Mark as initialized
 }
-
-// --- Core AJAX and URL Functions ---
 
 /**
  * Updates the browser's URL query string using history.pushState.
- * This reflects the current table state (search, sort, filters, page)
- * and allows for back/forward navigation without full page reloads.
- * @param {number} page - The current page number being displayed.
  */
 function updateUrl(page) {
-    const query = new URLSearchParams({
+    if (!baseUrl) {
+        console.warn("Cannot update URL: baseUrl is not set.");
+        return;
+    }
+    const queryParams = new URLSearchParams({
+        search: $('#search').val() || '',
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        perPage: perPage,
+        page: page || 1, // Ensure page is always set
+        filter_metode: $('#filter_metode').val() || '',
+        filter_layanan: $('#filter_layanan').val() || '',
+        filter_status: $('#filter_status').val() || '',
+        filter_status_bayar: $('#filter_status_bayar').val() || ''
+    });
+
+    const pathOnlyBaseUrl = baseUrl.split('?')[0];
+    // Ensure there's a slash before the query string if pathOnlyBaseUrl is not just "/"
+    const queryString = queryParams.toString();
+    let newUrl = pathOnlyBaseUrl;
+    if (pathOnlyBaseUrl !== '/' && !pathOnlyBaseUrl.endsWith('/')) {
+        newUrl += '/';
+    }
+    newUrl += `?${queryString}`;
+
+    window.history.pushState({ path: newUrl }, '', newUrl);
+}
+
+
+/**
+ * Fetches pemesanan data from the server via an AJAX GET request.
+ */
+function fetchPemesanans(page = 1) {
+    if (!baseUrl) {
+        console.error("Base URL is not set. Cannot fetch Pemesanan data.");
+        $('#pemesananTableContainer').html('<div class="text-center p-5 text-red-500">Kesalahan: URL dasar tidak diatur.</div>');
+        return;
+    }
+
+    const requestData = {
         search: $('#search').val() || '',
         sortBy: sortBy,
         sortOrder: sortOrder,
@@ -75,399 +137,428 @@ function updateUrl(page) {
         filter_layanan: $('#filter_layanan').val() || '',
         filter_status: $('#filter_status').val() || '',
         filter_status_bayar: $('#filter_status_bayar').val() || ''
-    }).toString();
-    const newUrl = baseUrl + '?' + query;
-
-    // Use pushState to add a new entry to the browser's history
-    window.history.pushState({ path: newUrl }, '', newUrl);
-    // console.log('URL updated to:', newUrl); // Optional: for debugging
-}
-
-/**
- * Fetches pemesanan data from the server via an AJAX GET request.
- * Sends current state (search, sort, filters, pagination) as query parameters.
- * Updates the '#pemesananTableContainer' with the returned HTML table partial.
- * @param {number} [page=1] - The page number to fetch.
- */
-function fetchPemesanans(page = 1) {
-    const searchVal = $('#search').val() || '';
-    const filterMetodeVal = $('#filter_metode').val() || '';
-    const filterLayananVal = $('#filter_layanan').val() || '';
-    const filterStatusVal = $('#filter_status').val() || '';
-    const filterStatusBayarVal = $('#filter_status_bayar').val() || '';
-
-    // Log the parameters being sent for debugging
-    console.log(`Fetching page: ${page} | Sort: ${sortBy} ${sortOrder} | PerPage: ${perPage} | Search: ${searchVal} | F_Metode: ${filterMetodeVal} | F_Layanan: ${filterLayananVal} | F_Status: ${filterStatusVal} | F_StatusBayar: ${filterStatusBayarVal} | URL: ${baseUrl}`);
-
-    // Data object for the AJAX request
-    const requestData = {
-        search: searchVal,
-        sortBy: sortBy,
-        sortOrder: sortOrder,
-        perPage: perPage,
-        page: page,
-        filter_metode: filterMetodeVal,
-        filter_layanan: filterLayananVal,
-        filter_status: filterStatusVal,
-        filter_status_bayar: filterStatusBayarVal
     };
-
-    // Ensure the base URL has been set
-    if (!baseUrl) {
-        console.error("Base URL is not set. Cannot fetch data.");
-        $('#pemesananTableContainer').html('<div class="text-center p-5 text-red-500">Kesalahan: URL dasar tidak diatur.</div>');
-        return;
-    }
-
     const container = $('#pemesananTableContainer');
 
+    console.log(`Fetching Pemesanan Data: URL='${baseUrl}', Params=`, requestData);
+
+
     $.ajax({
-        url: baseUrl, // Target the base route (e.g., /pemesanan)
+        url: baseUrl, // Controller index method handles these params
         type: 'GET',
-        dataType: 'json', // Expect a JSON response from the controller
-        data: requestData, // Send state as query parameters
+        dataType: 'json', // Expect JSON response containing HTML
+        data: requestData,
         beforeSend: function () {
-            // Display a loading indicator (ensure only one overlay exists)
-            if ($('#loadingOverlayPemesanan').length > 0) return;
-            container.css({ 'position': 'relative', 'min-height': '250px' });
-            const loadingHtml = `
-                <div id="loadingOverlayPemesanan" class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-20 rounded-lg" aria-label="Loading...">
-                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </div>`;
-            container.append(loadingHtml);
-            // console.log('Loading overlay shown.'); // Optional debug
+            if ($('#loadingOverlayPemesanan').length === 0) { // Add overlay only if not present
+                container.css({ 'position': 'relative', 'min-height': '250px' }); // Ensure container can hold overlay
+                const loadingHtml = `
+                    <div id="loadingOverlayPemesanan" class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-20 rounded-lg">
+                        <svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>`;
+                container.append(loadingHtml);
+            }
         },
         success: function (response) {
-            $('#loadingOverlayPemesanan').remove(); // Remove loader
+            $('#loadingOverlayPemesanan').remove();
             if (response && response.html) {
-                container.html(response.html); // Update table content
-                // Update the URL unless this fetch was triggered by popstate
-                const isPopState = typeof event !== 'undefined' && event instanceof PopStateEvent;
+                container.html(response.html);
+                // Check if the call was from popstate to avoid double history update
+                const isPopState = typeof event !== 'undefined' && event instanceof PopStateEvent && event.target === window;
                 if (!isPopState) {
                     updateUrl(page);
                 }
-                console.log('Table updated successfully.');
             } else {
-                // Handle cases where response is invalid or missing HTML
                 container.html('<div class="text-center p-5 text-red-500">Gagal memuat data atau format respon salah.</div>');
-                console.error("Invalid response structure:", response);
+                console.error("Invalid response structure for Pemesanan:", response);
             }
         },
         error: function (xhr, status, error) {
-            $('#loadingOverlayPemesanan').remove(); // Remove loader
-            // Display user-friendly error message
-            container.html('<div class="text-center p-5 text-red-500">Terjadi kesalahan saat memuat data. Silakan coba lagi.</div>');
-            console.error("Error fetching Pemesanan data:", status, error, xhr.responseText);
+            $('#loadingOverlayPemesanan').remove();
+            container.html('<div class="text-center p-5 text-red-500">Terjadi kesalahan saat memuat data. Silakan coba lagi. Detail: ' + xhr.status + ' ' + error + '</div>');
+            console.error("Error fetching Pemesanan data:", xhr, status, error);
         }
     });
 }
 
-// --- Page Load and Initialization ---
+// --- Page Load ---
+$(document).ready(function () {
+    // Initialize only if on the relevant page and not already initialized
+    if ($('#pemesananTableContainer').length > 0 && !$('body').data('pemesanan-initialized')) {
+        initializePemesananPage();
+    }
+});
 
-// Handles DIRECT page load (e.g., browser refresh or typing URL)
-if (window.location.pathname.includes('/pemesanan') && typeof $ !== 'undefined') {
-    $(document).ready(function () {
-        // Use a flag specific to direct load to prevent double init if script runs twice
-        if (!$('body').data('pemesanan-initialized-direct')) {
-            console.log('Direct page load initialization.');
-            initPemesanans(); // Initialize state from URL
-            // NOTE: No initial fetch here assuming the Blade view includes the first table render
-            $('body').data('pemesanan-initialized-direct', true); // Mark as initialized
-        }
-    });
-}
-
-// Handles content loading via AJAX (e.g., sidebar navigation triggering an event)
-// Ensure the event name "pemesanans:init" matches what your sidebar script triggers.
-$(document).on("pemesanans:init", function (event) {
+// --- Event Listener for Dynamic Content (if you use such a mechanism) ---
+// This is if you have a custom event like 'pemesanans:init' that fires after
+// a part of the page (like the main content area) is loaded via AJAX by another script.
+$(document).on("pemesanans:init", function () {
     console.log('Event pemesanans:init received.');
-    initPemesanans(); // Always initialize UI state from URL when loaded via AJAX
-    // Fetch data to ensure the table content matches the current (potentially new) URL state
-    fetchPemesanans(new URLSearchParams(window.location.search).get('page') || 1);
-    // Reset the direct load flag in case user navigates away and back via AJAX
-    $('body').data('pemesanan-initialized-direct', false);
+    if ($('#pemesananTableContainer').length > 0) {
+        initializePemesananPage(); // Re-initialize, including modal
+        const queryParams = new URLSearchParams(window.location.search);
+        fetchPemesanans(queryParams.get('page') || 1); // Fetch initial data if needed
+    }
 });
 
 // --- Event Listeners for UI Interactions ---
 
-// Search Input: Trigger fetch on typing (debounced)
+// Search Input (Debounced)
 $(document).on('input', '#search', function () {
-    clearTimeout(debounceTimer); // Clear previous timeout
-    const currentSearchValue = $(this).val(); // Get value now
-    debounceTimer = setTimeout(() => {
-        console.log('Debounced search triggered for:', currentSearchValue);
-        fetchPemesanans(1); // Fetch page 1 with the new search term
-    }, DEBOUNCE_DELAY);
+    if (!$('#pemesananTableContainer').length) return;
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => { fetchPemesanans(1); }, DEBOUNCE_DELAY);
 });
-
-// Search Input: Prevent Enter key from causing form submission
-$(document).on('keydown', '#search', function (e) {
-    if (e.keyCode === 13) { // 13 = Enter key code
-        console.log('Enter key pressed in search, preventing default.');
-        e.preventDefault(); // Stop default browser action for Enter
-    }
-});
-
-// Sorting: Toggle Ascending/Descending Order Button
-$(document).on('click', '#toggleSortOrderPemesanan', function () {
-    sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'; // Toggle state
-    $('#sort-order').val(sortOrder); // Update hidden input (optional)
-    $(this).find('svg').toggleClass('rotate-180'); // Toggle icon
-    console.log('Sort order toggled to:', sortOrder);
-    fetchPemesanans(1); // Refetch page 1 with new sort order
-});
-
-// Sorting: Select Sort By Field from Dropdown Menu
-$(document).on('click', '#sortByPopupPemesanan .sort-optionPemesanan', function (e) {
+$(document).on('submit', '#searchFormPemesanan', function (e) { // Prevent form submission if it's a form
     e.preventDefault();
-    const newSortBy = $(this).data('sortby');
-    if (newSortBy && newSortBy !== sortBy) { // If value changed
-        sortBy = newSortBy; // Update state
-        $('#sort-byPemesanan').val(sortBy); // Update hidden input (optional)
-        $('#sortByButtonPemesananText').text('Sort By: ' + $(this).text()); // Update button text
-        console.log('Sort by changed to:', sortBy);
-        fetchPemesanans(1); // Refetch page 1 with new sort field
-    }
-    $('#sortByPopupPemesanan').addClass('hidden'); // Close the dropdown
 });
 
-// Sorting: Show/Hide Sort By Dropdown
+
+// Sorting Dropdown Toggle
 $(document).on('click', '#sortByButtonPemesanan', function (e) {
-    e.stopPropagation(); // Prevent click from immediately closing dropdown via document listener
+    e.stopPropagation(); // Prevent click from closing the dropdown immediately
     $('#sortByPopupPemesanan').toggleClass('hidden');
 });
 
-// Sorting: Close Sort By Dropdown when clicking outside of it
-$(document).on('click', function (e) {
-    const sortByPopup = $('#sortByPopupPemesanan');
-    const sortByButton = $('#sortByButtonPemesanan');
-    // If the popup is visible and the click target is not the popup or the button
-    if (!sortByPopup.hasClass('hidden') && !sortByButton.is(e.target) && sortByPopup.has(e.target).length === 0) {
-        sortByPopup.addClass('hidden');
+// Sort By Option Click
+$(document).on('click', '.sort-optionPemesanan', function (e) {
+    e.preventDefault();
+    const newSortBy = $(this).data('sortby');
+    if (newSortBy && newSortBy !== sortBy) {
+        sortBy = newSortBy;
+        $('#sortByButtonPemesananText').text('Sort By: ' + $(this).text());
+        $('#sort-byPemesanan').val(sortBy); // Update hidden input if you use it
+        fetchPemesanans(1);
     }
+    $('#sortByPopupPemesanan').addClass('hidden'); // Hide dropdown
 });
 
-// Filtering: Handle changes on any filter dropdown
-$(document).on('change', '#filter_metode, #filter_layanan, #filter_status, #filter_status_bayar', function () {
-    const filterType = $(this).attr('id'); // e.g., 'filter_metode'
-    const filterValue = $(this).val();
-    console.log(`Filter changed - ${filterType}: ${filterValue}`);
-    fetchPemesanans(1); // Refetch data from page 1 applying the new filter(s)
-});
-
-// **** NEW: Reset Filter Button ****
-$(document).on('click', '#resetFiltersButton', function () {
-    console.log('Reset filters button clicked.');
-    // Clear the dropdowns
-    $('#filter_metode').val('');
-    $('#filter_layanan').val('');
-    $('#filter_status').val('');
-    $('#filter_status_bayar').val('');
-    // Refetch data with cleared filters (will pick up current sort/search)
+// Sort Order Toggle
+$(document).on('click', '#toggleSortOrderPemesanan', function () {
+    sortOrder = (sortOrder === 'asc') ? 'desc' : 'asc';
+    $('#sort-order').val(sortOrder); // Update hidden input if you use it
+    $(this).find('svg').toggleClass('rotate-180');
     fetchPemesanans(1);
 });
 
-// Pagination: Change Items Per Page Dropdown
-$(document).on('change', '#perPagePemesanan', function () {
-    perPage = $(this).val(); // Update state
-    console.log('Per page changed to:', perPage);
-    fetchPemesanans(1); // Refetch page 1 with new item count
+// Hide Sort Dropdown on clicking outside
+$(document).on('click', function (e) {
+    const $sortByButton = $('#sortByButtonPemesanan');
+    const $sortByPopup = $('#sortByPopupPemesanan');
+    if (!$sortByButton.is(e.target) && $sortByButton.has(e.target).length === 0 &&
+        !$sortByPopup.is(e.target) && $sortByPopup.has(e.target).length === 0) {
+        $sortByPopup.addClass('hidden');
+    }
 });
 
-// Pagination: Handle Clicks on Page Number/Arrow Links
-$(document).on('click', '#pemesananTableContainer nav[role="navigation"] a', function (e) {
-    e.preventDefault(); // Prevent default link navigation
+
+// Filters Change
+$(document).on('change', '#filter_metode, #filter_layanan, #filter_status, #filter_status_bayar', function () {
+    fetchPemesanans(1);
+});
+
+// Reset Filters Button
+$(document).on('click', '#resetFiltersButton', function () {
+    $('#filter_metode, #filter_layanan, #filter_status, #filter_status_bayar').val(''); // Clear dropdowns
+    $('#search').val(''); // Optionally clear search as well
+    fetchPemesanans(1); // Fetch with default filters
+});
+
+// Per Page Change
+$(document).on('change', '#perPagePemesanan', function () {
+    perPage = $(this).val();
+    fetchPemesanans(1);
+});
+
+// Pagination Links Click (delegated to the container for dynamically loaded links)
+$(document).on('click', '#pemesananTableContainer .pagination a', function (e) {
+    e.preventDefault();
     const href = $(this).attr('href');
-
-    // Basic validation for the link (ignore if no href, disabled, or current page)
-    if (!href || href === '#' || $(this).parent().hasClass('disabled') || $(this).hasClass('disabled') || $(this).hasClass('cursor-not-allowed') || $(this).parent().hasClass('active')) {
-        console.log('Pagination click ignored (invalid/disabled/active).');
-        return;
+    if (!href || href === '#' || $(this).parent().hasClass('disabled') || $(this).parent().hasClass('active')) {
+        return; // Do nothing for invalid, disabled, or active links
     }
-
-    console.log('Pagination link clicked:', href);
     try {
-        const url = new URL(href); // Parse the link URL
-        const page = url.searchParams.get('page'); // Extract the target page number
-        if (page && !isNaN(page)) { // If page is valid
-            fetchPemesanans(page); // Fetch the specific page
+        const url = new URL(href);
+        const page = url.searchParams.get('page');
+        if (page && !isNaN(page)) {
+            fetchPemesanans(page);
         } else {
-            console.warn('Could not extract valid page number from pagination link:', href);
+            console.warn('Pagination link does not have a valid page parameter:', href);
         }
     } catch (error) {
         console.error("Error processing pagination URL:", href, error);
     }
 });
 
-// --- Row Selection Logic ---
-
-// Checkbox: Select/Deselect All Rows in the header
+// Checkbox All/Row Selection
 $(document).on('change', '#checkbox-all', function () {
     const isChecked = $(this).prop('checked');
-    // Target checkboxes only within the specific table container
-    $('#pemesananTableContainer .checkbox-row')
-        .prop('checked', isChecked)
-        .closest('tr').toggleClass('bg-indigo-50', isChecked); // Add/remove highlight class
-    console.log('Checkbox all toggled:', isChecked);
+    $('#pemesananTableContainer .checkbox-row').prop('checked', isChecked)
+        .closest('tr').toggleClass('bg-indigo-50', isChecked);
 });
-
-// Checkbox: Select/Deselect a Single Row
 $(document).on('change', '#pemesananTableContainer .checkbox-row', function () {
-    const $this = $(this);
-    $this.closest('tr').toggleClass('bg-indigo-50', $this.prop('checked')); // Toggle highlight for this row
-
-    // Update the header checkbox state based on whether all rows are now checked
+    $(this).closest('tr').toggleClass('bg-indigo-50', $(this).prop('checked'));
     const totalCheckboxes = $('#pemesananTableContainer .checkbox-row').length;
     const checkedCheckboxes = $('#pemesananTableContainer .checkbox-row:checked').length;
     $('#checkbox-all').prop('checked', totalCheckboxes > 0 && totalCheckboxes === checkedCheckboxes);
 });
 
-// --- Delete Actions ---
-
-// Delete: Single Row Button Click
-$(document).on('click', '.delete-pemesanan', function (e) {
+// --- Quick View Modal ---
+$(document).on('click', '.quick-view-btn', function (e) {
     e.preventDefault();
-    const $button = $(this);
-    let idPemesanan = $button.data('id'); // Get ID from data-id attribute
-    let row = $button.closest('tr'); // Get the table row to remove later
-    const csrfToken = $('meta[name="csrf-token"]').attr('content'); // Get CSRF token
+    const pemesananId = $(this).data('id');
+    const $modalContent = $('#quickViewModalContent');
 
-    // Basic input validation
-    if (!idPemesanan) { /* Handle missing ID */ return; }
-    if (!csrfToken) { /* Handle missing CSRF */ return; }
+    if (!pemesananId) {
+        Swal.fire('Error', 'ID Pesanan tidak ditemukan.', 'error');
+        return;
+    }
+    if (!baseUrl) {
+        Swal.fire('Error', 'Base URL tidak terkonfigurasi.', 'error');
+        return;
+    }
+    if (!quickViewModalInstance) {
+        Swal.fire('Error', 'Komponen modal tidak siap. Coba segarkan halaman.', 'error');
+        console.error("QuickViewModalInstance is not initialized!");
+        return;
+    }
 
-    // Confirmation dialog using SweetAlert2
-    Swal.fire({
-        title: 'Apakah Anda yakin?',
-        text: `Hapus pemesanan (ID: ${idPemesanan})? Data tidak dapat dikembalikan!`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33', // Red confirm button
-        cancelButtonColor: '#6b7280', // Gray cancel button
-        confirmButtonText: '<i class="fas fa-trash-alt mr-1"></i> Ya, Hapus!', // FontAwesome icon example
-        cancelButtonText: 'Batal',
-        reverseButtons: true // Puts confirm button on the right
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Proceed with deletion if confirmed
-            const deleteUrl = baseUrl + '/single/' + idPemesanan; // Construct specific delete route URL
-            console.log("Attempting single delete:", deleteUrl);
+    // 1. Show loading spinner in modal content area
+    $modalContent.html(
+        `<div class="text-center py-10">
+            <svg class="animate-spin h-8 w-8 text-gray-500 dark:text-gray-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Memuat detail...</p>
+        </div>`
+    );
 
-            $.ajax({
-                url: deleteUrl,
-                type: 'DELETE', // Use DELETE HTTP method
-                headers: { 'X-CSRF-TOKEN': csrfToken }, // Send CSRF token in headers
-                dataType: 'json', // Expect JSON response
-                success: function (response) {
-                    if (response && response.success) {
-                        // Remove row from table with fade effect
-                        row.fadeOut(400, function () { $(this).remove(); });
-                        // Show success notification
-                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: response.message || 'Pemesanan berhasil dihapus.', timer: 1500, showConfirmButton: false, timerProgressBar: true });
-                        // Optional: Refresh if table becomes empty
-                        if ($('#pemesananTableContainer tbody tr').not(':has(td[colspan])').length <= 1) {
-                            fetchPemesanans(1); // Or fetch the current page
-                        }
-                    } else {
-                        // Show failure message from server or generic error
-                        Swal.fire('Gagal', response.message || 'Gagal menghapus pemesanan.', 'error');
-                    }
-                },
-                error: function (xhr, status, error) {
-                    // Handle AJAX errors (network, server error, etc.)
-                    let errorMsg = 'Terjadi kesalahan saat menghapus.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) errorMsg = xhr.responseJSON.message;
-                    else if (xhr.status === 404) errorMsg = 'Data pemesanan tidak ditemukan (404).';
-                    else if (xhr.status === 403) errorMsg = 'Anda tidak diizinkan melakukan aksi ini (403).';
-                    Swal.fire('Error', errorMsg, 'error');
-                    console.error("Single delete error:", status, error, xhr.responseText);
-                }
-            });
+    // 2. Show the modal using the Flowbite instance
+    quickViewModalInstance.show();
+
+    // 3. Fetch modal content via AJAX
+    const ajaxUrl = `${baseUrl.replace(/\/$/, "")}/${pemesananId}/quick-view`;
+    $.ajax({
+        url: ajaxUrl,
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            if (response.success && response.html) {
+                $modalContent.html(response.html);
+                // Flowbite should handle the data-modal-hide attributes on buttons
+                // inside the newly loaded HTML because the parent modal instance is already active.
+            } else {
+                $modalContent.html(`<div class="p-6 text-center text-red-500">${response.message || 'Gagal memuat detail.'}</div>`);
+            }
+        },
+        error: function (xhr) {
+            $modalContent.html(`<div class="p-6 text-center text-red-500">Error: ${xhr.status}. Gagal memuat detail.</div>`);
+            console.error("Quick view AJAX error:", xhr.responseText);
+            // Optionally, hide modal on error:
+            // if (quickViewModalInstance.isVisible()) {
+            //     quickViewModalInstance.hide();
+            // }
         }
     });
 });
 
-// Delete: Bulk Action Button Click
-$(document).on('click', '#bulkDeleteButton', function (e) {
-    e.preventDefault();
-    // Get array of IDs from checked checkboxes within the table container
-    let selectedIds = $('#pemesananTableContainer .checkbox-row:checked').map(function () {
-        return $(this).val();
-    }).get();
 
+// --- Inline Status Update Handler ---
+$(document).on('change', '.status-dropdown', function () {
+    const $select = $(this);
+    const pemesananId = $select.data('id');
+    const newStatus = $select.val();
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+    const $spinner = $select.closest('td').find('.status-spinner-' + pemesananId); // Ensure spinner exists with this class
+
+    // Store original value if not already stored, for reverting on error
+    if (typeof $select.data('original-value') === 'undefined') {
+        $select.data('original-value', $select.find('option[selected]').val() || $select.find('option:first').val());
+    }
+    const originalStatus = $select.data('original-value');
+
+    // Store old badge classes for reverting on error
+    let oldClassesArray = [];
+    const currentClasses = $select.attr('class') || "";
+    currentClasses.split(' ').forEach(function (cls) {
+        if (cls.startsWith('bg-') || cls.startsWith('text-')) { oldClassesArray.push(cls); }
+    });
+    const oldBadgeClasses = oldClassesArray.join(' ');
+
+
+    if (!pemesananId || typeof newStatus === 'undefined' || !csrfToken || !baseUrl) {
+        Swal.fire('Error', 'Data tidak lengkap untuk update status.', 'error');
+        return;
+    }
+
+    $spinner.removeClass('hidden');
+    $select.prop('disabled', true);
+
+    $.ajax({
+        url: `${baseUrl.replace(/\/$/, "")}/${pemesananId}/status`,
+        type: 'PATCH',
+        headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+        data: { status_pesanan: newStatus },
+        dataType: 'json',
+        success: function (response) {
+            if (response.success) {
+                Swal.fire({ toast: true, icon: 'success', title: response.message || 'Status diperbarui!', position: 'top-end', showConfirmButton: false, timer: 2500, timerProgressBar: true });
+
+                // Update badge class
+                if (oldBadgeClasses) $select.removeClass(oldBadgeClasses);
+                if (response.status_badge_class) $select.addClass(response.status_badge_class);
+
+                $select.data('original-value', newStatus); // Update original value to current
+            } else {
+                Swal.fire('Gagal', response.message || 'Gagal memperbarui status.', 'error');
+                $select.val(originalStatus); // Revert to original status
+                // Revert badge class
+                if (response.status_badge_class) $select.removeClass(response.status_badge_class); // Remove newly added (failed) class
+                if (oldBadgeClasses) $select.addClass(oldBadgeClasses); // Add back original classes
+            }
+        },
+        error: function (xhr) {
+            let errorMsg = 'Terjadi kesalahan server.';
+            if (xhr.responseJSON && xhr.responseJSON.message) { errorMsg = xhr.responseJSON.message; }
+            else if (xhr.statusText) { errorMsg = xhr.statusText; }
+            Swal.fire('Error ' + xhr.status, errorMsg, 'error');
+            $select.val(originalStatus); // Revert to original status
+
+            // Revert badge classes more carefully on AJAX error
+            const currentSelectClassesOnError = $select.attr('class') || "";
+            let newAppliedClassesOnError = [];
+            currentSelectClassesOnError.split(' ').forEach(cls => {
+                if (cls.startsWith('bg-') || cls.startsWith('text-')) newAppliedClassesOnError.push(cls);
+            });
+            if (newAppliedClassesOnError.length > 0) $select.removeClass(newAppliedClassesOnError.join(' '));
+            if (oldBadgeClasses) $select.addClass(oldBadgeClasses);
+
+            console.error("Inline status update error:", xhr.responseText);
+        },
+        complete: function () {
+            $spinner.addClass('hidden');
+            $select.prop('disabled', false);
+        }
+    });
+});
+
+
+// --- Delete Actions (Single and Bulk) ---
+// Single Delete
+$(document).on('click', '.delete-pemesanan', function (e) {
+    e.preventDefault();
+    const $button = $(this);
+    const idPemesanan = $button.data('id');
     const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
-    // Validations
-    if (selectedIds.length === 0) {
-        Swal.fire('Perhatian', 'Pilih setidaknya satu pemesanan untuk dihapus.', 'warning');
-        return;
-    }
-    if (!csrfToken) {
-        Swal.fire('Error', 'Kesalahan keamanan (CSRF). Refresh halaman.', 'error');
+    if (!idPemesanan || !csrfToken || !baseUrl) {
+        Swal.fire('Error', 'Data tidak lengkap untuk menghapus.', 'error');
         return;
     }
 
-    const bulkDeleteUrl = baseUrl + '/mass-delete'; // URL for the bulk delete route
-
-    // Confirmation Dialog
     Swal.fire({
         title: 'Apakah Anda yakin?',
-        text: `Anda akan menghapus ${selectedIds.length} pemesanan yang dipilih secara permanen!`,
+        text: `Hapus pemesanan (ID: ${idPemesanan})? Tindakan ini tidak dapat dibatalkan.`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#6b7280',
-        confirmButtonText: '<i class="fas fa-trash-alt mr-1"></i> Ya, Hapus!',
-        cancelButtonText: 'Batal',
-        reverseButtons: true
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Data to be sent in the request body
-            const requestData = {
-                _token: csrfToken,
-                _method: 'DELETE', // Method spoofing for Laravel DELETE route via POST
-                ids: selectedIds   // Array of selected IDs
-            };
-            console.log("Attempting bulk delete:", bulkDeleteUrl, "Data:", requestData);
-
             $.ajax({
-                url: bulkDeleteUrl,
-                type: 'POST', // Use POST because HTML forms don't natively support DELETE
-                data: requestData, // Send data in the request body
+                url: `${baseUrl.replace(/\/$/, "")}/single/${idPemesanan}`,
+                type: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
                 dataType: 'json',
                 success: function (response) {
-                    if (response && response.success) {
-                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: response.message || `${selectedIds.length} Pemesanan berhasil dihapus.`, timer: 2000, showConfirmButton: false, timerProgressBar: true });
-                        fetchPemesanans(1); // Refresh table, go back to page 1
-                        $('#checkbox-all').prop('checked', false); // Uncheck the header checkbox
+                    if (response.success) {
+                        $button.closest('tr').fadeOut(400, function () { $(this).remove(); });
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: response.message, timer: 1500, showConfirmButton: false });
+                        // Optionally, refresh table if it becomes empty
+                        if ($('#pemesananTableContainer tbody tr').not(':has(td[colspan])').length === 0) {
+                            fetchPemesanans(1);
+                        }
                     } else {
-                        Swal.fire('Gagal', response.message || 'Gagal menghapus pemesanan.', 'error');
+                        Swal.fire('Gagal', response.message || 'Gagal menghapus pesanan.', 'error');
                     }
                 },
-                error: function (xhr, status, error) {
-                    // Handle AJAX errors
-                    let errorMsg = 'Terjadi kesalahan saat menghapus.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) errorMsg = xhr.responseJSON.message;
-                    else if (xhr.status === 403) errorMsg = 'Anda tidak diizinkan melakukan aksi ini (403).';
-                    Swal.fire('Error', errorMsg, 'error');
-                    console.error("Bulk delete error:", status, error, xhr.responseText);
+                error: function (xhr) {
+                    Swal.fire('Error', `Terjadi kesalahan: ${xhr.status} ${xhr.statusText}`, 'error');
+                    console.error("Single delete error:", xhr.responseText);
                 }
             });
         }
     });
 });
 
-// --- Browser History Navigation (Back/Forward Buttons) ---
+// Bulk Delete
+$(document).on('click', '#bulkDeleteButton', function (e) {
+    e.preventDefault();
+    const selectedIds = $('#pemesananTableContainer .checkbox-row:checked').map(function () { return $(this).val(); }).get();
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
-// Listen for the 'popstate' event, which fires when the active history entry changes
+    if (selectedIds.length === 0) {
+        Swal.fire('Perhatian', 'Pilih setidaknya satu item untuk dihapus.', 'warning');
+        return;
+    }
+    if (!csrfToken || !baseUrl) {
+        Swal.fire('Error', 'Konfigurasi tidak lengkap untuk penghapusan massal.', 'error');
+        return;
+    }
+
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: `Hapus ${selectedIds.length} item terpilih? Tindakan ini tidak dapat dibatalkan.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Hapus Semua!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `${baseUrl.replace(/\/$/, "")}/mass-delete`,
+                type: 'POST', // Laravel uses POST for mass delete with _method spoofing
+                data: {
+                    _token: csrfToken,
+                    _method: 'DELETE', // Method spoofing
+                    ids: selectedIds
+                },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: response.message, timer: 2000, showConfirmButton: false });
+                        fetchPemesanans(1); // Refresh table data
+                        $('#checkbox-all').prop('checked', false); // Uncheck master checkbox
+                    } else {
+                        Swal.fire('Gagal', response.message || 'Gagal menghapus item terpilih.', 'error');
+                    }
+                },
+                error: function (xhr) {
+                    Swal.fire('Error', `Terjadi kesalahan: ${xhr.status} ${xhr.statusText}`, 'error');
+                    console.error("Bulk delete error:", xhr.responseText);
+                }
+            });
+        }
+    });
+});
+
+
+// Browser History Navigation (Back/Forward Buttons)
 window.addEventListener('popstate', function (event) {
-    console.log('Popstate event triggered. Current URL:', window.location.href, 'State:', event.state);
-    // The URL has changed due to back/forward navigation.
-    // Re-initialize the UI state based on the new URL parameters.
-    initPemesanans();
-    // Fetch the data corresponding to the state in the new URL.
-    fetchPemesanans(new URLSearchParams(window.location.search).get('page') || 1);
+    // Check if we are on a page that uses this script and was initialized
+    if ($('#pemesananTableContainer').length > 0 && $('body').data('pemesanan-initialized')) {
+        console.log('Popstate event triggered for Pemesanan. Current URL:', window.location.href);
+        // Re-initialize states from URL and fetch data.
+        // The initializePemesananPage function will read params from the new URL.
+        initializePemesananPage();
+        const queryParams = new URLSearchParams(window.location.search);
+        fetchPemesanans(queryParams.get('page') || 1);
+    }
 });
