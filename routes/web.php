@@ -3,17 +3,18 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ObatController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\LayananController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PemesananController;
+use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\SatuanObatController;
 use App\Http\Controllers\KategoriObatController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\PembelianObatController;
 use App\Http\Controllers\PenjualanObatController;
-use App\Http\Controllers\PemesananController;
-use App\Http\Controllers\LayananController;
-use App\Http\Controllers\RiwayatController;
-use App\Http\Controllers\TransaksiController;
-use App\Http\Controllers\DashboardController;
 
 
 
@@ -88,10 +89,11 @@ Route::delete('/transaksis/single/{id}', [TransaksiController::class, 'destroySi
 
 Route::resource('riwayat', RiwayatController::class)->middleware(['auth', 'verified']);
 
-// Route untuk Settings
-Route::get('/settings', function () {
-    return view('settings');
-})->middleware(['auth', 'verified'])->name('settings');
+
+
+// TAMBAHKAN ROUTE BARU UNTUK SETTINGS DI SINI:
+Route::get('/settings', [SettingController::class, 'index'])->middleware(['auth', 'verified'])->name('settings.index');
+Route::put('/settings', [SettingController::class, 'update'])->middleware(['auth', 'verified'])->name('settings.update');
 
 // Profile Routes
 Route::middleware('auth')->group(function () {

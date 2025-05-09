@@ -4,36 +4,50 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pemesanan;
-// use App\Models\Layanan; // Tidak perlu di-use jika hanya diakses via relasi
+use Carbon\Carbon; // Import Carbon
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // 1) Pesanan per Tahun
-        //    Gunakan 'tanggal_pesan' atau 'created_at'
-        $rawYearly = Pemesanan::selectRaw('YEAR(tanggal_pesan) as year, COUNT(*) as total') // GANTI: tanggal -> tanggal_pesan
-            ->groupBy('year')
-            ->orderBy('year')
-            ->pluck('total', 'year')
-            ->toArray();
-        $yearLabels   = array_keys($rawYearly);
-        $yearlyOrders = array_values($rawYearly);
+        // 1) Keuntungan per Minggu (Senin - Minggu, minggu ini)
+        $startOfWeek = now()->startOfWeek(Carbon::MONDAY); // Senin minggu ini
+        $endOfWeek   = now()->endOfWeek(Carbon::SUNDAY);   // Minggu minggu ini
 
-        // 2) Pendapatan per Bulan
-        //    Gunakan 'tanggal_pesan' atau 'created_at'
-        $rawRevenue = Pemesanan::selectRaw('MONTH(tanggal_pesan) as m, SUM(total_harga) as total') // GANTI: tanggal -> tanggal_pesan
+        // Ambil data keuntungan per hari dalam rentang minggu ini
+        // DAYOFWEEK() MySQL: 1=Minggu, 2=Senin, ..., 7=Sabtu
+        // Kita ingin Senin (index 0) s/d Minggu (index 6)
+        $rawWeeklyProfit = Pemesanan::selectRaw('DAYOFWEEK(tanggal_pesan) as day_of_week_mysql, SUM(total_harga) as total_profit')
+            ->whereBetween('tanggal_pesan', [$startOfWeek, $endOfWeek])
+            // Opsional: Filter status pesanan yang sudah selesai/dibayar jika perlu
+            // ->whereIn('status_pesanan', ['Selesai', 'Diambil', 'Sudah Diantar'])
+            ->groupBy('day_of_week_mysql')
+            ->pluck('total_profit', 'day_of_week_mysql')
+            ->toArray();
+
+        $weeklyProfitLabels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+        $weeklyProfitData = array_fill(0, 7, 0); // Inisialisasi 7 hari dengan 0
+
+        // Mapping dari DAYOFWEEK() MySQL ke array kita (0=Sen, ..., 6=Min)
+        foreach ($rawWeeklyProfit as $dayMysql => $profit) {
+            if ($dayMysql == 1) { // Minggu (MySQL)
+                $weeklyProfitData[6] = (float) $profit; // Index 6 untuk Minggu
+            } else { // Senin-Sabtu (MySQL: 2-7)
+                $weeklyProfitData[$dayMysql - 2] = (float) $profit; // Index 0-5 untuk Senin-Sabtu
+            }
+        }
+
+        // 2) Pendapatan per Bulan (Tahunan)
+        $rawRevenue = Pemesanan::selectRaw('MONTH(tanggal_pesan) as m, SUM(total_harga) as total')
+            ->whereYear('tanggal_pesan', now()->year) // Filter untuk tahun ini saja
             // Filter status pesanan yang sudah selesai/dibayar jika perlu?
             // ->whereIn('status_pesanan', ['Selesai', 'Diambil', 'Sudah Diantar'])
             ->groupBy('m')
             ->pluck('total', 'm')
             ->toArray();
-        // Pastikan keys adalah 1-12, bukan 0-11 jika MONTH() mengembalikan 1-12
-        $revenueData = array_replace(array_fill(1, 12, 0), $rawRevenue); // Mulai dari key 1
-        // Ubah keys kembali ke 0-11 jika JS mengharapkannya (meskipun array_values di bawah lebih aman)
-        // $revenueData = array_values($revenueData); // Ini akan menghasilkan array 0-11
+        $revenueData = array_replace(array_fill(1, 12, 0), $rawRevenue);
 
-        // 3) Status Pemesanan (Ini sepertinya sudah OK)
+        // 3) Status Pemesanan
         $rawStatus = Pemesanan::selectRaw('status_pesanan, COUNT(*) as total')
             ->groupBy('status_pesanan')
             ->pluck('total', 'status_pesanan')
@@ -42,33 +56,36 @@ class DashboardController extends Controller
         $statusData   = array_values($rawStatus);
 
         // 4) Top 5 Layanan
-        $topRaw = Pemesanan::selectRaw('layanan_utama_id, COUNT(*) as total') // GANTI: layanan_id -> layanan_utama_id
-            ->groupBy('layanan_utama_id') // GANTI: layanan_id -> layanan_utama_id
+        $topRaw = Pemesanan::selectRaw('layanan_utama_id, COUNT(*) as total')
+            ->groupBy('layanan_utama_id')
             ->orderByDesc('total')
-            ->with('layananUtama') // GANTI: layanan -> layananUtama
+            ->with('layananUtama')
             ->limit(5)
             ->get();
-        // GANTI: layanan.nama_layanan -> layananUtama.nama_layanan
         $topServicesLabels = $topRaw->pluck('layananUtama.nama_layanan')->toArray();
         $topServicesData   = $topRaw->pluck('total')->toArray();
 
-        // Data yang dikirim ke view (struktur harus sesuai dengan ekspektasi JS)
         $dashboardData = [
-            'yearLabels' => $yearLabels,
-            'yearlyOrders' => $yearlyOrders,
-            // Kirim array values agar index selalu 0-11 untuk JS
-            'revenue' => array_values($revenueData),
+            // Data untuk Keuntungan Mingguan
+            'weeklyProfitLabels' => $weeklyProfitLabels,
+            'weeklyProfitData' => $weeklyProfitData,
+
+            // Data untuk Pendapatan Bulanan
+            'revenue' => array_values($revenueData), // array_values agar index 0-11 untuk JS
+
+            // Data untuk Status Pemesanan
             'status' => [
                 'labels' => $statusLabels,
                 'data' => $statusData,
             ],
+
+            // Data untuk Top 5 Layanan
             'topServices' => [
                 'labels' => $topServicesLabels,
                 'data' => $topServicesData,
             ]
         ];
 
-        // Kirim $dashboardData ke view
         return view('dashboard', compact('dashboardData'));
     }
 }
