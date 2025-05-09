@@ -316,7 +316,24 @@ class PemesananController extends Controller
     public function showGuestOrderForm()
     {
         $layanans = Layanan::orderBy('nama_layanan', 'asc')->get(['id', 'nama_layanan', 'harga']);
-        return view('guest.order_form', compact('layanans'));
+
+        // Definisikan biaya tambahan di sini agar bisa di-pass ke view
+        // Ini bisa juga diambil dari database atau config jika lebih dinamis
+        $biayaTambahan = [
+            'kecepatan' => [
+                'Reguler' => 0,
+                'Express' => 10000, // Contoh biaya
+                'Kilat' => 20000,   // Contoh biaya
+            ],
+            'metode' => [
+                'Datang Langsung' => 0,
+                'Antar Jemput' => 5000,                 // Contoh biaya
+                'Antar Sendiri Minta Diantar' => 3000,  // Contoh biaya
+                'Minta Dijemput Ambil Sendiri' => 3000, // Contoh biaya
+            ]
+        ];
+
+        return view('guest.order_form', compact('layanans', 'biayaTambahan'));
     }
 
     public function storeGuestOrder(Request $request)
